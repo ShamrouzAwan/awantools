@@ -1,6 +1,10 @@
 <?php
 defined('AWAN') or die('Direct access denied.');
 
+require_once __DIR__ . '/../../_bootstrap.php';
+require_once __DIR__ . '/../../plugins/_sdk.php';
+require_once AWAN_ROOT . '/_core/Plugin.php';
+
 require_once __DIR__ . '/engine/Color.php';
 require_once __DIR__ . '/engine/Text.php';
 require_once __DIR__ . '/engine/Icons.php';
