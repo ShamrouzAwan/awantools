@@ -1,0 +1,21 @@
+<?php
+// ─── AWAN Local Configuration ─────────────────────────────────────────────────
+// Copy this file to config.local.php for local development or staging.
+// config.local.php is git-ignored and never deployed to production.
+// On shared hosting, configure via environment variables in your hosting panel instead.
+//
+// USAGE: Uncomment and set the values you need.
+
+// Environment: 'development' enables debug mode and detailed errors.
+// define('AWAN_ENV_LOCAL', 'development');
+
+// Application key — used for CSRF and session security. Generate a random string.
+// define('APP_KEY_LOCAL', 'your-random-secret-key-here-' . bin2hex(random_bytes(16)));
+
+// Database (MySQL) — only needed if using MySQL instead of SQLite.
+// define('DB_DRIVER_LOCAL', 'mysql');
+// define('DB_HOST_LOCAL',   '127.0.0.1');
+// define('DB_PORT_LOCAL',   '3306');
+// define('DB_NAME_LOCAL',   'awan_db');
+// define('DB_USER_LOCAL',   'root');
+// define('DB_PASS_LOCAL',   'your_password');
