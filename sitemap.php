@@ -16,8 +16,9 @@ $priHome    = $settings->get('sitemap_priority_home', '1.0');
 $priPages   = $settings->get('sitemap_priority_pages', '0.8');
 $incUsers   = $settings->get('sitemap_include_users', '0') === '1';
 
-$pages = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
-$users = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
+$pages   = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
+$users   = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
+$plugins = $db->fetchAll("SELECT slug, installed_at FROM plugins WHERE status='active' ORDER BY slug ASC");
 
 $base = $siteUrl ?: 'http://localhost';
 
@@ -41,6 +42,17 @@ foreach ($pages as $page) {
     $lastmod = $lastmod ? date('Y-m-d', strtotime($lastmod)) : date('Y-m-d');
     echo "  <url>\n";
     echo "    <loc>" . htmlspecialchars($base . '/' . $page['slug'], ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>" . $lastmod . "</lastmod>\n";
+    echo "    <changefreq>" . e($changeFreq) . "</changefreq>\n";
+    echo "    <priority>" . e($priPages) . "</priority>\n";
+    echo "  </url>\n";
+}
+
+// Active plugin pages
+foreach ($plugins as $plugin) {
+    $lastmod = $plugin['installed_at'] ? date('Y-m-d', strtotime($plugin['installed_at'])) : date('Y-m-d');
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($base . '/plugins/' . $plugin['slug'] . '/', ENT_XML1) . "</loc>\n";
     echo "    <lastmod>" . $lastmod . "</lastmod>\n";
     echo "    <changefreq>" . e($changeFreq) . "</changefreq>\n";
     echo "    <priority>" . e($priPages) . "</priority>\n";
