@@ -925,7 +925,6 @@ var ET = (function () {
         switchTool('b64enc');
         renderQbRows();
         initImgEnc();
-        var _t = new URLSearchParams(location.search).get('tool'); if (_t) switchTool(_t);
     });
 
     /* ── Public API ──────────────────────────────────────────────────── */

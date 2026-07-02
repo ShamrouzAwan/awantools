@@ -16,12 +16,9 @@ $priHome    = $settings->get('sitemap_priority_home', '1.0');
 $priPages   = $settings->get('sitemap_priority_pages', '0.8');
 $incUsers   = $settings->get('sitemap_include_users', '0') === '1';
 
-$pages      = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
-$users      = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
-$plugins    = $db->fetchAll("SELECT slug, installed_at FROM plugins WHERE status='active' ORDER BY slug ASC");
-$toolRegistry = (file_exists(__DIR__ . '/_data/plugin_tools.php'))
-    ? require __DIR__ . '/_data/plugin_tools.php'
-    : [];
+$pages   = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
+$users   = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
+$plugins = $db->fetchAll("SELECT slug, installed_at FROM plugins WHERE status='active' ORDER BY slug ASC");
 
 $base = $siteUrl ?: 'http://localhost';
 
@@ -51,9 +48,10 @@ foreach ($pages as $page) {
     echo "  </url>\n";
 }
 
-// Active plugin pages + individual tool pages
+// Active plugin pages + tag/keyword discovery URLs from plugin.json
 foreach ($plugins as $plugin) {
     $lastmod = $plugin['installed_at'] ? date('Y-m-d', strtotime($plugin['installed_at'])) : date('Y-m-d');
+
     // Plugin index page
     echo "  <url>\n";
     echo "    <loc>" . htmlspecialchars($base . '/plugins/' . $plugin['slug'] . '/', ENT_XML1) . "</loc>\n";
@@ -61,16 +59,33 @@ foreach ($plugins as $plugin) {
     echo "    <changefreq>" . e($changeFreq) . "</changefreq>\n";
     echo "    <priority>" . e($priPages) . "</priority>\n";
     echo "  </url>\n";
-    // Individual tool pages for plugins that have a tool registry
-    if (!empty($toolRegistry[$plugin['slug']])) {
-        foreach ($toolRegistry[$plugin['slug']] as $tool) {
-            echo "  <url>\n";
-            echo "    <loc>" . htmlspecialchars($base . '/plugins/' . $plugin['slug'] . '/?tool=' . rawurlencode($tool[0]), ENT_XML1) . "</loc>\n";
-            echo "    <lastmod>" . $lastmod . "</lastmod>\n";
-            echo "    <changefreq>" . e($changeFreq) . "</changefreq>\n";
-            echo "    <priority>0.7</priority>\n";
-            echo "  </url>\n";
-        }
+
+    // Read plugin.json to get tags and keywords
+    $manifestPath = __DIR__ . '/plugins/' . $plugin['slug'] . '/plugin.json';
+    if (!file_exists($manifestPath)) continue;
+
+    $manifest = json_decode(file_get_contents($manifestPath), true);
+    if (!is_array($manifest)) continue;
+
+    // Collect tags (URL-slug formatted, e.g. "base64-encoder") and
+    // keywords (raw terms, e.g. "base64") — deduplicated, sorted
+    $tags     = array_filter((array)($manifest['tags']     ?? []), 'is_string');
+    $keywords = array_filter((array)($manifest['keywords'] ?? []), 'is_string');
+
+    // Normalise keywords into URL slugs (lowercase, spaces → hyphens)
+    $kwSlugs = array_map(fn($k) => strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($k))), $keywords);
+
+    // Merge, deduplicate, drop empties, sort
+    $allTerms = array_values(array_unique(array_filter(array_merge($tags, $kwSlugs))));
+    sort($allTerms);
+
+    foreach ($allTerms as $term) {
+        echo "  <url>\n";
+        echo "    <loc>" . htmlspecialchars($base . '/plugins/' . $plugin['slug'] . '/?t=' . rawurlencode($term), ENT_XML1) . "</loc>\n";
+        echo "    <lastmod>" . $lastmod . "</lastmod>\n";
+        echo "    <changefreq>" . e($changeFreq) . "</changefreq>\n";
+        echo "    <priority>0.6</priority>\n";
+        echo "  </url>\n";
     }
 }
 
