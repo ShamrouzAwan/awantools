@@ -1,0 +1,63 @@
+.front-content {
+    padding: 20px 50px;
+}
+
+@media (max-width: 640px) {
+    .front-content {
+        padding: 20px !important;
+        ;
+    }
+}
+
+.card-body>a>div>svg {
+    padding: 5px;
+}
+
+.header-hero {
+    background: linear-gradient(135deg, rgba(79, 70, 229, .07) 0%, rgba(99, 102, 241, .03) 100%);
+    border: 1px solid rgba(99, 102, 241, .2);
+    border-radius: var(--radius-medium, 10px);
+    padding: 22px 26px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-hero-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.header-hero-title svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.header-hero-subtitle {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.header-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.header-hstat {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, .75);
+    border: 1px solid rgba(99, 102, 241, .3);
+    border-radius: 999px;
+    padding: 3px 11px;
+}
