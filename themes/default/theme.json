@@ -1,0 +1,109 @@
+{
+  "slug": "default",
+  "name": "AWAN Default",
+  "version": "1.0",
+  "author": "AWAN Platform",
+  "description": "Professional AWAN blue theme with light and dark mode support",
+  "screenshot": "screenshot.png",
+
+  "variables": {
+    "color-background": "#f1f5f9",
+    "color-surface": "#ffffff",
+    "color-card": "#ffffff",
+
+    "color-sidebar": "#061F52",
+    "color-sidebar-surface": "#0B1E46",
+    "color-sidebar-text": "#A8B6D3",
+    "color-sidebar-text-active": "#ffffff",
+    "color-sidebar-active-bg": "#10337D",
+
+    "color-primary": "#0F6BFF",
+    "color-primary-hover": "#0052E0",
+    "color-primary-light": "#EAF3FF",
+
+    "color-success": "#10b981",
+    "color-success-light": "#d1fae5",
+
+    "color-danger": "#ef4444",
+    "color-danger-light": "#fee2e2",
+
+    "color-warning": "#f59e0b",
+    "color-warning-light": "#fef3c7",
+
+    "color-info": "#0F6BFF",
+    "color-info-light": "#EAF3FF",
+
+    "color-text": "#0f172a",
+    "color-text-secondary": "#64748b",
+    "color-text-muted": "#94a3b8",
+
+    "color-border": "#e2e8f0",
+    "color-border-strong": "#cbd5e1",
+
+    "radius-small": "4px",
+    "radius-medium": "8px",
+    "radius-large": "12px",
+    "radius-full": "9999px",
+
+    "shadow-small": "0 1px 3px rgba(0,0,0,0.08)",
+    "shadow-medium": "0 4px 12px rgba(0,0,0,0.08)",
+    "shadow-large": "0 8px 24px rgba(0,0,0,0.1)",
+
+    "sidebar-width": "240px",
+    "header-height": "56px",
+
+    "font-family": "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif",
+
+    "font-size-base": "14px",
+    "font-size-sm": "12px",
+    "font-size-lg": "16px",
+    "font-size-xl": "20px",
+    "font-size-2xl": "24px",
+
+    "font-weight-normal": "400",
+    "font-weight-medium": "500",
+    "font-weight-semibold": "600",
+    "font-weight-bold": "700",
+
+    "line-height-base": "1.5"
+  },
+
+  "dark": {
+    "color-background": "#050B18",
+    "color-surface": "#0B1328",
+    "color-card": "#101A34",
+
+    "color-sidebar": "#030814",
+    "color-sidebar-surface": "#061226",
+    "color-sidebar-text": "#7F93B8",
+    "color-sidebar-text-active": "#FFFFFF",
+    "color-sidebar-active-bg": "#10337D",
+
+    "color-primary": "#3D8BFF",
+    "color-primary-hover": "#0F6BFF",
+    "color-primary-light": "#0B1E46",
+
+    "color-success": "#34d399",
+    "color-success-light": "#064e3b",
+
+    "color-danger": "#f87171",
+    "color-danger-light": "#7f1d1d",
+
+    "color-warning": "#fbbf24",
+    "color-warning-light": "#78350f",
+
+    "color-info": "#60A5FA",
+    "color-info-light": "#0B1E46",
+
+    "color-text": "#F8FAFC",
+    "color-text-secondary": "#B6C2D9",
+    "color-text-muted": "#6B7C99",
+
+    "color-border": "#172554",
+    "color-border-strong": "#1E3A8A",
+
+    "shadow-small": "0 1px 3px rgba(0,0,0,0.4)",
+    "shadow-medium": "0 4px 12px rgba(0,0,0,0.4)",
+    "shadow-large": "0 8px 24px rgba(0,0,0,0.5)"
+  }
+}
