@@ -32,7 +32,7 @@ function pt_github_repo_dark(array $p): string
     $w1  = $w - 1;
     $h1  = $h - 1;
     $head_x = $pad + 70;
-    $head_y = $pad + 24;
+    $head_y = $pad + 38;  // was +24; raised to vertically center with icon (icon cy = pad+32)
     $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*11 + 20;
     $line_y = $h - $pad - 70;
     $line_x2 = $w - $pad;
@@ -74,7 +74,7 @@ function pt_github_repo_light(array $p): string
     $fe   = PT_Text::e($p['footer'] ?: $p['username']);
     $tag  = PT_Text::e($p['tag']);
     $head_x = $pad + 70;
-    $head_y = $pad + 24;
+    $head_y = $pad + 38;  // was +24; raised to vertically center with icon (icon cy = pad+32)
     $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*11 + 20;
     $line_y = $h - $pad - 70;
     $line_x2 = $w - $pad;

@@ -20,7 +20,7 @@ function pt_og_github_dark(array $p): string
     $hl  = PT_Text::wrap($p['heading'], $w - $pad*2 - 40, 68, 0.52, 2);
     $dl  = PT_Text::wrap($p['description'], $w - $pad*2, 28, 0.52, 3);
     $icx = $pad + 36; $icy = $pad + 36;
-    $hy  = $icy + 60;
+    $hy  = $icy + 78;  // was +60; pushed down to clear icon (radius ~22 + cap-height gap)
     $hlh = 82;
     $dy  = $hy + count($hl)*$hlh + 18;
     $dlh = 38;
@@ -57,7 +57,7 @@ function pt_og_github_light(array $p): string
     $hl   = PT_Text::wrap($p['heading'], $w - $pad*2, 68, 0.52, 2);
     $dl   = PT_Text::wrap($p['description'], $w - $pad*2, 28, 0.52, 3);
     $icx  = $pad + 36; $icy = $pad + 36;
-    $hy   = $icy + 60; $hlh = 82;
+    $hy   = $icy + 78; $hlh = 82;  // was +60; pushed down to clear icon (matches github_dark)
     $dy   = $hy + count($hl)*$hlh + 16; $dlh = 38;
     $dots = PT_Renderer::dots(8, 6, $w-260, 20, 28, $ac, 0.12, 2.2);
     $icon = PT_Icons::icon_block($p['icon'], $icx, $icy, 36, $p['accent_color'], $p['accent_color'], 22);
@@ -96,7 +96,7 @@ function pt_og_glassmorphism(array $p): string
     $dl     = PT_Text::wrap($p['description'], $w - $pad*4, 26, 0.52, 3);
     $icx    = $w/2; $icy = $pad + 52;
     $hlh    = 74; $dlh = 36;
-    $text_y = $icy + 68;
+    $text_y = $icy + 84;  // was +68; pushed down to clear icon (radius ~28 + cap-height gap)
     $hy     = $text_y;
     $dy     = $hy + count($hl)*$hlh + 16;
     $fy     = $h - $pad - 10;
@@ -185,7 +185,7 @@ function pt_og_minimal(array $p): string
     $cx     = $w/2;
     $hlh    = 76; $dlh = 36;
     $icx    = $cx; $icy = $pad + 55;
-    $hy     = $icy + 68;
+    $hy     = $icy + 84;  // was +68; pushed down to clear icon (radius ~26 + cap-height gap)
     $dy     = $hy + count($hl)*$hlh + 16;
     $icon   = PT_Icons::icon_block($p['icon'], $icx, $icy, 44, $p['accent_color'], $p['accent_color'], 26);
     $hs     = PT_Text::tspans_center($hl, $cx, $hlh);

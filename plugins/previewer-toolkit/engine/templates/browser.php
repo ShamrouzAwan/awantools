@@ -161,13 +161,13 @@ function pt_br_content(array $p, int $w, int $content_h, int $offset, string $fo
     $hl     = PT_Text::wrap($p['heading'], $w - 160, 44, 0.52, 2);
     $dl     = PT_Text::wrap($p['description'], $w - 200, 20, 0.52, 3);
     $hlh    = 56; $dlh = 28;
-    $hy     = $offset + (int)($content_h * 0.36);
+    $nav_h  = 44;
+    $icx    = $cx; $icy = $offset + $nav_h + 44; // icon below nav bar (was % of content_h, caused overlap)
+    $icon   = PT_Icons::icon_block($p['icon'], $icx, $icy, 36, $p['accent_color'], $p['accent_color'], 24);
+    $hy     = $icy + 48;                          // heading anchored below icon
     $dy     = $hy + count($hl)*$hlh + 14;
     $hs     = PT_Text::tspans_center($hl, $cx, $hlh);
     $ds     = PT_Text::tspans_center($dl, $cx, $dlh);
-    $icx    = $cx; $icy = $offset + (int)($content_h * 0.18);
-    $icon   = PT_Icons::icon_block($p['icon'], $icx, $icy, 36, $p['accent_color'], $p['accent_color'], 24);
-    $nav_h  = 44;
     $nav_bg = PT_Color::h(PT_Color::darken($p['bg_color'], 0.04));
     $nav_bd = PT_Color::h(PT_Color::darken($p['bg_color'], 0.08));
     $nav_sep_y = $offset + $nav_h;

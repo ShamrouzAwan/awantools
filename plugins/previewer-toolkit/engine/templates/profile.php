@@ -82,7 +82,7 @@ function pt_profile_modern(array $p): string
   <circle cx="$cx" cy="$av_cy" r="$av_r" fill="$bg"/>
   $icon_svg
   <text x="$cx" y="$name_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="28" font-weight="700" fill="#111827">$name_e</text>
-  <text x="$cx" y="$role_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="$bg" font-weight="600">$role_e</text>
+  <text x="$cx" y="$role_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="$ac" font-weight="600">$role_e</text>
   <text x="$cx" y="$desc_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="#6b7280">$ds</text>
   <text x="$cx" y="$footer_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="12" fill="#9ca3af">$fe</text>
 </g></svg>
