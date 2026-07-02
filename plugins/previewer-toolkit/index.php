@@ -112,7 +112,7 @@ $cats_json = json_encode($cats, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
 
 ob_start(); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-<link rel="stylesheet" href="/plugins/preview/assets/builder.css">
+<link rel="stylesheet" href="./assets/builder.css">
 
 <div class="pt-app" id="ptApp">
 
@@ -441,7 +441,7 @@ ob_start(); ?>
 var PT_BASE_URL = <?= json_encode($base_url) ?>;
 var PT_CATS = <?= $cats_json ?>;
 </script>
-<script src="/plugins/preview/assets/builder.js"></script>
+<script src="./assets/builder.js"></script>
 
 <?php
 $content = ob_get_clean();

@@ -1,21 +1,22 @@
 /* ── Previewer Toolkit Builder CSS ───────────────────────────────────────── */
+/* All tokens delegate to platform CSS variables for theme compatibility.    */
 :root {
-  --pt-bg:        #0d0f17;
-  --pt-surface:   #111827;
-  --pt-surface2:  #1a2235;
-  --pt-surface3:  #1f2d44;
-  --pt-border:    #1e2d40;
-  --pt-border2:   #2a3a54;
-  --pt-text:      #e2e8f0;
-  --pt-muted:     #64748b;
-  --pt-muted2:    #94a3b8;
-  --pt-accent:    #4f46e5;
-  --pt-accent2:   #6366f1;
-  --pt-green:     #10b981;
-  --pt-radius:    10px;
-  --pt-radius-sm: 6px;
-  --pt-radius-lg: 16px;
-  --pt-shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --pt-bg:        var(--color-background, #f1f5f9);
+  --pt-surface:   var(--color-surface, #ffffff);
+  --pt-surface2:  var(--color-background, #f1f5f9);
+  --pt-surface3:  var(--color-background, #f1f5f9);
+  --pt-border:    var(--color-border, #e2e8f0);
+  --pt-border2:   var(--color-border, #e2e8f0);
+  --pt-text:      var(--color-text, #0f172a);
+  --pt-muted:     var(--color-text-muted, #94a3b8);
+  --pt-muted2:    var(--color-text-secondary, #64748b);
+  --pt-accent:    var(--color-primary-hover, #4f46e5);
+  --pt-accent2:   var(--color-primary, #6366f1);
+  --pt-green:     var(--color-success, #10b981);
+  --pt-radius:    var(--radius-medium, 8px);
+  --pt-radius-sm: var(--radius-small, 4px);
+  --pt-radius-lg: var(--radius-medium, 12px);
+  --pt-shadow:    0 4px 24px rgba(0,0,0,0.12);
 }
 
 .pt-app {
