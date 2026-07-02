@@ -1,1 +1,1 @@
-- [Workflow rules](workflow-rules.md) — shared hosting deploy: always report changed files, never touch schema without approval, minimal surgical edits only
+- [Workflow rules](workflow-rules.md) — shared hosting deploy: report changed files, no schema changes without approval, minimal edits, prefer existing data sources over new files
