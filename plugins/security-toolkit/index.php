@@ -1380,6 +1380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ST.switchTool('md5');
     ST.runPwGen();
     ST.runTokenGen();
+    var t = new URLSearchParams(location.search).get('tool'); if (t) ST.switchTool(t);
 });
 </script>
 <?php

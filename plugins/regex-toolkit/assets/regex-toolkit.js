@@ -861,3 +861,9 @@ var RT = (function () {
         runNamedGroups: runNamedGroups
     };
 })();
+
+/* Deep-link: ?tool=<id> activates that tool on page load */
+document.addEventListener('DOMContentLoaded', function() {
+    var t = new URLSearchParams(location.search).get('tool');
+    if (t) RT.switchTool(t);
+});

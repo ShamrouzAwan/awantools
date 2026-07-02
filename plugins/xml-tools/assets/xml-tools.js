@@ -670,7 +670,8 @@ function XT_toggle(id) {
     if (preview) preview.style.display = isHidden ? 'none' : '';
 }
 
-/* Auto-activate first tool on load */
+/* Auto-activate first tool on load; honour ?tool= deep-link */
 document.addEventListener('DOMContentLoaded', function () {
     XT.switchTool('formatter');
+    var t = new URLSearchParams(location.search).get('tool'); if (t) XT.switchTool(t);
 });
