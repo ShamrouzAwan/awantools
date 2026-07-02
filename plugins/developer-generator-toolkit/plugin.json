@@ -1,0 +1,37 @@
+{
+    "name": "Developer Generator Toolkit",
+    "slug": "dev-generator-toolkit",
+    "version": "1.0.0",
+    "description": "100+ developer generators in one place — UUIDs, passwords, fake data, lorem ipsum, SQL, JSON, CSV, XML, HTML, CSS, JS snippets, regex, slugs, colors, boilerplate code, and config files. All 100% client-side.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/dev-generator-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 100,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M9 9h6M9 12h6M9 15h4'/><circle cx='18' cy='18' r='3' fill='currentColor' stroke='none'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Generators", "Utilities"],
+    "keywords": [
+        "uuid", "generator", "password", "fake", "lorem ipsum", "sql", "json", "csv", "xml",
+        "html", "css", "javascript", "regex", "slug", "color", "boilerplate", "config",
+        "nanoid", "ulid", "guid", "random", "developer", "tools", "online", "free"
+    ],
+    "tags": [
+        "uuid-generator", "password-generator", "fake-data", "lorem-ipsum",
+        "sql-generator", "json-generator", "csv-generator", "xml-generator",
+        "html-generator", "css-generator", "js-generator", "regex-generator",
+        "slug-generator", "color-generator", "boilerplate", "config-generator",
+        "developer-tools", "online-tool", "free-tool", "client-side-tool"
+    ],
+    "meta": {
+        "title": "Developer Generator Toolkit — 100+ Free Online Generators",
+        "description": "Generate UUIDs, passwords, fake data, lorem ipsum, SQL, JSON, CSV, HTML, CSS, JavaScript snippets, regex patterns, slugs, colors, and boilerplate code. 100% free, client-side, no sign-up.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/dev-generator-toolkit/"
+    }
+}

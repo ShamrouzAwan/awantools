@@ -1,0 +1,38 @@
+{
+    "name": "Time Toolkit",
+    "slug": "time-toolkit",
+    "version": "1.0.0",
+    "description": "Professional Date & Time Workbench — Universal input auto-detects any date, timestamp, timezone, or coordinate and instantly populates 16 intelligent tool groups: basic info, timestamp converter, date formats, calendar, timezones, date arithmetic, date difference, age calculator, astronomy, business days, developer snippets, cron parser, export, productivity, religious calendar, and utilities. 100+ tools in one elegant single-page workbench.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/time-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 120,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Utilities", "Converters"],
+    "keywords": [
+        "date", "time", "timezone", "timestamp", "unix", "epoch", "iso8601",
+        "calendar", "hijri", "cron", "age", "countdown", "astronomy", "sunrise",
+        "sunset", "moon", "business days", "date format", "date difference",
+        "date arithmetic", "developer", "tools", "workbench", "converter"
+    ],
+    "tags": [
+        "time-toolkit", "date-tools", "timestamp-converter", "timezone-converter",
+        "date-calculator", "age-calculator", "cron-parser", "calendar-tools",
+        "unix-timestamp", "iso-8601", "date-format", "date-difference",
+        "astronomy-tools", "sunrise-sunset", "moon-phase", "hijri-calendar",
+        "business-days", "date-arithmetic", "developer-tools", "date-workbench"
+    ],
+    "meta": {
+        "title": "Time Toolkit — Professional Date & Time Workbench",
+        "description": "Universal date & time workbench with 16 tool groups — timestamp conversion, timezone world clock, date arithmetic, age calculator, astronomy, cron parser, Hijri calendar, developer code snippets, and more. 100% client-side.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/time-toolkit/"
+    }
+}

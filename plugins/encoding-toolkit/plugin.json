@@ -1,0 +1,38 @@
+{
+    "name": "Encoding Toolkit",
+    "slug": "encoding-toolkit",
+    "version": "1.0.0",
+    "description": "31 encoding, decoding & hashing utilities in one place — Base64, URL encoding, URL parsing, ASCII, Unicode, UTF-8/16, Binary, Hex, Octal, MD5, CRC32, SHA-256/512, HMAC and more. All processing is 100% client-side; no data is ever sent to a server.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/encoding-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 31,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='3' width='20' height='14' rx='2'/><line x1='8' y1='21' x2='16' y2='21'/><line x1='12' y1='17' x2='12' y2='21'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Utilities", "Converters", "Formatters"],
+    "keywords": [
+        "base64", "encoder", "decoder", "url", "encoding", "decoding",
+        "ascii", "unicode", "utf8", "utf16", "binary", "hex", "octal",
+        "decimal", "character", "code", "query", "string", "parser",
+        "developer", "tools", "online", "free", "client-side"
+    ],
+    "tags": [
+        "base64", "base64-encoder", "base64-decoder", "base64-image",
+        "url-encoder", "url-decoder", "url-parser", "url-query",
+        "ascii", "unicode", "utf-8", "utf-16", "binary", "hex", "octal",
+        "character-encoding", "encoding-tools", "decoding-tools",
+        "developer-tools", "online-tool", "free-tool", "client-side-tool"
+    ],
+    "meta": {
+        "title": "Encoding Toolkit — 24 Free Online Encoding & Decoding Utilities",
+        "description": "Encode and decode Base64, URLs, ASCII, Unicode, UTF-8/16, Binary, Hex, Octal and more with 24 free browser-based tools. No sign-up required.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/encoding-toolkit/"
+    }
+}

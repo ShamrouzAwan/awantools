@@ -1,0 +1,36 @@
+{
+    "name": "Previewer Toolkit",
+    "slug": "preview",
+    "version": "1.0.0",
+    "description": "High-performance image rendering engine that generates preview images entirely from URL parameters. Generate OG images, social cards, browser mockups, terminal screenshots, profile cards, code snippets, and more — all customizable via URL.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/preview/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 8,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Design", "Utilities", "Generators"],
+    "keywords": [
+        "og image", "social card", "preview", "image generator", "placeholder",
+        "browser mockup", "terminal", "profile card", "code snippet",
+        "github readme", "svg", "png", "dynamic image", "meta image",
+        "open graph", "twitter card", "image url", "design tool"
+    ],
+    "tags": [
+        "og-image", "social-cards", "image-generator", "placeholder-images",
+        "browser-mockup", "terminal-screenshot", "profile-card", "code-snippet",
+        "svg-renderer", "dynamic-images", "design-tool", "developer-tools"
+    ],
+    "meta": {
+        "title": "Previewer Toolkit — Dynamic Image Generator",
+        "description": "Generate OG images, social cards, browser mockups, profile cards, code snippets and more from URL parameters. No uploads, no storage — just URLs.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/preview/"
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "name": "Internet Speed Test",
+    "slug": "internet-speed-test",
+    "version": "1.0.0",
+    "description": "Professional Internet Diagnostics Suite — download/upload speed, latency, jitter, packet loss, DNS timing, TLS handshake, HTTP response analysis, server performance timings, ISP quality assessment, connection quality scores, browser environment profiling, and individual diagnostic tools. Generates detailed reports with JSON/PDF/TXT/CSV export and terminal cURL output. Integrates with Network Toolkit for deep-dive analysis.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/internet-speed-test/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 15,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M22 12h-4l-3 9L9 3l-3 9H2'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Network", "Developer Tools", "Utilities"],
+    "keywords": [
+        "speed test", "internet speed", "bandwidth", "latency", "ping", "jitter",
+        "packet loss", "download speed", "upload speed", "network diagnostics",
+        "dns timing", "tls", "http timing", "connection quality", "network health",
+        "broadband test", "fiber test", "wifi test", "mbps", "network analyzer",
+        "server timings", "isp quality", "countdown timer", "connection grade"
+    ],
+    "tags": [
+        "speed-test", "bandwidth-test", "latency-test", "ping-test", "jitter-test",
+        "packet-loss", "dns-timing", "network-diagnostics", "connection-quality",
+        "internet-diagnostics", "network-health", "browser-diagnostics",
+        "server-timings", "isp-quality"
+    ],
+    "meta": {
+        "title": "Internet Speed Test — Professional Network Diagnostics Suite",
+        "description": "Test your internet speed with precision: download, upload, ping, jitter, packet loss, DNS timing, TLS handshake, HTTP response analysis, and connection quality scoring. Detailed reports with export.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/internet-speed-test/"
+    }
+}

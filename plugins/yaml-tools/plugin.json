@@ -1,0 +1,41 @@
+{
+    "name": "YAML Tools",
+    "slug": "yaml-tools",
+    "version": "1.0.0",
+    "description": "12 powerful YAML utilities in one place — format, validate, view, sort keys, flatten, diff, escape, and convert YAML to JSON, CSV, and more. All processing is 100% client-side; no data is ever sent to a server.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/yaml-tools/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 12,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='4' y1='6' x2='20' y2='6'/><line x1='4' y1='12' x2='14' y2='12'/><line x1='4' y1='18' x2='20' y2='18'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Utilities", "Converters", "Formatters"],
+    "keywords": [
+        "yaml", "formatter", "validator", "viewer", "converter",
+        "json", "csv", "diff", "compare", "escape", "unescape",
+        "sort", "keys", "flatten", "unflatten", "parse",
+        "developer", "tools", "format", "pretty", "print",
+        "online", "free", "client-side", "no-upload"
+    ],
+    "tags": [
+        "yaml", "yaml-formatter", "yaml-validator", "yaml-viewer",
+        "yaml-to-json", "json-to-yaml", "yaml-to-csv", "csv-to-yaml",
+        "yaml-escape", "yaml-unescape", "yaml-sort", "yaml-flatten",
+        "yaml-diff", "yaml-compare", "yaml-pretty-print",
+        "developer-tools", "data-converter", "data-formatter",
+        "online-tool", "free-tool", "client-side-tool",
+        "web-developer", "backend-developer", "fullstack"
+    ],
+    "meta": {
+        "title": "YAML Tools — 12 Free Online YAML Utilities",
+        "description": "Format, validate, view, sort, flatten, diff, and convert YAML data with 12 free browser-based tools. No sign-up required. YAML to JSON, CSV, and more.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/yaml-tools/"
+    }
+}

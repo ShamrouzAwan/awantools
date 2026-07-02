@@ -1,0 +1,39 @@
+{
+    "name": "Network Toolkit",
+    "slug": "network-toolkit",
+    "version": "1.0.0",
+    "description": "82+ network utilities across 8 groups — IP calculators, DNS lookups (A/AAAA/MX/TXT/NS/SOA/SRV/DKIM/DMARC), DNS propagation checker, WHOIS/RDAP, domain age/expiry/availability, URL tools, HTTP header checker, SSL certificate viewer, CSR decoder/generator, PEM decoder, email tools, open redirect checker, and more. Shared-hosting friendly — no raw sockets or root access required.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/network-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 82,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='2' y1='12' x2='22' y2='12'/><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Network", "Utilities"],
+    "keywords": [
+        "network", "ip", "dns", "whois", "rdap", "cidr", "subnet", "url",
+        "http", "ssl", "tls", "certificate", "headers", "security", "email",
+        "spf", "dkim", "dmarc", "mx", "redirect", "robots", "sitemap",
+        "ipv4", "ipv6", "arin", "asn", "geolocation", "traceroute",
+        "developer", "tools", "online", "free", "shared-hosting"
+    ],
+    "tags": [
+        "network-toolkit", "ip-tools", "dns-lookup", "whois", "cidr-calculator",
+        "subnet-calculator", "url-parser", "http-headers", "ssl-checker",
+        "security-headers", "redirect-chain", "email-header-analyzer",
+        "spf-checker", "dkim-checker", "dmarc-checker", "robots-txt",
+        "sitemap-checker", "ip-geolocation", "asn-lookup", "developer-tools"
+    ],
+    "meta": {
+        "title": "Network Toolkit — 70+ Free Online Network & DNS Utilities",
+        "description": "IP calculators, DNS lookups, WHOIS/RDAP, HTTP header checker, SSL certificate inspector, redirect chain tracer, SPF/DKIM/DMARC checker and 60+ more network tools — all free, shared-hosting friendly.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/network-toolkit/"
+    }
+}

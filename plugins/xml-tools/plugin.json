@@ -1,0 +1,41 @@
+{
+    "name": "XML Tools",
+    "slug": "xml-tools",
+    "version": "1.0.0",
+    "description": "10 powerful XML utilities in one place — format, beautify, minify, validate, view, escape, unescape, convert XML to CSV, CSV to XML, and diff two XML documents. All processing is 100% client-side; no data is ever sent to a server.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/xml-tools/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 10,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='16 18 22 12 16 6'/><polyline points='8 6 2 12 8 18'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Utilities", "Converters", "Formatters"],
+    "keywords": [
+        "xml", "formatter", "validator", "minifier", "beautifier",
+        "viewer", "converter", "csv", "escape", "unescape",
+        "diff", "compare", "parser", "format", "pretty",
+        "encode", "decode", "transform", "data", "developer",
+        "tools", "online", "free", "client-side", "no-upload"
+    ],
+    "tags": [
+        "xml", "xml-formatter", "xml-validator", "xml-minifier",
+        "xml-beautifier", "xml-viewer", "xml-to-csv", "csv-to-xml",
+        "xml-escape", "xml-unescape", "xml-diff", "xml-compare",
+        "xml-encoder", "xml-decoder", "xml-pretty-print",
+        "developer-tools", "data-converter", "data-formatter",
+        "online-tool", "free-tool", "client-side-tool",
+        "web-developer", "backend-developer", "fullstack"
+    ],
+    "meta": {
+        "title": "XML Tools — 10 Free Online XML Utilities",
+        "description": "Format, validate, minify, beautify, view, escape, convert and diff XML data with 10 free browser-based tools. No sign-up required. XML to CSV, CSV to XML, and more.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/xml-tools/"
+    }
+}

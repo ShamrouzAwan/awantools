@@ -1,0 +1,48 @@
+{
+    "name": "JSON Tools",
+    "slug": "json-tools",
+    "version": "2.0.0",
+    "description": "19 powerful JSON utilities in one place — format, validate, minify, diff, sort keys, flatten, query (JSONPath), escape, and convert JSON to CSV, XML, YAML, and more. All processing is 100% client-side; no data is ever sent to a server.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/json-tools/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 19,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/><polyline points='10 9 9 9 8 9'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Utilities", "Converters", "Formatters"],
+    "keywords": [
+        "json", "formatter", "validator", "minifier", "beautifier",
+        "converter", "yaml", "xml", "csv", "parser", "viewer",
+        "developer", "tools", "format", "pretty", "print",
+        "escape", "unescape", "encode", "decode",
+        "sort", "keys", "flatten", "unflatten",
+        "compare", "diff", "query", "jq", "transform",
+        "data", "api", "rest", "schema", "structure",
+        "online", "free", "client-side", "no-upload"
+    ],
+    "tags": [
+        "json", "json-formatter", "json-validator", "json-minifier",
+        "json-beautifier", "json-viewer", "json-parser", "json-to-yaml",
+        "json-to-xml", "json-to-csv", "yaml-to-json", "csv-to-json",
+        "json-escape", "json-unescape", "json-sort", "json-flatten",
+        "json-unflatten", "json-compare", "json-diff", "json-query",
+        "json-pretty-print", "json-tree", "json-encoder", "json-decoder",
+        "developer-tools", "data-converter", "data-formatter",
+        "online-tool", "free-tool", "client-side-tool",
+        "api-tool", "rest-tool", "data-transform",
+        "web-developer", "backend-developer", "fullstack"
+    ],
+    "meta": {
+        "title": "JSON Tools — 19 Free Online JSON Utilities",
+        "description": "Format, validate, minify, diff, sort, flatten, query (JSONPath), and convert JSON data with 19 free browser-based tools. No sign-up required. JSON to YAML, XML, CSV, and more.",
+        "og_image": "https://awantools.site/storage/uploads/1782157844_0772c56b_json.png",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/json-tools/"
+    }
+}

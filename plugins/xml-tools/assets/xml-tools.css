@@ -1,0 +1,548 @@
+/* ============================================================
+   XML Tools Plugin
+   Uses platform CSS variables for theme compatibility.
+   Mirrors json-tools layout with xt- prefix.
+   ============================================================ */
+
+/* ── Shell layout ──────────────────────────────────────────── */
+.xt-shell {
+    display: flex;
+    min-height: 540px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium, 8px);
+    overflow: hidden;
+    margin-top: 16px;
+    background: var(--color-surface);
+}
+
+/* ── Sidebar ───────────────────────────────────────────────── */
+.xt-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+    padding: 8px 0 20px;
+    scrollbar-width: thin;
+}
+
+.xt-nav-group {
+    padding: 14px 14px 5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.xt-nav-group::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    margin-left: 4px;
+}
+
+.xt-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 12px 7px 14px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    border-left: 3px solid transparent;
+    transition: background .12s, border-color .12s;
+}
+.xt-nav:hover { background: rgba(99,102,241,.07); }
+.xt-nav.active {
+    background: rgba(99,102,241,.1);
+    border-left-color: var(--color-primary);
+}
+
+.xt-nav-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background .12s, border-color .12s;
+    color: var(--color-text-muted);
+}
+.xt-nav-icon svg { width: 13px; height: 13px; }
+.xt-nav.active .xt-nav-icon {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.xt-nav-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.xt-nav-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.xt-nav.active .xt-nav-name { color: var(--color-primary); font-weight: 600; }
+.xt-nav-hint {
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Content area ──────────────────────────────────────────── */
+.xt-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background);
+    overflow: hidden;
+}
+
+.xt-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ── Toolbar ───────────────────────────────────────────────── */
+.xt-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+.xt-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.xt-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.xt-tool-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+}
+.xt-hint {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.xt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small, 5px);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+.xt-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+.xt-btn:hover {
+    background: rgba(99,102,241,.08);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+.xt-btn-primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+.xt-btn-primary:hover {
+    opacity: .88;
+    color: #fff;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* ── Status chip ───────────────────────────────────────────── */
+.xt-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+.xt-status-chip.ok    { background: #dcfce7; color: #16a34a; }
+.xt-status-chip.error { background: #fee2e2; color: #dc2626; }
+.xt-status-chip .xt-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+}
+[data-theme="dark"] .xt-status-chip.ok    { background: rgba(22,163,74,.2);  color: #4ade80; }
+[data-theme="dark"] .xt-status-chip.error { background: rgba(220,38,38,.2);  color: #f87171; }
+
+/* ── Select wrapper ────────────────────────────────────────── */
+.xt-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+.xt-select-wrap select {
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small, 5px);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+/* ── Pane label bar ────────────────────────────────────────── */
+.xt-pane-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 6px 14px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+    gap: 8px;
+}
+.xt-pane-label-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.xt-pane-meta {
+    font-size: 10.5px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--color-text-muted);
+    font-family: monospace;
+}
+.xt-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    font-size: 10.5px;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-background);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all .12s;
+    white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.4;
+}
+.xt-copy-btn svg { width: 10px; height: 10px; }
+.xt-copy-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(99,102,241,.06);
+}
+.xt-copy-btn.copied {
+    border-color: #16a34a;
+    color: #16a34a;
+    background: rgba(22,163,74,.07);
+}
+
+/* ── Editor split panes ────────────────────────────────────── */
+.xt-editors {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+.xt-editor-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.xt-editor-divider {
+    width: 1px;
+    background: var(--color-border);
+    flex-shrink: 0;
+}
+
+/* ── Textarea (editor) ─────────────────────────────────────── */
+.xt-ta {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    padding: 12px 14px;
+    border: none;
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: 'JetBrains Mono','Fira Code','Cascadia Code',Consolas,monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    box-sizing: border-box;
+    outline: none;
+    overflow: auto;
+}
+.xt-ta:focus { box-shadow: inset 0 0 0 2px rgba(99,102,241,.2); }
+.xt-ta[readonly] { color: var(--color-text-muted); }
+
+/* ── Validator result box ──────────────────────────────────── */
+.xt-val-result {
+    margin: 12px 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-small, 5px);
+    font-size: 13px;
+    line-height: 1.6;
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+/* ── Tree viewer ───────────────────────────────────────────── */
+.xt-el-tag   { color: var(--color-primary); font-weight: 500; }
+.xt-el-close { color: var(--color-primary); opacity: .65; }
+.xt-el-text  { color: #16a34a; }
+.xt-attr-name { color: #d97706; }
+.xt-attr-val  { color: #16a34a; }
+[data-theme="dark"] .xt-el-text  { color: #4ade80; }
+[data-theme="dark"] .xt-attr-name { color: #fbbf24; }
+[data-theme="dark"] .xt-attr-val  { color: #4ade80; }
+
+.xt-toggle { cursor: pointer; user-select: none; }
+.xt-toggle:hover { opacity: .75; }
+
+/* ── Input row (CSV to XML options) ───────────────────────── */
+.xt-input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+.xt-input-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+.xt-input-row input[type="text"] {
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small, 5px);
+    background: var(--color-background);
+    color: var(--color-text);
+    width: 90px;
+    outline: none;
+}
+.xt-input-row input[type="text"]:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(99,102,241,.15);
+}
+
+/* ── Empty / placeholder ───────────────────────────────────── */
+.xt-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+.xt-empty svg { width: 32px; height: 32px; opacity: .4; }
+
+/* ── Diff table ────────────────────────────────────────────── */
+.xt-diff-table { font-size: 12.5px; font-family: monospace; }
+.xt-diff-head {
+    display: grid;
+    grid-template-columns: 2fr 90px 1fr 1fr;
+    gap: 0;
+    padding: 7px 14px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.xt-diff-row {
+    display: grid;
+    grid-template-columns: 2fr 90px 1fr 1fr;
+    gap: 0;
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--color-border);
+    align-items: start;
+}
+.xt-diff-row:hover { background: rgba(99,102,241,.04); }
+.xt-diff-row.xt-diff-added   { background: rgba(22,163,74,.04); }
+.xt-diff-row.xt-diff-removed { background: rgba(220,38,38,.04); }
+.xt-diff-row.xt-diff-changed { background: rgba(217,119,6,.04); }
+.xt-diff-path {
+    word-break: break-all;
+    color: var(--color-text);
+    font-weight: 500;
+    padding-right: 8px;
+}
+.xt-diff-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    width: fit-content;
+}
+.xt-diff-badge-added   { background: #dcfce7; color: #16a34a; }
+.xt-diff-badge-removed { background: #fee2e2; color: #dc2626; }
+.xt-diff-badge-changed { background: #fef3c7; color: #d97706; }
+[data-theme="dark"] .xt-diff-badge-added   { background: rgba(22,163,74,.2);  color: #4ade80; }
+[data-theme="dark"] .xt-diff-badge-removed { background: rgba(220,38,38,.2);  color: #f87171; }
+[data-theme="dark"] .xt-diff-badge-changed { background: rgba(217,119,6,.2);  color: #fbbf24; }
+.xt-diff-val {
+    word-break: break-all;
+    color: var(--color-text-muted);
+    padding-left: 8px;
+}
+.xt-diff-val em { font-style: normal; opacity: .4; }
+.xt-diff-equal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 20px;
+    color: #16a34a;
+    font-size: 13px;
+    font-weight: 600;
+}
+.xt-diff-equal svg { flex-shrink: 0; }
+.xt-diff-err {
+    padding: 16px 20px;
+    color: #dc2626;
+    font-family: monospace;
+    font-size: 12.5px;
+}
+
+/* ── Mobile sidebar → horizontal tabs ─────────────────────── */
+@media (max-width: 760px) {
+    .xt-shell {
+        flex-direction: column;
+        height: auto;
+        min-height: unset;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin-top: 12px;
+    }
+    .page-header-actions { display: none; }
+    .xt-sidebar {
+        width: 100%;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        background: var(--color-surface);
+    }
+    .xt-sidebar::-webkit-scrollbar { display: none; }
+    .xt-nav-group { display: none; }
+    .xt-nav {
+        flex-direction: column;
+        align-items: center;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        padding: 10px 14px 8px;
+        gap: 4px;
+        min-width: fit-content;
+        flex-shrink: 0;
+    }
+    .xt-nav.active {
+        background: rgba(99,102,241,.07);
+        border-left-color: transparent;
+        border-bottom-color: var(--color-primary);
+    }
+    .xt-nav-icon { width: 26px; height: 26px; }
+    .xt-nav-text { align-items: center; }
+    .xt-nav-name { font-size: 11px; }
+    .xt-nav-hint { display: none; }
+    .xt-content { height: auto; min-height: 420px; }
+    .xt-panel { height: auto; min-height: 420px; }
+    .xt-editors { flex-direction: column; }
+    .xt-editor-divider { width: 100%; height: 1px; }
+    .xt-ta { min-height: 350px; }
+    .xt-toolbar { padding: 8px 12px; }
+    .xt-hint { display: none; }
+}
+
+@media (max-width: 480px) {
+    .xt-tool-title { font-size: 12.5px; }
+    .xt-btn { padding: 4px 10px; font-size: 11.5px; }
+}
+
+@media (max-width: 600px) {
+    .xt-diff-head,
+    .xt-diff-row { grid-template-columns: 1fr 70px; }
+    .xt-diff-head span:nth-child(n+3),
+    .xt-diff-row span:nth-child(n+3) { display: none; }
+}

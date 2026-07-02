@@ -1,0 +1,61 @@
+{
+    "name": "Frontend Studio",
+    "slug": "frontend-studio",
+    "version": "1.0.0",
+    "description": "Professional browser-based frontend IDE — HTML, CSS, JavaScript, SVG, JSON, Markdown and more. Monaco editor, live preview, project management, AI assistant, extensions, themes, and command palette. The complete frontend development environment in your browser.",
+    "author": "Shamrouz Awan",
+    "author_url": "https:\/\/shamrouzawan.com",
+    "homepage": "https:\/\/awantools.site\/plugins\/frontend-studio\/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 21,
+    "icon": "<svg xmlns='http:\/\/www.w3.org\/2000\/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='16 18 22 12 16 6'\/><polyline points='8 6 2 12 8 18'\/><line x1='12' y1='2' x2='12' y2='22'\/><\/svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": [
+        "Developer Tools",
+        "IDE",
+        "Editor",
+        "Frontend"
+    ],
+    "keywords": [
+        "ide",
+        "editor",
+        "frontend",
+        "html",
+        "css",
+        "javascript",
+        "code editor",
+        "monaco",
+        "live preview",
+        "browser ide",
+        "web development",
+        "coding",
+        "vscode",
+        "online editor",
+        "playground",
+        "svg",
+        "json",
+        "markdown"
+    ],
+    "tags": [
+        "frontend-ide",
+        "code-editor",
+        "html-editor",
+        "css-editor",
+        "js-editor",
+        "live-preview",
+        "browser-ide",
+        "monaco-editor",
+        "developer-tools"
+    ],
+    "meta": {
+        "title": "Frontend Studio — Professional Browser-based Frontend IDE",
+        "description": "Write HTML, CSS, JavaScript, SVG, and more with Monaco editor, live preview, AI assistance, extensions, and project management — all in your browser.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https:\/\/awantools.site\/plugins\/frontend-studio\/"
+    }
+}

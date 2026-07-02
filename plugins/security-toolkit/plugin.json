@@ -1,0 +1,37 @@
+{
+    "name": "Security Toolkit",
+    "slug": "security-toolkit",
+    "version": "1.0.0",
+    "description": "21 browser-based security utilities — hash generators (MD5, SHA-1/224/256/384/512, CRC32, RIPEMD-160, Whirlpool), password tools, JWT encoder/decoder/validator, HMAC generator, file hash calculator and hash verifier. 100% client-side; no data is ever sent to a server.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/security-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 22,
+    "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>",
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": ["Developer Tools", "Security", "Utilities"],
+    "keywords": [
+        "security", "hash", "md5", "sha1", "sha256", "sha512", "sha224", "sha384",
+        "crc32", "ripemd160", "whirlpool", "password", "bcrypt", "jwt", "hmac",
+        "generator", "checker", "verifier", "encoder", "decoder", "token",
+        "developer", "tools", "online", "free", "client-side", "cryptography"
+    ],
+    "tags": [
+        "security", "hash-generator", "md5", "sha-256", "sha-512", "sha-224", "sha-384",
+        "crc32", "ripemd-160", "whirlpool", "password-generator", "bcrypt",
+        "jwt-decoder", "jwt-encoder", "hmac", "file-hash", "hash-verifier",
+        "cryptography", "developer-tools", "online-tool", "free-tool", "client-side"
+    ],
+    "meta": {
+        "title": "Security Toolkit — 21 Free Online Security & Hash Utilities",
+        "description": "Hash text with MD5, SHA-1/224/256/384/512, CRC32, RIPEMD-160 and Whirlpool. Generate passwords, check strength, encode/decode JWTs and compute HMAC — all free and 100% client-side.",
+        "twitter_card": "summary_large_image",
+        "canonical": "https://awantools.site/plugins/security-toolkit/"
+    }
+}
