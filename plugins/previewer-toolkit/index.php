@@ -30,38 +30,6 @@ if ($action === 'cache_stats') {
     exit;
 }
 
-// ── Awan Tools: resolve aliases BEFORE render-mode detection ──────────────────
-// This runs early so that: (a) theme_mode can inject `template` when omitted,
-// (b) category=awan_tools_plugins works, and (c) short param names are canonical
-// before the cache key is computed.
-if (($raw['category'] ?? '') === 'awan_tools_plugins') {
-    $raw['category'] = 'awan_tools';
-}
-if (($raw['category'] ?? '') === 'awan_tools') {
-    // Short content aliases → canonical names; alias key removed so the cache
-    // key is the same regardless of which alias the caller used.
-    if (isset($raw['title']))    { $raw['heading']     = $raw['heading']     ?? $raw['title'];    unset($raw['title']); }
-    if (isset($raw['desc']))     { $raw['description'] = $raw['description'] ?? $raw['desc'];     unset($raw['desc']); }
-    if (isset($raw['counter1'])) { $raw['stat1_value'] = $raw['stat1_value'] ?? $raw['counter1']; unset($raw['counter1']); }
-    if (isset($raw['counter2'])) { $raw['stat2_value'] = $raw['stat2_value'] ?? $raw['counter2']; unset($raw['counter2']); }
-    if (isset($raw['counter3'])) { $raw['stat3_value'] = $raw['stat3_value'] ?? $raw['counter3']; unset($raw['counter3']); }
-
-    // Numeric template aliases: 1=light  2=dark  3=neon
-    $num_tpl = ['1' => 'light', '2' => 'dark', '3' => 'neon'];
-    if (isset($num_tpl[$raw['template'] ?? ''])) {
-        $raw['template'] = $num_tpl[$raw['template']];
-    }
-
-    // theme_mode → inject template when not already a valid slug.
-    // This also handles the case where `template` is absent entirely — after this
-    // block `$raw['template']` is always set, so $is_render becomes true.
-    if (!in_array($raw['template'] ?? '', ['light', 'dark', 'neon'], true)) {
-        $tm = strtolower(trim($raw['theme_mode'] ?? 'dark'));
-        $raw['template'] = ($tm === 'light') ? 'light' : 'dark'; // default → dark
-    }
-    unset($raw['theme_mode']); // consumed; must not pollute the cache key
-}
-
 // ── Render mode detection ──────────────────────────────────────────────────────
 $is_render = isset($raw['category']) && isset($raw['template']);
 
