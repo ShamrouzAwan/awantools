@@ -507,19 +507,33 @@
       }
     });
 
-    // ── OG Image preview ────────────────────────────────────────────────────
-    const ogImg  = groups.og.tags.find(t => t.name === 'og:image')?.content ||
-                   groups.twitter.tags.find(t => t.name === 'twitter:image')?.content || '';
-    const imgWrap = $('ptMiOgImgWrap');
-    const imgEl   = $('ptMiOgImg');
-    const dimsEl  = $('ptMiOgDims');
-    if (ogImg && imgWrap && imgEl) {
-      imgEl.onload  = () => { if (dimsEl) dimsEl.textContent = imgEl.naturalWidth + ' × ' + imgEl.naturalHeight + ' px'; };
-      imgEl.onerror = () => { if (dimsEl) dimsEl.textContent = 'Image could not be loaded'; };
-      imgEl.src     = ogImg;
-      imgWrap.style.display = '';
-    } else if (imgWrap) {
-      imgWrap.style.display = 'none';
+    // ── Social link preview card ─────────────────────────────────────────────
+    const ogImg      = groups.og.tags.find(t => t.name === 'og:image')?.content ||
+                       groups.twitter.tags.find(t => t.name === 'twitter:image')?.content || '';
+    const ogTitle    = groups.og.tags.find(t => t.name === 'og:title')?.content || data.title || '';
+    const ogDesc     = groups.og.tags.find(t => t.name === 'og:description')?.content ||
+                       groups.basic.tags.find(t => t.name === 'description')?.content || '';
+    const siteName   = groups.og.tags.find(t => t.name === 'og:site_name')?.content || '';
+    const pageHost   = (() => { try { return new URL(data.url || '').hostname.replace(/^www\./, ''); } catch { return data.url || ''; } })();
+
+    const lpCard    = $('ptMiLinkPreview');
+    const lpImgWrap = $('ptMiLpImgWrap');
+    const lpImg     = $('ptMiLpImg');
+    const lpSite    = $('ptMiLpSite');
+    const lpTitleEl = $('ptMiLpTitle');
+    const lpDescEl  = $('ptMiLpDesc');
+
+    if (lpCard) {
+      if (lpSite)    lpSite.textContent    = siteName || pageHost;
+      if (lpTitleEl) lpTitleEl.textContent = ogTitle;
+      if (lpDescEl)  lpDescEl.textContent  = ogDesc;
+      if (ogImg && lpImg && lpImgWrap) {
+        lpImg.src = ogImg;
+        lpImgWrap.style.display = '';
+      } else if (lpImgWrap) {
+        lpImgWrap.style.display = 'none';
+      }
+      lpCard.style.display = '';
     }
 
     // ── Summary cards ────────────────────────────────────────────────────────
@@ -849,9 +863,11 @@
     // Build example URLs
     buildExamples();
 
-    // Start in Generate mode, then render initial category
+    // Start in Generate mode, then render the first category + template dynamically
     selectMode('generate');
-    selectCategory('og', 'github_dark');
+    const firstCat = Object.keys(PT_CATS)[0] || 'og';
+    const firstTpl = Object.keys(PT_CATS[firstCat]?.templates || {})[0] || 'default';
+    selectCategory(firstCat, firstTpl);
 
     // Load cache stats into button badge
     loadCacheStats();

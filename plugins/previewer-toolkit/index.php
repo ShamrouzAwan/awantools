@@ -574,12 +574,20 @@ ob_start(); ?>
       <span id="ptMiErrorMsg">Could not fetch URL.</span>
     </div>
     <div class="pt-mi-results" id="ptMiResults" style="display:none">
-      <div class="pt-mi-summary" id="ptMiSummary">
-        <div class="pt-mi-og-image-wrap" id="ptMiOgImgWrap" style="display:none">
-          <div class="pt-mi-og-label"><i class="fa-solid fa-image"></i> OG / Twitter Image</div>
-          <img id="ptMiOgImg" src="" alt="OG Image" class="pt-mi-og-image">
-          <div class="pt-mi-og-dims" id="ptMiOgDims"></div>
+
+      <!-- Social link preview card -->
+      <div class="pt-mi-link-preview" id="ptMiLinkPreview" style="display:none">
+        <div class="pt-mi-lp-img-wrap" id="ptMiLpImgWrap" style="display:none">
+          <img id="ptMiLpImg" src="" alt="" class="pt-mi-lp-img">
         </div>
+        <div class="pt-mi-lp-body">
+          <div class="pt-mi-lp-site" id="ptMiLpSite"></div>
+          <div class="pt-mi-lp-title" id="ptMiLpTitle"></div>
+          <div class="pt-mi-lp-desc" id="ptMiLpDesc"></div>
+        </div>
+      </div>
+
+      <div class="pt-mi-summary" id="ptMiSummary">
         <div class="pt-mi-summary-cards" id="ptMiSummaryInfo"></div>
       </div>
       <div class="pt-mi-groups" id="ptMiGroups"></div>
