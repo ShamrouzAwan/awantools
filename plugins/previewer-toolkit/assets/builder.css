@@ -1714,9 +1714,29 @@
 .pt-mi-lp-img-wrap {
   width: 100%;
   max-height: 300px;
+  min-height: 160px;
   overflow: hidden;
   background: var(--pt-surface2);
   border-bottom: 1px solid var(--pt-border);
+  position: relative;
+}
+
+/* Loading skeleton shimmer */
+.pt-mi-lp-img-wrap.pt-mi-lp-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    var(--pt-surface2) 25%,
+    var(--pt-border)   50%,
+    var(--pt-surface2) 75%);
+  background-size: 200% 100%;
+  animation: pt-shimmer 1.4s infinite linear;
+}
+
+@keyframes pt-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .pt-mi-lp-img {
@@ -1724,6 +1744,7 @@
   width: 100%;
   height: auto;
   object-fit: cover;
+  transition: opacity 0.25s ease;
 }
 
 .pt-mi-lp-body {

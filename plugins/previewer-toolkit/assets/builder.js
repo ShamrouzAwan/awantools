@@ -266,7 +266,7 @@
   function selectTemplate(cat, tpl) {
     state.template = tpl;
     // Match by data-template slug, not by NodeList index, so grid reordering won't break highlighting.
-    $('.pt-tpl-card').forEach(card => card.classList.toggle('active', card.dataset.template === tpl));
+    $$('.pt-tpl-card').forEach(card => card.classList.toggle('active', card.dataset.template === tpl));
 
     // Update info label
     const info = $('ptTplInfo');
@@ -527,9 +527,23 @@
       if (lpSite)    lpSite.textContent    = siteName || pageHost;
       if (lpTitleEl) lpTitleEl.textContent = ogTitle;
       if (lpDescEl)  lpDescEl.textContent  = ogDesc;
-      if (ogImg && lpImg && lpImgWrap) {
-        lpImg.src = ogImg;
+
+      // Resolve relative OG image URLs against the inspected page's origin
+      const resolvedImg = resolveOgUrl(ogImg, data.url || '');
+
+      if (resolvedImg && lpImg && lpImgWrap) {
         lpImgWrap.style.display = '';
+        lpImgWrap.classList.add('pt-mi-lp-loading');
+        lpImg.style.opacity = '0';
+        lpImg.onload = () => {
+          lpImgWrap.classList.remove('pt-mi-lp-loading');
+          lpImg.style.opacity = '1';
+        };
+        lpImg.onerror = () => {
+          lpImgWrap.classList.remove('pt-mi-lp-loading');
+          lpImgWrap.style.display = 'none';
+        };
+        lpImg.src = resolvedImg;
       } else if (lpImgWrap) {
         lpImgWrap.style.display = 'none';
       }
@@ -717,6 +731,17 @@
 
   function randomize() {
     const colors = RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+
+    // Pick template FIRST — selectTemplate calls applyTemplateDefaults which resets
+    // colours, so we must run it before applying our random overrides.
+    const tpls = Object.keys(PT_CATS[state.category]?.templates || {});
+    if (tpls.length > 1) {
+      const current = state.template;
+      const others  = tpls.filter(t => t !== current);
+      selectTemplate(state.category, others[Math.floor(Math.random() * others.length)]);
+    }
+
+    // Override with random colours after applyTemplateDefaults has run
     setColor('bg',          '#' + colors[0]);
     setColor('heading',     '#' + colors[1]);
     setColor('description', '#' + colors[2]);
@@ -728,14 +753,6 @@
     if (d) d.value = RANDOM_DESCS[Math.floor(Math.random() * RANDOM_DESCS.length)];
     const i = $('f_icon');
     if (i) i.value = RANDOM_ICONS[Math.floor(Math.random() * RANDOM_ICONS.length)];
-
-    // Randomize template in current category
-    const tpls = Object.keys(PT_CATS[state.category]?.templates || {});
-    if (tpls.length > 1) {
-      const current = state.template;
-      const others  = tpls.filter(t => t !== current);
-      selectTemplate(state.category, others[Math.floor(Math.random() * others.length)]);
-    }
 
     update();
   }
