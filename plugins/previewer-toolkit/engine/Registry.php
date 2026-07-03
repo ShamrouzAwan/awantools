@@ -170,6 +170,26 @@ class PT_Registry
                     'minimal'     => ['bg_color' => 'fafafa', 'heading_color' => '383a42', 'accent_color' => '4078f2', 'language' => 'javascript'],
                 ],
             ],
+        'awan_tools' => [
+            'name'           => 'Awan Tools',
+            'icon'           => 'a',
+            'description'    => 'Official Awan Tools branded OG images',
+            'default_width'  => 1200,
+            'default_height' => 630,
+            'templates'      => [
+                'homepage_og' => ['name' => 'Homepage OG', 'desc' => 'Live-count homepage Open Graph image'],
+            ],
+            'defaults' => [
+                'homepage_og' => [
+                    'bg_color'          => '62bcee',
+                    'heading_color'     => '0a1628',
+                    'description_color' => '0a1628',
+                    'accent_color'      => '1565c0',
+                    'heading'           => 'Awan Tools',
+                    'footer'            => 'WWW.AWANTOOLS.SITE',
+                ],
+            ],
+        ],
         ];
     }
 
