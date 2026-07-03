@@ -986,7 +986,39 @@ if (empty($sectionOrder) && isset($sectionHtml['hero'])) {
 }
 $content = ob_get_clean();
 
+// --- Dynamic OG Image (Previewer Toolkit profile card) ---
+// Build an absolute base URL so the og:image works everywhere (social crawlers, etc.)
+$_ogScheme  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$_ogHost    = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$_ogBase    = $_ogScheme . '://' . $_ogHost;
+// Tool count: real sum of offered tools for active plugins, rounded down to nearest 10
+$_ogCount   = max(10, (int)(floor(max(1, $totalPlugins) / 10) * 10));
+$_ogBadge   = $_ogCount . '+ Active Tools,No Subscriptions,Free Forever';
+$_ogParams  = http_build_query([
+    'category'          => 'profile',
+    'template'          => 'minimal',
+    'icon'              => 'terminal',
+    'heading'           => 'Awan Tools',
+    'subheading'        => 'Free Online Utilities',
+    'description'       => "Free collection of fast, reliable, and privacy-friendly online tools designed to simplify everyday tasks. From quick utilities to professional workflows.\nNo complexity, No extra logins, No subscriptions.",
+    'footer'            => 'Developer: Shamrouz Awan',
+    'badge'             => $_ogBadge,
+    'bg_color'          => 'ffffff',
+    'heading_color'     => '111827',
+    'description_color' => '6b7280',
+    'accent_color'      => '3d8bff',
+    'font'              => 'Poppins',
+    'radius'            => '20',
+    'padding'           => '54',
+    'width'             => '800',
+    'height'            => '470',
+    'format'            => 'png',
+    'username'          => '@shamrouzawan',
+]);
+$_ogImageUrl = $_ogBase . '/plugins/previewer-toolkit/?' . $_ogParams;
+
 require THEMES_PATH . '/default/templates/layout.php';
 render_page($settings->siteName(), $content, [
     'description' => $settings->siteTagline(),
+    'og_image'    => $_ogImageUrl,
 ]);
