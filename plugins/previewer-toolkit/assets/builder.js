@@ -156,13 +156,40 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  // Escape for use inside HTML attribute values (adds " and ')
+  function escAttr(s) {
+    return escHtml(String(s)).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   // ── Category & Template Selection ─────────────────────────────────────────
   function selectCategory(cat, tpl) {
+    // Update tab UI
+    $('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
+
+    const miEl   = $('ptMetaInspector');
+    const tplEl  = $('ptTemplatesSection');
+    const mainEl = $('ptMain');
+    const isMeta = cat === 'meta_inspector';
+
+    if (miEl)   miEl.style.display   = isMeta ? '' : 'none';
+    if (tplEl)  tplEl.style.display  = isMeta ? 'none' : '';
+    if (mainEl) mainEl.style.display = isMeta ? 'none' : '';
+
+    if (isMeta) {
+      state.category = cat;
+      // Auto-populate URL from footer/website field when input is empty
+      const urlInput = $('ptMiUrl');
+      if (urlInput && !urlInput.value.trim()) {
+        const footer = $('f_footer')?.value?.trim() || '';
+        if (footer) {
+          urlInput.value = footer.startsWith('http') ? footer : 'https://' + footer;
+        }
+      }
+      return;
+    }
+
     state.category = cat;
     state.template = tpl || Object.keys(PT_CATS[cat]?.templates || {})[0] || 'default';
-
-    // Update tab UI
-    $$('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
 
     // Render template grid
     renderTemplateGrid(cat);
@@ -381,6 +408,186 @@
     closeIconPicker();
     updateIconPreview();
     update();
+  }
+
+  // ── Meta Inspector ─────────────────────────────────────────────────────────
+  function inspectMeta() {
+    const urlInput = $('ptMiUrl');
+    let url = urlInput?.value?.trim() || '';
+    if (!url) { urlInput?.focus(); return; }
+    if (!url.startsWith('http')) url = 'https://' + url;
+    if (urlInput) urlInput.value = url;
+
+    $('ptMiLoading').style.display = 'flex';
+    $('ptMiResults').style.display = 'none';
+    $('ptMiError').style.display   = 'none';
+
+    const btn = $('ptMiBtn');
+    if (btn) { btn.classList.add('loading'); btn.disabled = true; }
+
+    fetch('?action=inspect_meta&url=' + encodeURIComponent(url))
+      .then(r => r.json())
+      .then(data => {
+        $('ptMiLoading').style.display = 'none';
+        if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        if (!data.ok) {
+          $('ptMiError').style.display = 'flex';
+          $('ptMiErrorMsg').textContent = data.error || 'Unknown error';
+          return;
+        }
+        renderMetaResults(data);
+      })
+      .catch(err => {
+        $('ptMiLoading').style.display = 'none';
+        if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        $('ptMiError').style.display = 'flex';
+        $('ptMiErrorMsg').textContent = 'Request failed: ' + err.message;
+      });
+  }
+
+  function miQuick(url) {
+    const inp = $('ptMiUrl');
+    if (inp) inp.value = url;
+    inspectMeta();
+  }
+
+  function renderTagContent(tag) {
+    const raw = tag.content || '';
+    if (!raw) return '<span style="color:var(--pt-muted)">—</span>';
+    const v   = escHtml(raw);
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      const safe  = escAttr(raw);
+      const isImg = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(raw.split('?')[0]);
+      const link  = `<a href="${safe}" target="_blank" rel="noopener noreferrer">${v}</a>`;
+      return isImg
+        ? link + `<img class="pt-mi-inline-img" src="${safe}" alt="" loading="lazy">`
+        : link;
+    }
+    return v;
+  }
+
+  function renderMetaResults(data) {
+    const groups = {
+      basic:   { title: 'Basic',            icon: 'circle-info',  tags: [] },
+      og:      { title: 'Open Graph',       icon: 'share-nodes',  tags: [] },
+      twitter: { title: 'Twitter / X Card', icon: 'hashtag',      tags: [] },
+      link:    { title: 'Link Relations',   icon: 'link',         tags: [] },
+      other:   { title: 'Other Meta',       icon: 'tag',          tags: [] },
+    };
+
+    // Page title as a synthetic basic tag
+    if (data.title) {
+      groups.basic.tags.unshift({ type: 'synthetic', name: 'title', content: data.title, attr: 'element' });
+    }
+
+    (data.tags || []).forEach(tag => {
+      const n = (tag.name || '').toLowerCase();
+      if (tag.type === 'link') {
+        groups.link.tags.push(tag);
+      } else if (n.startsWith('og:')) {
+        groups.og.tags.push(tag);
+      } else if (n.startsWith('twitter:')) {
+        groups.twitter.tags.push(tag);
+      } else if (['description','viewport','charset','robots','keywords','author',
+                  'theme-color','msapplication-tilecolor','generator',
+                  'application-name','referrer','color-scheme'].includes(n) || tag.attr === 'charset') {
+        groups.basic.tags.push(tag);
+      } else {
+        groups.other.tags.push(tag);
+      }
+    });
+
+    // ── OG Image preview ────────────────────────────────────────────────────
+    const ogImg  = groups.og.tags.find(t => t.name === 'og:image')?.content ||
+                   groups.twitter.tags.find(t => t.name === 'twitter:image')?.content || '';
+    const imgWrap = $('ptMiOgImgWrap');
+    const imgEl   = $('ptMiOgImg');
+    const dimsEl  = $('ptMiOgDims');
+    if (ogImg && imgWrap && imgEl) {
+      imgEl.onload  = () => { if (dimsEl) dimsEl.textContent = imgEl.naturalWidth + ' × ' + imgEl.naturalHeight + ' px'; };
+      imgEl.onerror = () => { if (dimsEl) dimsEl.textContent = 'Image could not be loaded'; };
+      imgEl.src     = ogImg;
+      imgWrap.style.display = '';
+    } else if (imgWrap) {
+      imgWrap.style.display = 'none';
+    }
+
+    // ── Summary cards ────────────────────────────────────────────────────────
+    const summaryEl = $('ptMiSummaryInfo');
+    if (summaryEl) {
+      const ogTitle    = groups.og.tags.find(t => t.name === 'og:title')?.content || '';
+      const ogDesc     = groups.og.tags.find(t => t.name === 'og:description')?.content ||
+                         groups.basic.tags.find(t => t.name === 'description')?.content || '';
+      const canonical  = groups.link.tags.find(t => t.name === 'canonical')?.content || data.url;
+      const ogType     = groups.og.tags.find(t => t.name === 'og:type')?.content || '';
+      const siteName   = groups.og.tags.find(t => t.name === 'og:site_name')?.content || '';
+      const twCard     = groups.twitter.tags.find(t => t.name === 'twitter:card')?.content || '';
+      const charset    = groups.basic.tags.find(t => t.name === 'charset')?.content || '';
+      const viewport   = groups.basic.tags.find(t => t.name === 'viewport')?.content || '';
+      const robots     = groups.basic.tags.find(t => t.name === 'robots')?.content || '';
+
+      const badge = (label, val) => val
+        ? `<div class="pt-mi-badge"><span>${escHtml(label)}</span><div class="pt-mi-badge-val">${escHtml(val)}</div></div>`
+        : '';
+
+      summaryEl.innerHTML = `
+        <div class="pt-mi-card">
+          <div class="pt-mi-card-label"><i class="fa-solid fa-heading"></i> Page Title</div>
+          <div class="pt-mi-card-value">${escHtml(data.title || '—')}</div>
+        </div>
+        ${ogTitle && ogTitle !== data.title ? `
+        <div class="pt-mi-card">
+          <div class="pt-mi-card-label"><i class="fa-solid fa-share-nodes"></i> OG Title</div>
+          <div class="pt-mi-card-value">${escHtml(ogTitle)}</div>
+        </div>` : ''}
+        ${ogDesc ? `
+        <div class="pt-mi-card">
+          <div class="pt-mi-card-label"><i class="fa-solid fa-align-left"></i> Description</div>
+          <div class="pt-mi-card-value">${escHtml(ogDesc)}</div>
+        </div>` : ''}
+        <div class="pt-mi-card">
+          <div class="pt-mi-card-label"><i class="fa-solid fa-link"></i> URL</div>
+          <div class="pt-mi-card-value pt-mi-card-url"><a href="${escAttr(canonical)}" target="_blank" rel="noopener noreferrer">${escHtml(canonical)}</a></div>
+        </div>
+        <div class="pt-mi-card-row">
+          ${badge('OG Type', ogType)}
+          ${badge('Site Name', siteName)}
+          ${badge('TW Card', twCard)}
+          ${badge('Charset', charset)}
+          ${badge('Robots', robots)}
+          ${viewport ? badge('Viewport', viewport.split(',')[0].trim()) : ''}
+        </div>`;
+    }
+
+    // ── Tag group tables ─────────────────────────────────────────────────────
+    const groupsEl = $('ptMiGroups');
+    if (groupsEl) {
+      const filledGroups = Object.entries(groups).filter(([, g]) => g.tags.length > 0);
+      if (filledGroups.length === 0) {
+        groupsEl.innerHTML = `<div class="pt-mi-empty"><i class="fa-solid fa-circle-info" style="margin-right:8px;color:var(--pt-muted2)"></i>No meta or Open Graph tags were found on this page.</div>`;
+      } else {
+        groupsEl.innerHTML = filledGroups.map(([, g]) => `
+          <div class="pt-mi-group">
+            <div class="pt-mi-group-head">
+              <i class="fa-solid fa-${escAttr(g.icon)}"></i>
+              ${escHtml(g.title)}
+              <span class="pt-mi-group-count">${g.tags.length}</span>
+            </div>
+            <table class="pt-mi-table">
+              <thead><tr><th>Name / Property</th><th>Content / Value</th></tr></thead>
+              <tbody>${g.tags.map(tag => `
+                <tr class="pt-mi-tag-row">
+                  <td class="pt-mi-tag-name"><code>${escHtml(tag.name)}</code></td>
+                  <td class="pt-mi-tag-content">${renderTagContent(tag)}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>`).join('');
+      }
+    }
+
+    $('ptMiResults').style.display = '';
+    $('ptMiResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ── Output Tabs ────────────────────────────────────────────────────────────
@@ -661,6 +868,9 @@
     resetToDefaults,
     useExample,
     clearCache,
+    // Meta Inspector
+    inspectMeta,
+    miQuick,
   };
 
   // ── Wait for DOM ───────────────────────────────────────────────────────────
