@@ -1747,6 +1747,37 @@
   transition: opacity 0.25s ease;
 }
 
+/* Fallback when no OG image is available */
+.pt-mi-lp-img-wrap.pt-mi-lp-no-img {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pt-mi-lp-no-img-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--pt-muted);
+  padding: 28px 16px;
+}
+
+.pt-mi-lp-no-img-msg i {
+  font-size: 32px;
+  color: var(--pt-muted);
+  opacity: 0.5;
+}
+
+.pt-mi-lp-no-img-msg span {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-align: center;
+  opacity: 0.7;
+}
+
 .pt-mi-lp-body {
   padding: 14px 18px 16px;
   display: flex;

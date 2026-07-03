@@ -543,9 +543,13 @@
       // Resolve relative OG image URLs against the inspected page's origin
       const resolvedImg = resolveOgUrl(ogImg, data.url || '');
 
+      const noImgFallback = '<div class="pt-mi-lp-no-img-msg"><i class="fa-regular fa-image"></i><span>This page has no OG image</span></div>';
+
       if (resolvedImg && lpImg && lpImgWrap) {
         lpImgWrap.style.display = '';
+        lpImgWrap.classList.remove('pt-mi-lp-no-img');
         lpImgWrap.classList.add('pt-mi-lp-loading');
+        lpImg.style.display = '';
         lpImg.style.opacity = '0';
         lpImg.onload = () => {
           lpImgWrap.classList.remove('pt-mi-lp-loading');
@@ -553,11 +557,15 @@
         };
         lpImg.onerror = () => {
           lpImgWrap.classList.remove('pt-mi-lp-loading');
-          lpImgWrap.style.display = 'none';
+          lpImg.classList.add('pt-mi-lp-no-img');
+          lpImg.style.display = 'none';
+          lpImgWrap.innerHTML = noImgFallback;
         };
         lpImg.src = resolvedImg;
       } else if (lpImgWrap) {
-        lpImgWrap.style.display = 'none';
+        lpImgWrap.style.display = '';
+        lpImgWrap.classList.add('pt-mi-lp-no-img');
+        lpImgWrap.innerHTML = noImgFallback;
       }
       lpCard.style.display = '';
     }
