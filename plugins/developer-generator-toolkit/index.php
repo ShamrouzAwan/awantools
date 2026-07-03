@@ -249,11 +249,7 @@ ob_start();
 <script src="./assets/dev-generator-toolkit.js"></script>
 <script src="./assets/dgt-features.js"></script>
 <?php
-
-
-<?php echo plugin_related_html($slug); ?>
-
-
+echo plugin_related_html($slug);
 $content = ob_get_clean();
 plugin_render(
     $_meta['title']       ?? 'Developer Generator Toolkit — 125+ Free Online Generators',
