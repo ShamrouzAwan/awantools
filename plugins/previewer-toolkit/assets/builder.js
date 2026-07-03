@@ -161,23 +161,22 @@
     return escHtml(String(s)).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
-  // ── Category & Template Selection ─────────────────────────────────────────
-  function selectCategory(cat, tpl) {
-    // Update tab UI
-    $('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
+  // ── Mode Switching (Generate vs Inspect) ──────────────────────────────────
+  function selectMode(mode) {
+    const genCard = $('ptModeGenerate');
+    const insCard = $('ptModeInspect');
+    const genWs   = $('ptGeneratorWorkspace');
+    const insWs   = $('ptMetaInspector');
+    const isInspect = mode === 'inspect';
 
-    const miEl   = $('ptMetaInspector');
-    const tplEl  = $('ptTemplatesSection');
-    const mainEl = $('ptMain');
-    const isMeta = cat === 'meta_inspector';
+    if (genCard) genCard.classList.toggle('active', !isInspect);
+    if (insCard) insCard.classList.toggle('active', isInspect);
+    if (genWs)   genWs.style.display = isInspect ? 'none' : '';
+    if (insWs)   insWs.style.display = isInspect ? '' : 'none';
 
-    if (miEl)   miEl.style.display   = isMeta ? '' : 'none';
-    if (tplEl)  tplEl.style.display  = isMeta ? 'none' : '';
-    if (mainEl) mainEl.style.display = isMeta ? 'none' : '';
-
-    if (isMeta) {
-      state.category = cat;
-      // Auto-populate URL from footer/website field when input is empty
+    if (isInspect) {
+      state.category = 'meta_inspector';
+      // Auto-fill URL from footer field if the input is blank
       const urlInput = $('ptMiUrl');
       if (urlInput && !urlInput.value.trim()) {
         const footer = $('f_footer')?.value?.trim() || '';
@@ -185,8 +184,19 @@
           urlInput.value = footer.startsWith('http') ? footer : 'https://' + footer;
         }
       }
-      return;
+      setTimeout(() => $('ptMiUrl')?.focus(), 80);
+    } else {
+      // Switch back to generator
+      if (state.category === 'meta_inspector' || !PT_CATS[state.category]) {
+        selectCategory('og');
+      }
     }
+  }
+
+  // ── Category & Template Selection ─────────────────────────────────────────
+  function selectCategory(cat, tpl) {
+    // Update tab UI
+    $('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
 
     state.category = cat;
     state.template = tpl || Object.keys(PT_CATS[cat]?.templates || {})[0] || 'default';
@@ -839,7 +849,8 @@
     // Build example URLs
     buildExamples();
 
-    // Initial render
+    // Start in Generate mode, then render initial category
+    selectMode('generate');
     selectCategory('og', 'github_dark');
 
     // Load cache stats into button badge
@@ -849,6 +860,7 @@
   // ── Public API ─────────────────────────────────────────────────────────────
   window.PT = {
     update,
+    selectMode,
     selectCategory,
     selectTemplate,
     syncColor,

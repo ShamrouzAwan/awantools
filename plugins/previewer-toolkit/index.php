@@ -200,56 +200,343 @@ ob_start(); ?>
 
 <div class="pt-app" id="ptApp">
 
-  <!-- ── Header ── -->
-  <div class="pt-header">
-    <div class="pt-header-left">
-      <div class="pt-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>Previewer <strong>Toolkit</strong></span>
-      </div>
-      <p>Generate beautiful previews for anything.</p>
-      <p class="pt-sub">Create OG Images, Social Cards, Browser Mockups, Profile Cards, Code Snippets, and more with real-time customization.</p>
-      <div class="pt-header-btns">
-        <button class="pt-btn-primary" onclick="PT.openPreview()">
-          <i class="fa-solid fa-eye"></i> Live Preview
-        </button>
-        <button class="pt-btn-secondary" onclick="PT.downloadImage()">
-          <i class="fa-solid fa-download"></i> Export Image
-        </button>
-        <button class="pt-btn-cache" id="ptCacheBtn" onclick="PT.clearCache()" title="Clear all server-cached images">
-          <i class="fa-solid fa-trash-can"></i> Clear Cache
-          <span class="pt-cache-badge" id="ptCacheBadge">…</span>
-        </button>
-      </div>
+  <!-- ── Top Bar ── -->
+  <div class="pt-topbar">
+    <div class="pt-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>Previewer <strong>Toolkit</strong></span>
     </div>
-    <div class="pt-how-it-works">
-      <div class="pt-how-title"><i class="fa-solid fa-circle-question"></i> How it works</div>
-      <ol>
-        <li><i class="fa-solid fa-1"></i> Choose a category</li>
-        <li><i class="fa-solid fa-2"></i> Select a template</li>
-        <li><i class="fa-solid fa-3"></i> Customize content &amp; styles</li>
-        <li><i class="fa-solid fa-4"></i> Copy your URL or export image</li>
-      </ol>
+    <button class="pt-btn-cache" id="ptCacheBtn" onclick="PT.clearCache()" title="Clear all server-cached images">
+      <i class="fa-solid fa-trash-can"></i> Clear Cache
+      <span class="pt-cache-badge" id="ptCacheBadge">…</span>
+    </button>
+  </div>
+
+  <!-- ── Hero / Mode Selector ── -->
+  <div class="pt-hero">
+    <div class="pt-hero-intro">
+      <h1 class="pt-hero-title">OG Image Generator &amp; Meta Inspector</h1>
+      <p class="pt-hero-sub">Design your Open Graph image, customize it to your brand, and get a permanent URL — no image hosting, no downloads required. Or inspect any site's OG &amp; meta tags in one click.</p>
+    </div>
+    <div class="pt-mode-cards">
+
+      <!-- ── Generator Card ── -->
+      <div class="pt-mode-card pt-mode-card--gen active" id="ptModeGenerate" onclick="PT.selectMode('generate')">
+        <div class="pt-mode-accent pt-mode-accent--gen">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="pt-mode-body">
+          <div class="pt-mode-name">OG Image Generator</div>
+          <div class="pt-mode-desc">Pick a template, set your colors and text, then copy the URL. Paste it as your <code>og:image</code> meta tag — your server generates the image on demand, forever.</div>
+          <div class="pt-mode-flow">
+            <span class="pt-flow-step"><i class="fa-solid fa-palette"></i> Customize</span>
+            <i class="fa-solid fa-chevron-right pt-flow-arrow"></i>
+            <span class="pt-flow-step"><i class="fa-solid fa-link"></i> Copy URL</span>
+            <i class="fa-solid fa-chevron-right pt-flow-arrow"></i>
+            <span class="pt-flow-step"><i class="fa-solid fa-code"></i> Paste as og:image</span>
+          </div>
+        </div>
+        <div class="pt-mode-cta">Open Generator <i class="fa-solid fa-arrow-right"></i></div>
+      </div>
+
+      <!-- ── Inspector Card ── -->
+      <div class="pt-mode-card pt-mode-card--inspect" id="ptModeInspect" onclick="PT.selectMode('inspect')">
+        <div class="pt-mode-accent pt-mode-accent--inspect">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+        </div>
+        <div class="pt-mode-body">
+          <div class="pt-mode-name">Meta Inspector</div>
+          <div class="pt-mode-desc">Enter any URL to instantly reveal all its Open Graph tags, Twitter Card data, canonical links, favicon, and a live preview of the OG image.</div>
+          <div class="pt-mode-flow">
+            <span class="pt-flow-step"><i class="fa-solid fa-link"></i> Paste URL</span>
+            <i class="fa-solid fa-chevron-right pt-flow-arrow"></i>
+            <span class="pt-flow-step"><i class="fa-solid fa-table-list"></i> View All Tags</span>
+            <i class="fa-solid fa-chevron-right pt-flow-arrow"></i>
+            <span class="pt-flow-step"><i class="fa-solid fa-image"></i> See OG Preview</span>
+          </div>
+        </div>
+        <div class="pt-mode-cta">Open Inspector <i class="fa-solid fa-arrow-right"></i></div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ── Category Tabs ── -->
-  <div class="pt-cats-row">
-    <div class="pt-cats" id="ptCats">
-      <?php foreach ($cats as $slug => $cat): ?>
-      <button class="pt-cat <?= $slug === 'og' ? 'active' : '' ?>" data-cat="<?= $slug ?>">
-        <i class="fa-solid fa-<?= htmlspecialchars(str_replace([' '], ['-'], strtolower($cat['icon']))) ?>"></i>
-        <?= htmlspecialchars($cat['name']) ?>
-      </button>
-      <?php endforeach; ?>
-      <button class="pt-cat pt-cat-inspector" data-cat="meta_inspector">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Meta Inspector
-      </button>
-    </div>
-  </div>
+  <!-- ══════════════════════════════════════════════════════════
+       Generator Workspace
+       ══════════════════════════════════════════════════════════ -->
+  <div id="ptGeneratorWorkspace">
 
-  <!-- ── Meta Inspector ── -->
+    <!-- Category Tabs -->
+    <div class="pt-cats-row">
+      <div class="pt-cats" id="ptCats">
+        <?php foreach ($cats as $slug => $cat): ?>
+        <button class="pt-cat <?= $slug === 'og' ? 'active' : '' ?>" data-cat="<?= $slug ?>">
+          <i class="fa-solid fa-<?= htmlspecialchars(str_replace([' '], ['-'], strtolower($cat['icon']))) ?>"></i>
+          <?= htmlspecialchars($cat['name']) ?>
+        </button>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <!-- Template Chooser -->
+    <div class="pt-templates-section" id="ptTemplatesSection">
+      <div class="pt-templates-header">
+        <h3>Choose a Template</h3>
+        <span id="ptTplInfo" class="pt-tpl-info">Template: <strong>GitHub Dark</strong></span>
+      </div>
+      <div class="pt-template-grid" id="ptTemplateGrid"><!-- Populated by JS --></div>
+    </div>
+
+    <!-- Main Builder -->
+    <div class="pt-main" id="ptMain">
+
+      <!-- Left: Controls -->
+      <div class="pt-controls" id="ptControls">
+        <div class="pt-controls-header">
+          <h3>Customize</h3>
+          <button class="pt-btn-ghost" onclick="PT.resetToDefaults()">Reset</button>
+        </div>
+
+        <!-- 1. Content -->
+        <div class="pt-section">
+          <div class="pt-section-head" onclick="PT.toggleSection(this)">
+            <span>1. Content</span>
+            <i class="fa-solid fa-chevron-down pt-chevron"></i>
+          </div>
+          <div class="pt-section-body">
+            <div class="pt-field">
+              <label>Icon <span class="pt-hint">(Font Awesome)</span></label>
+              <div class="pt-icon-input">
+                <input type="text" id="f_icon" placeholder="e.g. code" value="code" onchange="PT.update()">
+                <button class="pt-icon-preview" id="iconPreviewBtn" onclick="PT.openIconPicker()">
+                  <i class="fa-solid fa-code" id="iconPreviewEl"></i>
+                </button>
+              </div>
+            </div>
+            <div class="pt-field">
+              <label>Heading</label>
+              <input type="text" id="f_heading" value="Developer Toolkit" oninput="PT.update()">
+            </div>
+            <div class="pt-field">
+              <label>Subheading</label>
+              <input type="text" id="f_subheading" value="" placeholder="Optional subheading" oninput="PT.update()">
+            </div>
+            <div class="pt-field">
+              <label>Description <span class="pt-hint">120 chars</span></label>
+              <textarea id="f_description" rows="2" oninput="PT.update()">200+ developer tools to supercharge your workflow.</textarea>
+            </div>
+            <div class="pt-field">
+              <label>Footer / Website</label>
+              <input type="text" id="f_footer" value="awantools.site" oninput="PT.update()">
+            </div>
+            <div class="pt-field">
+              <label>Badge Text</label>
+              <input type="text" id="f_badge" value="" placeholder="e.g. Open Source" oninput="PT.update()">
+            </div>
+            <div class="pt-extra-fields" id="ptExtraFields"></div>
+          </div>
+        </div>
+
+        <!-- 2. Colors -->
+        <div class="pt-section">
+          <div class="pt-section-head" onclick="PT.toggleSection(this)">
+            <span>2. Colors</span>
+            <i class="fa-solid fa-chevron-down pt-chevron"></i>
+          </div>
+          <div class="pt-section-body">
+            <div class="pt-field pt-color-field">
+              <label>Background</label>
+              <div class="pt-color-row">
+                <input type="color" id="fc_bg" value="#0d1117" oninput="PT.syncColor('bg', this.value)">
+                <input type="text" id="ft_bg" value="#0d1117" placeholder="#hex" oninput="PT.syncColorText('bg', this.value)" maxlength="7">
+              </div>
+            </div>
+            <div class="pt-field pt-color-field">
+              <label>Heading</label>
+              <div class="pt-color-row">
+                <input type="color" id="fc_heading" value="#ffffff" oninput="PT.syncColor('heading', this.value)">
+                <input type="text" id="ft_heading" value="#ffffff" placeholder="#hex" oninput="PT.syncColorText('heading', this.value)" maxlength="7">
+              </div>
+            </div>
+            <div class="pt-field pt-color-field">
+              <label>Description</label>
+              <div class="pt-color-row">
+                <input type="color" id="fc_description" value="#94a3b8" oninput="PT.syncColor('description', this.value)">
+                <input type="text" id="ft_description" value="#94a3b8" placeholder="#hex" oninput="PT.syncColorText('description', this.value)" maxlength="7">
+              </div>
+            </div>
+            <div class="pt-field pt-color-field">
+              <label>Accent</label>
+              <div class="pt-color-row">
+                <input type="color" id="fc_accent" value="#22c55e" oninput="PT.syncColor('accent', this.value)">
+                <input type="text" id="ft_accent" value="#22c55e" placeholder="#hex" oninput="PT.syncColorText('accent', this.value)" maxlength="7">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Design -->
+        <div class="pt-section">
+          <div class="pt-section-head" onclick="PT.toggleSection(this)">
+            <span>3. Design</span>
+            <i class="fa-solid fa-chevron-down pt-chevron"></i>
+          </div>
+          <div class="pt-section-body">
+            <div class="pt-field">
+              <label>Font <span class="pt-hint">Google Fonts</span></label>
+              <select id="f_font" onchange="PT.update()">
+                <option value="Inter" selected>Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Lato">Lato</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Source Code Pro">Source Code Pro</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+                <option value="Fira Code">Fira Code</option>
+              </select>
+            </div>
+            <div class="pt-field">
+              <label>Border Radius <span class="pt-val" id="v_radius">20px</span></label>
+              <input type="range" id="f_radius" min="0" max="60" value="20" oninput="PT.updateSlider('radius', this.value); PT.update()">
+            </div>
+            <div class="pt-field">
+              <label>Padding <span class="pt-val" id="v_padding">60px</span></label>
+              <input type="range" id="f_padding" min="10" max="120" value="60" oninput="PT.updateSlider('padding', this.value); PT.update()">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Output Size -->
+        <div class="pt-section">
+          <div class="pt-section-head" onclick="PT.toggleSection(this)">
+            <span>4. Output Size</span>
+            <i class="fa-solid fa-chevron-down pt-chevron"></i>
+          </div>
+          <div class="pt-section-body">
+            <div class="pt-field-row">
+              <div class="pt-field">
+                <label>Width</label>
+                <input type="number" id="f_width" value="1200" min="100" max="3000" oninput="PT.update()">
+              </div>
+              <div class="pt-field">
+                <label>Height</label>
+                <input type="number" id="f_height" value="630" min="100" max="3000" oninput="PT.update()">
+              </div>
+            </div>
+            <div class="pt-field">
+              <label>Format</label>
+              <select id="f_format" onchange="PT.update()">
+                <option value="svg">SVG (Vector)</option>
+                <option value="png" selected>PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pt-controls -->
+
+      <!-- Right: Preview + Output -->
+      <div class="pt-preview-col">
+
+        <!-- Live Preview -->
+        <div class="pt-preview-panel">
+          <div class="pt-preview-bar">
+            <span class="pt-preview-live"><span class="pt-dot"></span> Live Preview</span>
+            <div class="pt-device-btns">
+              <button class="pt-dev active" data-scale="1" title="Desktop" onclick="PT.setScale(1, this)"><i class="fa-solid fa-desktop"></i></button>
+              <button class="pt-dev" data-scale="0.66" title="Tablet" onclick="PT.setScale(0.66, this)"><i class="fa-solid fa-tablet-screen-button"></i></button>
+              <button class="pt-dev" data-scale="0.45" title="Mobile" onclick="PT.setScale(0.45, this)"><i class="fa-solid fa-mobile-screen"></i></button>
+              <button class="pt-dev" data-scale="0.33" title="Small" onclick="PT.setScale(0.33, this)"><i class="fa-solid fa-compress"></i></button>
+            </div>
+          </div>
+          <div class="pt-preview-frame" id="ptPreviewFrame">
+            <div class="pt-preview-wrap" id="ptPreviewWrap">
+              <img id="ptPreviewImg" src="" alt="Preview" loading="lazy">
+            </div>
+            <div class="pt-preview-loading" id="ptLoading">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- ★ URL Copy Hero — the primary action ── -->
+        <div class="pt-url-hero">
+          <div class="pt-url-hero-header">
+            <div class="pt-url-hero-title">
+              <i class="fa-solid fa-link"></i> Your OG Image URL
+            </div>
+            <div class="pt-url-hero-hint">Copy this URL and set it as your <code>og:image</code> — no hosting needed, the image generates on every request</div>
+          </div>
+          <div class="pt-url-hero-row">
+            <input type="text" id="ptUrlOut" class="pt-url-hero-input" readonly onclick="this.select()" placeholder="Generating URL…">
+            <button class="pt-url-hero-copy" onclick="PT.copy('ptUrlOut', this)">
+              <i class="fa-solid fa-copy"></i> Copy URL
+            </button>
+          </div>
+          <div class="pt-url-hero-actions">
+            <button class="pt-url-open-btn" onclick="PT.openPreview()">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in new tab
+            </button>
+            <button class="pt-url-open-btn" onclick="PT.downloadImage()">
+              <i class="fa-solid fa-download"></i> Download image
+            </button>
+          </div>
+        </div>
+
+        <!-- Secondary Output Panel -->
+        <div class="pt-output-panel">
+          <div class="pt-output-panel-head">
+            <span class="pt-output-panel-label">Also copy as:</span>
+            <div class="pt-output-tabs">
+              <button class="pt-otab active" onclick="PT.switchOutTab('html', this)">HTML</button>
+              <button class="pt-otab" onclick="PT.switchOutTab('md', this)">Markdown</button>
+              <button class="pt-otab" onclick="PT.switchOutTab('params', this)">Parameters</button>
+            </div>
+          </div>
+
+          <div id="otab_html" class="pt-output-section">
+            <div class="pt-url-row">
+              <input type="text" id="ptHtmlOut" class="pt-url-input" readonly onclick="this.select()">
+              <button class="pt-copy-btn" onclick="PT.copy('ptHtmlOut', this)"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+          </div>
+          <div id="otab_md" class="pt-output-section" style="display:none">
+            <div class="pt-url-row">
+              <input type="text" id="ptMdOut" class="pt-url-input" readonly onclick="this.select()">
+              <button class="pt-copy-btn" onclick="PT.copy('ptMdOut', this)"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+          </div>
+          <div id="otab_params" class="pt-output-section" style="display:none">
+            <div class="pt-params-list" id="ptParamsList"></div>
+          </div>
+
+          <div class="pt-action-row">
+            <button class="pt-btn-secondary" onclick="PT.randomize()">
+              <i class="fa-solid fa-shuffle"></i> Randomize
+            </button>
+            <button class="pt-btn-ghost" onclick="PT.resetToDefaults()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+
+          <div class="pt-examples" id="ptExamples">
+            <div class="pt-examples-title">Example URLs <span class="pt-hint">Click to load</span></div>
+            <div class="pt-example-list" id="ptExampleList"></div>
+          </div>
+        </div>
+
+      </div><!-- /pt-preview-col -->
+    </div><!-- /pt-main -->
+  </div><!-- /ptGeneratorWorkspace -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       Meta Inspector Workspace
+       ══════════════════════════════════════════════════════════ -->
   <div class="pt-meta-inspector" id="ptMetaInspector" style="display:none">
 
     <!-- URL Input Bar -->
@@ -278,299 +565,27 @@ ob_start(); ?>
       </div>
     </div>
 
-    <!-- Loading state -->
     <div class="pt-mi-loading" id="ptMiLoading" style="display:none">
       <i class="fa-solid fa-spinner fa-spin"></i>
       <span>Fetching and parsing meta tags…</span>
     </div>
-
-    <!-- Error state -->
     <div class="pt-mi-error" id="ptMiError" style="display:none">
       <i class="fa-solid fa-circle-exclamation"></i>
       <span id="ptMiErrorMsg">Could not fetch URL.</span>
     </div>
-
-    <!-- Results -->
     <div class="pt-mi-results" id="ptMiResults" style="display:none">
-
-      <!-- Summary: OG image preview + key info cards -->
       <div class="pt-mi-summary" id="ptMiSummary">
         <div class="pt-mi-og-image-wrap" id="ptMiOgImgWrap" style="display:none">
-          <div class="pt-mi-og-label">
-            <i class="fa-solid fa-image"></i> OG / Twitter Image
-          </div>
+          <div class="pt-mi-og-label"><i class="fa-solid fa-image"></i> OG / Twitter Image</div>
           <img id="ptMiOgImg" src="" alt="OG Image" class="pt-mi-og-image">
           <div class="pt-mi-og-dims" id="ptMiOgDims"></div>
         </div>
         <div class="pt-mi-summary-cards" id="ptMiSummaryInfo"></div>
       </div>
-
-      <!-- Grouped meta tag tables -->
       <div class="pt-mi-groups" id="ptMiGroups"></div>
-
     </div>
 
-  </div>
-
-  <!-- ── Template Chooser ── -->
-  <div class="pt-templates-section" id="ptTemplatesSection">
-    <div class="pt-templates-header">
-      <h3>Choose a Template</h3>
-      <span id="ptTplInfo" class="pt-tpl-info">Template: <strong>GitHub Dark</strong></span>
-    </div>
-    <div class="pt-template-grid" id="ptTemplateGrid">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-
-  <!-- ── Main Layout ── -->
-  <div class="pt-main" id="ptMain">
-
-    <!-- Left: Controls -->
-    <div class="pt-controls" id="ptControls">
-      <div class="pt-controls-header">
-        <h3>Customize</h3>
-        <button class="pt-btn-ghost" onclick="PT.resetToDefaults()">Reset</button>
-      </div>
-
-      <!-- 1. Content -->
-      <div class="pt-section">
-        <div class="pt-section-head" onclick="PT.toggleSection(this)">
-          <span>1. Content</span>
-          <i class="fa-solid fa-chevron-down pt-chevron"></i>
-        </div>
-        <div class="pt-section-body">
-          <div class="pt-field">
-            <label>Icon <span class="pt-hint">(Font Awesome)</span></label>
-            <div class="pt-icon-input">
-              <input type="text" id="f_icon" placeholder="e.g. code" value="code" onchange="PT.update()">
-              <button class="pt-icon-preview" id="iconPreviewBtn" onclick="PT.openIconPicker()">
-                <i class="fa-solid fa-code" id="iconPreviewEl"></i>
-              </button>
-            </div>
-          </div>
-          <div class="pt-field">
-            <label>Heading</label>
-            <input type="text" id="f_heading" value="Developer Toolkit" oninput="PT.update()">
-          </div>
-          <div class="pt-field">
-            <label>Subheading</label>
-            <input type="text" id="f_subheading" value="" placeholder="Optional subheading" oninput="PT.update()">
-          </div>
-          <div class="pt-field">
-            <label>Description <span class="pt-hint">120 chars</span></label>
-            <textarea id="f_description" rows="2" oninput="PT.update()">200+ developer tools to supercharge your workflow.</textarea>
-          </div>
-          <div class="pt-field">
-            <label>Footer / Website</label>
-            <input type="text" id="f_footer" value="awantools.site" oninput="PT.update()">
-          </div>
-          <div class="pt-field">
-            <label>Badge Text</label>
-            <input type="text" id="f_badge" value="" placeholder="e.g. Open Source" oninput="PT.update()">
-          </div>
-          <!-- Extended fields shown per category -->
-          <div class="pt-extra-fields" id="ptExtraFields"></div>
-        </div>
-      </div>
-
-      <!-- 2. Colors -->
-      <div class="pt-section">
-        <div class="pt-section-head" onclick="PT.toggleSection(this)">
-          <span>2. Colors</span>
-          <i class="fa-solid fa-chevron-down pt-chevron"></i>
-        </div>
-        <div class="pt-section-body">
-          <div class="pt-field pt-color-field">
-            <label>Background Color</label>
-            <div class="pt-color-row">
-              <input type="color" id="fc_bg" value="#0d1117" oninput="PT.syncColor('bg', this.value)">
-              <input type="text" id="ft_bg" value="#0d1117" placeholder="#hex" oninput="PT.syncColorText('bg', this.value)" maxlength="7">
-            </div>
-          </div>
-          <div class="pt-field pt-color-field">
-            <label>Heading Color</label>
-            <div class="pt-color-row">
-              <input type="color" id="fc_heading" value="#ffffff" oninput="PT.syncColor('heading', this.value)">
-              <input type="text" id="ft_heading" value="#ffffff" placeholder="#hex" oninput="PT.syncColorText('heading', this.value)" maxlength="7">
-            </div>
-          </div>
-          <div class="pt-field pt-color-field">
-            <label>Description Color</label>
-            <div class="pt-color-row">
-              <input type="color" id="fc_description" value="#94a3b8" oninput="PT.syncColor('description', this.value)">
-              <input type="text" id="ft_description" value="#94a3b8" placeholder="#hex" oninput="PT.syncColorText('description', this.value)" maxlength="7">
-            </div>
-          </div>
-          <div class="pt-field pt-color-field">
-            <label>Accent Color</label>
-            <div class="pt-color-row">
-              <input type="color" id="fc_accent" value="#22c55e" oninput="PT.syncColor('accent', this.value)">
-              <input type="text" id="ft_accent" value="#22c55e" placeholder="#hex" oninput="PT.syncColorText('accent', this.value)" maxlength="7">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. Design -->
-      <div class="pt-section">
-        <div class="pt-section-head" onclick="PT.toggleSection(this)">
-          <span>3. Design</span>
-          <i class="fa-solid fa-chevron-down pt-chevron"></i>
-        </div>
-        <div class="pt-section-body">
-          <div class="pt-field">
-            <label>Font Family <span class="pt-hint">Google Fonts</span></label>
-            <select id="f_font" onchange="PT.update()">
-              <option value="Inter" selected>Inter</option>
-              <option value="Roboto">Roboto</option>
-              <option value="Poppins">Poppins</option>
-              <option value="Montserrat">Montserrat</option>
-              <option value="Raleway">Raleway</option>
-              <option value="Lato">Lato</option>
-              <option value="Open Sans">Open Sans</option>
-              <option value="Nunito">Nunito</option>
-              <option value="Playfair Display">Playfair Display</option>
-              <option value="Source Code Pro">Source Code Pro</option>
-              <option value="JetBrains Mono">JetBrains Mono</option>
-              <option value="Fira Code">Fira Code</option>
-            </select>
-          </div>
-          <div class="pt-field">
-            <label>Border Radius <span class="pt-val" id="v_radius">20px</span></label>
-            <input type="range" id="f_radius" min="0" max="60" value="20" oninput="PT.updateSlider('radius', this.value); PT.update()">
-          </div>
-          <div class="pt-field">
-            <label>Padding <span class="pt-val" id="v_padding">60px</span></label>
-            <input type="range" id="f_padding" min="10" max="120" value="60" oninput="PT.updateSlider('padding', this.value); PT.update()">
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. Output -->
-      <div class="pt-section">
-        <div class="pt-section-head" onclick="PT.toggleSection(this)">
-          <span>4. Output</span>
-          <i class="fa-solid fa-chevron-down pt-chevron"></i>
-        </div>
-        <div class="pt-section-body">
-          <div class="pt-field-row">
-            <div class="pt-field">
-              <label>Width</label>
-              <input type="number" id="f_width" value="1200" min="100" max="3000" oninput="PT.update()">
-            </div>
-            <div class="pt-field">
-              <label>Height</label>
-              <input type="number" id="f_height" value="630" min="100" max="3000" oninput="PT.update()">
-            </div>
-          </div>
-          <div class="pt-field">
-            <label>Format</label>
-            <select id="f_format" onchange="PT.update()">
-              <option value="svg">SVG (Vector)</option>
-              <option value="png" selected>PNG</option>
-              <option value="jpg">JPG</option>
-              <option value="webp">WebP</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Preview + Output -->
-    <div class="pt-preview-col">
-
-      <!-- Preview -->
-      <div class="pt-preview-panel">
-        <div class="pt-preview-bar">
-          <span class="pt-preview-live"><span class="pt-dot"></span> Live Preview</span>
-          <div class="pt-device-btns">
-            <button class="pt-dev active" data-scale="1" title="Desktop" onclick="PT.setScale(1, this)">
-              <i class="fa-solid fa-desktop"></i>
-            </button>
-            <button class="pt-dev" data-scale="0.66" title="Tablet" onclick="PT.setScale(0.66, this)">
-              <i class="fa-solid fa-tablet-screen-button"></i>
-            </button>
-            <button class="pt-dev" data-scale="0.45" title="Mobile" onclick="PT.setScale(0.45, this)">
-              <i class="fa-solid fa-mobile-screen"></i>
-            </button>
-            <button class="pt-dev" data-scale="0.33" title="Small" onclick="PT.setScale(0.33, this)">
-              <i class="fa-solid fa-compress"></i>
-            </button>
-          </div>
-        </div>
-        <div class="pt-preview-frame" id="ptPreviewFrame">
-          <div class="pt-preview-wrap" id="ptPreviewWrap">
-            <img id="ptPreviewImg" src="" alt="Preview" loading="lazy">
-          </div>
-          <div class="pt-preview-loading" id="ptLoading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- Output URLs -->
-      <div class="pt-output-panel">
-        <div class="pt-output-section">
-          <div class="pt-output-label">
-            <i class="fa-solid fa-link"></i> Generated Image URL
-            <span class="pt-output-hint">Use this URL in any &lt;img&gt; tag to display your image</span>
-          </div>
-          <div class="pt-url-row">
-            <input type="text" id="ptUrlOut" class="pt-url-input" readonly onclick="this.select()">
-            <button class="pt-copy-btn" onclick="PT.copy('ptUrlOut', this)" title="Copy URL">
-              <i class="fa-solid fa-copy"></i> Copy URL
-            </button>
-          </div>
-        </div>
-
-        <div class="pt-output-tabs">
-          <button class="pt-otab active" onclick="PT.switchOutTab('html', this)">HTML</button>
-          <button class="pt-otab" onclick="PT.switchOutTab('md', this)">Markdown</button>
-          <button class="pt-otab" onclick="PT.switchOutTab('params', this)">Parameters</button>
-        </div>
-
-        <div id="otab_html" class="pt-output-section">
-          <div class="pt-url-row">
-            <input type="text" id="ptHtmlOut" class="pt-url-input" readonly onclick="this.select()">
-            <button class="pt-copy-btn" onclick="PT.copy('ptHtmlOut', this)">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-          </div>
-        </div>
-        <div id="otab_md" class="pt-output-section" style="display:none">
-          <div class="pt-url-row">
-            <input type="text" id="ptMdOut" class="pt-url-input" readonly onclick="this.select()">
-            <button class="pt-copy-btn" onclick="PT.copy('ptMdOut', this)">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-          </div>
-        </div>
-        <div id="otab_params" class="pt-output-section" style="display:none">
-          <div class="pt-params-list" id="ptParamsList"></div>
-        </div>
-
-        <div class="pt-action-btns">
-          <button class="pt-btn-primary" onclick="PT.downloadImage()">
-            <i class="fa-solid fa-download"></i> Download
-          </button>
-          <button class="pt-btn-secondary" onclick="PT.randomize()">
-            <i class="fa-solid fa-shuffle"></i> Randomize
-          </button>
-          <button class="pt-btn-ghost" onclick="PT.resetToDefaults()">
-            <i class="fa-solid fa-rotate-left"></i> Reset
-          </button>
-        </div>
-
-        <!-- Example URLs -->
-        <div class="pt-examples" id="ptExamples">
-          <div class="pt-examples-title">Example URLs <span class="pt-hint">Click to use</span></div>
-          <div class="pt-example-list" id="ptExampleList"></div>
-        </div>
-      </div>
-
-    </div><!-- /pt-preview-col -->
-  </div><!-- /pt-main -->
+  </div><!-- /ptMetaInspector -->
 
   <!-- Icon Picker Modal -->
   <div class="pt-modal" id="ptIconModal" style="display:none" onclick="if(event.target===this)PT.closeIconPicker()">
