@@ -196,7 +196,7 @@
   // ── Category & Template Selection ─────────────────────────────────────────
   function selectCategory(cat, tpl) {
     // Update tab UI
-    $('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
+    $$('.pt-cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
 
     state.category = cat;
     state.template = tpl || Object.keys(PT_CATS[cat]?.templates || {})[0] || 'default';
