@@ -57,11 +57,61 @@ function plugin_view(string $slug, string $view, array $vars = []): string {
 }
 
 /**
+ * Build the Previewer Toolkit OG image URL for a plugin.
+ * Uses the manifest's name, categories, description, and author.
+ * Returns an absolute URL pointing to the previewer-toolkit renderer.
+ */
+function plugin_og_image(string $slug): string {
+    global $settings;
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $base   = $scheme . '://' . $host;
+
+    $m      = plugin_manifest($slug);
+    $name   = $m['name']        ?? $slug;
+    $desc   = $m['description'] ?? '';
+    $author = $m['author']      ?? $settings->get('developer_name', '');
+    $cats   = $m['categories']  ?? (isset($m['category']) ? (array)$m['category'] : []);
+
+    $subheading = implode(' · ', array_slice($cats, 0, 3));
+    $footer     = $author ? 'Developer: ' . $author : '';
+
+    $params = http_build_query([
+        'category'          => 'profile',
+        'template'          => 'modern',
+        'icon'              => 'address-card',
+        'heading'           => $name,
+        'subheading'        => $subheading,
+        'description'       => $desc,
+        'footer'            => $footer,
+        'bg_color'          => '3d8bff',
+        'heading_color'     => '317ff3',
+        'description_color' => '454545',
+        'accent_color'      => '050b18',
+        'font'              => 'Inter',
+        'radius'            => '20',
+        'padding'           => '60',
+        'width'             => '800',
+        'height'            => '460',
+        'format'            => 'webp',
+    ]);
+
+    return $base . '/plugins/previewer-toolkit/?' . $params;
+}
+
+/**
  * Render a full page using the active theme layout.
  * Call this at the end of your plugin's page handler.
+ * Automatically injects a Previewer Toolkit OG image if og_image is not set.
  */
 function plugin_render(string $title, string $content, array $opts = []): void {
     global $theme, $settings, $auth;
+    if (!isset($opts['og_image'])) {
+        $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        if (preg_match('#^/plugins/([a-z0-9_\-]+)#i', $uriPath, $match)) {
+            $opts['og_image'] = plugin_og_image($match[1]);
+        }
+    }
     require $theme->template('layout');
     render_page($title, $content, $opts);
 }
