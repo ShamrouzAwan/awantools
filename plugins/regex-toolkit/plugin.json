@@ -1,5 +1,6 @@
 {
     "name": "Regex Toolkit",
+    "og_icon": "magnifying-glass",
     "slug": "regex-toolkit",
     "version": "1.0.0",
     "description": "10 browser-based regex utilities — test, replace, extract, explain, validate, highlight matches, view named capture groups, generate patterns, browse a common patterns library, and reference the full cheat sheet. Zero server calls.",
@@ -15,9 +16,30 @@
     "dashboard_enabled": false,
     "analytics_enabled": true,
     "permissions": [],
-    "categories": ["Developer Tools", "Utilities", "Text Processing"],
-    "keywords": ["regex","regular expression","tester","replace","extractor","explainer","cheatsheet","pattern","validator","highlighter"],
-    "tags": ["regex","regexp","regular-expression","pattern-matching","developer-tools"],
+    "categories": [
+        "Developer Tools",
+        "Utilities",
+        "Text Processing"
+    ],
+    "keywords": [
+        "regex",
+        "regular expression",
+        "tester",
+        "replace",
+        "extractor",
+        "explainer",
+        "cheatsheet",
+        "pattern",
+        "validator",
+        "highlighter"
+    ],
+    "tags": [
+        "regex",
+        "regexp",
+        "regular-expression",
+        "pattern-matching",
+        "developer-tools"
+    ],
     "meta": {
         "title": "Regex Toolkit — 10 Free Online Regular Expression Tools",
         "description": "Test, replace, extract, explain and generate regular expressions instantly in your browser. Includes cheat sheet, pattern library, named groups viewer and more.",

@@ -79,7 +79,7 @@ function plugin_og_image(string $slug): string {
     $params = http_build_query([
         'category'          => 'profile',
         'template'          => 'modern',
-        'icon'              => 'address-card',
+        'icon'              => $m['og_icon'] ?? 'address-card',
         'heading'           => $name,
         'subheading'        => $subheading,
         'description'       => $desc,
