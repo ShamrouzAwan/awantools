@@ -476,6 +476,18 @@
     return v;
   }
 
+  // Resolve a potentially relative OG image URL against the inspected page's origin.
+  function resolveOgUrl(imgUrl, pageUrl) {
+    if (!imgUrl) return '';
+    if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) return imgUrl;
+    try {
+      const base = new URL(pageUrl);
+      if (imgUrl.startsWith('//')) return base.protocol + imgUrl;
+      if (imgUrl.startsWith('/'))  return base.origin + imgUrl;
+      return new URL(imgUrl, pageUrl).href;
+    } catch { return imgUrl; }
+  }
+
   function renderMetaResults(data) {
     const groups = {
       basic:   { title: 'Basic',            icon: 'circle-info',  tags: [] },
