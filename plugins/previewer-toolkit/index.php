@@ -25,7 +25,7 @@ function pt_parse_attrs(string $attrs): array {
     );
     foreach ($av as $a) {
         $key = strtolower($a[1]);
-        $out[$key] = $a[2] !== '' ? $a[2] : ($a[3] !== '' ? $a[3] : $a[4]);
+        $out[$key] = ($a[2] ?? '') !== '' ? $a[2] : (($a[3] ?? '') !== '' ? $a[3] : ($a[4] ?? ''));
     }
     // Valueless charset="UTF-8" variant
     if (!isset($out['charset']) &&
@@ -177,8 +177,7 @@ if ($is_render) {
 
     PT_Cache::store($cache_key, $cache_fmt, $bytes);
 
-    header('Content-Type: ' . PT_Cache::mime($cache_fmt));
-    header('Cache-Control: public, max-age=86400');
+    // Headers were already sent by PT_Exporter::output() before ob_get_clean().
     echo $bytes;
     exit;
 }

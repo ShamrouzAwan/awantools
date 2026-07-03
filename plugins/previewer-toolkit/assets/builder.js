@@ -50,14 +50,14 @@
   ];
 
   const EXAMPLE_TEMPLATES = [
-    { category: 'og',          template: 'glassmorphism', icon: 'rocket',   heading: 'Launch Fast',          description: 'Built%20with%20passion%20for%20the%20world.' },
-    { category: 'og',          template: 'gradient',      icon: 'star',      heading: 'Premium%20Quality',     description: 'Built%20with%20%F0%9F%92%9C%20by%20you.' },
-    { category: 'og',          template: 'neon',          icon: 'heart',     heading: 'Made%20with%20Love',   description: 'Crafted%20beautifully%20for%20you.' },
-    { category: 'og',          template: 'minimal',       icon: 'lightbulb', heading: 'Simple%20Ideas',        description: 'Turning%20ideas%20into%20reality.' },
-    { category: 'social',      template: 'modern_dark',   icon: 'bolt',      heading: 'Ship%20Faster',         description: 'Build%20and%20deploy%20in%20minutes.' },
-    { category: 'terminal',    template: 'macos',         icon: 'terminal',  heading: 'Terminal',              description: '' },
-    { category: 'github',      template: 'repo_dark',     icon: 'github',    heading: 'My%20Project',          description: 'Open%20source%20and%20free.' },
-    { category: 'code',        template: 'dracula',       icon: 'code',      heading: 'snippet.js',            description: '' },
+    { category: 'og',          template: 'glassmorphism', icon: 'rocket',   heading: 'Launch Fast',       description: 'Built with passion for the world.' },
+    { category: 'og',          template: 'gradient',      icon: 'star',      heading: 'Premium Quality',   description: 'Built with love, by you.' },
+    { category: 'og',          template: 'neon',          icon: 'heart',     heading: 'Made with Love',    description: 'Crafted beautifully for you.' },
+    { category: 'og',          template: 'minimal',       icon: 'lightbulb', heading: 'Simple Ideas',      description: 'Turning ideas into reality.' },
+    { category: 'social',      template: 'modern_dark',   icon: 'bolt',      heading: 'Ship Faster',       description: 'Build and deploy in minutes.' },
+    { category: 'terminal',    template: 'macos',         icon: 'terminal',  heading: 'Terminal',          description: '' },
+    { category: 'github',      template: 'repo_dark',     icon: 'github',    heading: 'My Project',        description: 'Open source and free.' },
+    { category: 'code',        template: 'dracula',       icon: 'code',      heading: 'snippet.js',        description: '' },
   ];
 
   // ── DOM Helpers ────────────────────────────────────────────────────────────
@@ -221,6 +221,7 @@
       const thumbUrl = buildThumbURL(cat, slug);
       const card = document.createElement('div');
       card.className = 'pt-tpl-card' + (slug === state.template ? ' active' : '');
+      card.dataset.template = slug;
       card.innerHTML = `
         <img class="pt-tpl-thumb" src="${thumbUrl}" alt="${escHtml(tpl.name)}" loading="lazy">
         <div class="pt-tpl-label">${escHtml(tpl.name)}</div>`;
@@ -254,11 +255,8 @@
 
   function selectTemplate(cat, tpl) {
     state.template = tpl;
-    $$('.pt-tpl-card').forEach(card => card.classList.remove('active'));
-    const cards = $$('.pt-tpl-card');
-    const tplList = Object.keys(PT_CATS[cat]?.templates || {});
-    const idx = tplList.indexOf(tpl);
-    if (cards[idx]) cards[idx].classList.add('active');
+    // Match by data-template slug, not by NodeList index, so grid reordering won't break highlighting.
+    $('.pt-tpl-card').forEach(card => card.classList.toggle('active', card.dataset.template === tpl));
 
     // Update info label
     const info = $('ptTplInfo');
@@ -348,11 +346,13 @@
 
   function syncColorText(key, val) {
     if (!val.startsWith('#')) val = '#' + val;
+    // Only update when a complete, valid 6-digit hex is entered.
+    // This avoids firing render requests on every partial keystroke.
     if (/^#[0-9a-fA-F]{6}$/.test(val)) {
       const picker = $('fc_' + key);
       if (picker) picker.value = val;
+      update();
     }
-    update();
   }
 
   // ── Slider ─────────────────────────────────────────────────────────────────
@@ -630,7 +630,7 @@
 
   // ── Open Preview ───────────────────────────────────────────────────────────
   function openPreview() {
-    window.open(buildURL('svg'), '_blank');
+    window.open(buildURL($('f_format').value), '_blank');
   }
 
   // ── Set Scale ──────────────────────────────────────────────────────────────
@@ -689,7 +689,7 @@
     'Powerful, flexible, and beautiful by default.',
     'Open source tools trusted by thousands of developers.',
   ];
-  const RANDOM_ICONS = ['rocket','bolt','star','fire','crown','gem','magic','atom','brain','code','globe','terminal','server','shield','lightning','wand-magic-sparkles'];
+  const RANDOM_ICONS = ['rocket','bolt','star','fire','crown','gem','magic','atom','brain','code','globe','terminal','server','shield','bolt','wand-magic-sparkles'];
 
   function randomize() {
     const colors = RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];

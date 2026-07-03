@@ -21,39 +21,6 @@ class PT_Renderer
         }
     }
 
-    static function fa_style(): string
-    {
-        return "@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');";
-    }
-
-    static function defs_open(array $p, array $extra_defs = []): string
-    {
-        $w = $p['width'];
-        $h = $p['height'];
-        $r = $p['border_radius'];
-        $fa = self::fa_style();
-        $extra = implode("\n", $extra_defs);
-        return <<<XML
-<defs>
-  <style>$fa</style>
-  <clipPath id="clip"><rect width="$w" height="$h" rx="$r"/></clipPath>
-  $extra
-</defs>
-XML;
-    }
-
-    static function svg_open(array $p): string
-    {
-        $w = $p['width'];
-        $h = $p['height'];
-        return "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
-             . "width=\"$w\" height=\"$h\" viewBox=\"0 0 $w $h\">";
-    }
-
-    static function svg_close(): string { return '</svg>'; }
-
-    static function clip_group(): string { return "<g clip-path=\"url(#clip)\">"; }
-
     static function dots(int $cols, int $rows, float $startX, float $startY, float $gap, string $color, float $opacity = 0.25, float $r = 2.5): string
     {
         $out = '';
@@ -89,16 +56,16 @@ XML;
 
     static function error_svg(array $p, string $msg): string
     {
-        $w = $p['width'] ?? 800;
-        $h = $p['height'] ?? 400;
+        $w  = $p['width']  ?? 800;
+        $h  = $p['height'] ?? 400;
+        $cx = (int)($w / 2);
+        $cy = (int)($h / 2);
         $em = htmlspecialchars($msg, ENT_XML1);
         return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
   <rect width="$w" height="$h" fill="#1a1a2e"/>
-  <text x="{$w}" y="{$h}" text-anchor="middle" dominant-baseline="middle" 
-        transform="translate(-{$w}, -{$h}) translate({$w}, {$h})"
+  <text x="$cx" y="$cy" text-anchor="middle" dominant-baseline="middle"
         font-family="monospace" font-size="16" fill="#ef4444">Error: $em</text>
-  <text x='" . ($w/2) . "' y='" . ($h/2) . "' text-anchor='middle' dominant-baseline='middle' font-family='monospace' font-size='16' fill='#ef4444'>Error: $em</text>
 </svg>
 SVG;
     }

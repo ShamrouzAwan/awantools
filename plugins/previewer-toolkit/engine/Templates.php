@@ -710,7 +710,8 @@ function pt_github_repo_dark(array $p): string
     $border  = '#30363d';
     $w1 = $w - 1; $h1 = $h - 1;
     $head_x = $pad + 70; $head_y = $pad + 24;
-    $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*11 + 20;
+    // ~10px per char at 18px Inter; +32 for the " /" suffix and gap before tag.
+    $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*10 + 32;
     $line_y  = $h - $pad - 70;
     $line_x2 = $w - $pad;
     return <<<SVG
@@ -749,7 +750,8 @@ function pt_github_repo_light(array $p): string
     $tag    = PT_Text::e($p['tag']);
     $border = '#d0d7de';
     $head_x = $pad + 70; $head_y = $pad + 24;
-    $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*11 + 20;
+    // ~10px per char at 18px Inter; +32 for the " /" suffix and gap before tag.
+    $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*10 + 32;
     $line_y  = $h - $pad - 70;
     $line_x2 = $w - $pad;
     return <<<SVG
@@ -886,7 +888,9 @@ function pt_gh_stats_row(array $p, float $x, float $y, string $hc, string $dc, s
     $s3l = PT_Text::e($p['stat3_label']); $s3v = PT_Text::e($p['stat3_value']);
     $lc   = PT_Color::h($p['lang_color']);
     $lang = PT_Text::e($p['lang']);
-    $x2 = $x + 160; $x3 = $x + 260; $x4 = $x + 360;
+    // Proportional column offsets so stats scale with image width.
+    $span = (int)(($p['width'] - $x) / 4);
+    $x2 = $x + $span; $x3 = $x + $span * 2; $x4 = $x + $span * 3;
     return "
     <circle cx='$x' cy='$y' r='6' fill='$lc'/>
     <text x='$x' y='$y' dy='5' dx='14' font-family=\"'$font',sans-serif\" font-size='13' fill='$dc'>$lang</text>
@@ -1274,6 +1278,8 @@ function pt_profile_modern(array $p): string
     $av_r5   = $av_r + 5;
     $icon_s  = PT_Icons::icon_block($p['icon'], $cx, $av_cy, $av_r, $p['bg_color'], $p['accent_color'], (int)($av_r * 0.6));
     $role_y  = $name_y + 26; $desc_y = $name_y + 56; $foot_y = $h - $pad + 10;
+    // Card bg: always white for the split-card design; derive text colors from user params.
+    $card_bg = '#ffffff';
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
 <defs>
@@ -1281,15 +1287,15 @@ function pt_profile_modern(array $p): string
   <linearGradient id="banner" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="$bg"/><stop offset="100%" stop-color="$bg2"/></linearGradient>
 </defs>
 <g clip-path="url(#clip)">
-  <rect width="$w" height="$h" fill="#ffffff"/>
+  <rect width="$w" height="$h" fill="$card_bg"/>
   <rect x="0" y="0" width="$w" height="$banner_h" fill="url(#banner)"/>
-  <circle cx="$cx" cy="$av_cy" r="$av_r5" fill="white"/>
+  <circle cx="$cx" cy="$av_cy" r="$av_r5" fill="$card_bg"/>
   <circle cx="$cx" cy="$av_cy" r="$av_r" fill="$bg"/>
   $icon_s
-  <text x="$cx" y="$name_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="28" font-weight="700" fill="#111827">$ne</text>
-  <text x="$cx" y="$role_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="$bg" font-weight="600">$re</text>
-  <text x="$cx" y="$desc_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="#6b7280">$ds</text>
-  <text x="$cx" y="$foot_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="12" fill="#9ca3af">$fe</text>
+  <text x="$cx" y="$name_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="28" font-weight="700" fill="$hc">$ne</text>
+  <text x="$cx" y="$role_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="$ac" font-weight="600">$re</text>
+  <text x="$cx" y="$desc_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="14" fill="$dc">$ds</text>
+  <text x="$cx" y="$foot_y" text-anchor="middle" font-family="'$font',sans-serif" font-size="12" fill="$dc">$fe</text>
 </g></svg>
 SVG;
 }

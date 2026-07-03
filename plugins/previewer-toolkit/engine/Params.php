@@ -105,7 +105,7 @@ class PT_Params
         $fnt = $raw['font'] ?? 'Inter';
         $p['font'] = in_array($fnt, self::SAFE_FONTS, true) ? $fnt : 'Inter';
 
-        $p['border_radius'] = max(0, min(120, (int)($raw['radius'] ?? $raw['border_radius'] ?? $p['border_radius'])));
+        $p['border_radius'] = max(0, min(60, (int)($raw['radius'] ?? $raw['border_radius'] ?? $p['border_radius'])));
         $p['padding']       = max(0, min(200, (int)($raw['padding']  ?? $p['padding'])));
         $p['quality']       = max(1, min(100, (int)($raw['quality']  ?? $p['quality'])));
         $p['font_size']     = max(0, min(200, (int)($raw['font_size']?? $p['font_size'])));

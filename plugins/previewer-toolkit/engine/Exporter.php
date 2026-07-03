@@ -29,13 +29,17 @@ class PT_Exporter
 
         // Try ImageMagick only when exec() is available
         if (self::exec_available()) {
-            $tmp_svg = tempnam(sys_get_temp_dir(), 'pt_') . '.svg';
-            $tmp_out = tempnam(sys_get_temp_dir(), 'pt_');
-
+            // tempnam() creates the base file; rename it so it has the right
+            // extension — avoids leaking the extensionless temp file.
+            $base_svg = tempnam(sys_get_temp_dir(), 'pt_');
+            $tmp_svg  = $base_svg . '.svg';
+            rename($base_svg, $tmp_svg);
             file_put_contents($tmp_svg, $svg);
 
-            $ext = $fmt === 'jpg' ? 'jpg' : $fmt;
-            $tmp_out .= '.' . $ext;
+            $ext     = $fmt === 'jpg' ? 'jpg' : $fmt;
+            $base_out = tempnam(sys_get_temp_dir(), 'pt_');
+            $tmp_out  = $base_out . '.' . $ext;
+            rename($base_out, $tmp_out);
 
             $quality_flag = '';
             if ($fmt === 'jpg' || $fmt === 'webp') {
