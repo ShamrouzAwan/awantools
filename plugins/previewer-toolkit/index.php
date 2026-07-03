@@ -574,23 +574,11 @@ ob_start(); ?>
       <span id="ptMiErrorMsg">Could not fetch URL.</span>
     </div>
     <div class="pt-mi-results" id="ptMiResults" style="display:none">
-
-      <!-- Social link preview card -->
-      <div class="pt-mi-link-preview" id="ptMiLinkPreview" style="display:none">
-        <div class="pt-mi-lp-img-wrap" id="ptMiLpImgWrap" style="display:none">
-          <img id="ptMiLpImg" src="" alt="" class="pt-mi-lp-img">
-        </div>
-        <div class="pt-mi-lp-body">
-          <div class="pt-mi-lp-site" id="ptMiLpSite"></div>
-          <div class="pt-mi-lp-title" id="ptMiLpTitle"></div>
-          <div class="pt-mi-lp-desc" id="ptMiLpDesc"></div>
-        </div>
+      <div class="pt-mi-compact">
+        <div class="pt-mi-col-left"  id="ptMiColLeft"></div>
+        <div class="pt-mi-col-right" id="ptMiColRight"></div>
       </div>
-
-      <div class="pt-mi-summary" id="ptMiSummary">
-        <div class="pt-mi-summary-cards" id="ptMiSummaryInfo"></div>
-      </div>
-      <div class="pt-mi-groups" id="ptMiGroups"></div>
+      <div class="pt-mi-raw-wrap" id="ptMiRawWrap"></div>
     </div>
 
   </div><!-- /ptMetaInspector -->

@@ -488,6 +488,115 @@
     } catch { return imgUrl; }
   }
 
+  // Compute OG quality score + issue list.
+  function computeScore(groups) {
+    let score = 0;
+    const issues = [];
+    const get = (grp, name) => groups[grp]?.tags.find(t => t.name === name)?.content || '';
+
+    const ogTitle  = get('og', 'og:title');
+    const ogDesc   = get('og', 'og:description') || get('basic', 'description');
+    const ogImg    = get('og', 'og:image') || get('twitter', 'twitter:image');
+    const ogType   = get('og', 'og:type');
+    const ogImgW   = get('og', 'og:image:width');
+    const ogImgH   = get('og', 'og:image:height');
+    const twCard   = get('twitter', 'twitter:card');
+    const canonical= get('link', 'canonical');
+    const siteName = get('og', 'og:site_name');
+
+    if (ogTitle)    score += 20; else issues.push({ sev: 'HIGH',   title: 'Missing og:title',              desc: 'Social platforms fall back to the page title, which may not be share-optimised.' });
+    if (ogDesc)     score += 15; else issues.push({ sev: 'MEDIUM', title: 'Missing og:description',        desc: 'Without a description, platforms generate unpredictable preview text.' });
+    if (ogImg) {
+      score += 25;
+      if (!ogImgW || !ogImgH) issues.push({ sev: 'MEDIUM', title: 'Image dimensions not specified', desc: 'Add og:image:width and og:image:height for faster preview rendering.' });
+    } else             issues.push({ sev: 'HIGH',   title: 'Missing og:image',                desc: 'Without an OG image, social shares show a generic placeholder or nothing.' });
+    if (ogType)     score += 10; else issues.push({ sev: 'LOW',    title: 'Missing og:type',              desc: 'Set og:type to "website" or "article" to categorise your content.' });
+    if (twCard)     score += 10; else issues.push({ sev: 'LOW',    title: 'Missing twitter:card',         desc: 'Add twitter:card to control how your link renders on X (Twitter).' });
+    if (canonical)  score += 10; else issues.push({ sev: 'LOW',    title: 'No canonical URL',             desc: 'A canonical link prevents duplicate-content issues with search engines.' });
+    if (siteName)   score +=  5;
+    if (ogImgW && ogImgH) score += 5;
+    if (ogTitle && ogTitle.length > 60)  issues.push({ sev: 'LOW', title: 'Title may be too long',        desc: `og:title is ${ogTitle.length} chars — keep under 60 to avoid truncation.` });
+    if (ogDesc  && ogDesc.length  > 160) issues.push({ sev: 'LOW', title: 'Description may be too long',  desc: `og:description is ${ogDesc.length} chars — keep under 160.` });
+
+    return { score: Math.min(score, 100), issues };
+  }
+
+  // Build the right-column social preview HTML for the given platform.
+  function buildSocialPreviewHtml(platform) {
+    const d = state.miPreviewData;
+    if (!d) return '';
+    const { resolvedImg, ogTitle, ogDesc, siteName, pageHost,
+            hasOgTitle, hasDesc, hasImg, ogTagCount } = d;
+
+    const platforms = [
+      { id: 'facebook', label: 'Facebook' },
+      { id: 'linkedin', label: 'LinkedIn' },
+      { id: 'x',        label: 'X' },
+      { id: 'google',   label: 'Google' },
+      { id: 'slack',    label: 'Slack' },
+    ];
+
+    const sb = (label, found) =>
+      `<span class="pt-mi-sbadge ${found ? 'found' : 'missing'}">` +
+      `<i class="fa-solid fa-circle"></i>${escHtml(label)}: <strong>${found ? 'Found' : 'Missing'}</strong></span>`;
+
+    let previewHtml = '';
+    if (platform === 'google') {
+      previewHtml = `
+        <div class="pt-mi-sp-google">
+          <div class="pt-mi-sp-g-row">
+            <span class="pt-mi-sp-g-favicon">🌐</span>
+            <span class="pt-mi-sp-g-host">${escHtml(siteName || pageHost || 'example.com')}</span>
+          </div>
+          <div class="pt-mi-sp-g-title">${escHtml(ogTitle || 'No title')}</div>
+          <div class="pt-mi-sp-g-desc">${escHtml(ogDesc || 'No description available.')}</div>
+        </div>`;
+    } else if (platform === 'slack') {
+      previewHtml = `
+        <div class="pt-mi-sp-slack">
+          <div class="pt-mi-sp-sl-bar"></div>
+          <div class="pt-mi-sp-sl-inner">
+            <div class="pt-mi-sp-sl-site">${escHtml(siteName || pageHost || 'example.com')}</div>
+            <div class="pt-mi-sp-sl-title">${escHtml(ogTitle || 'No title')}</div>
+            ${ogDesc ? `<div class="pt-mi-sp-sl-desc">${escHtml(ogDesc)}</div>` : ''}
+            ${resolvedImg ? `<img class="pt-mi-sp-sl-img" src="${escAttr(resolvedImg)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+          </div>
+        </div>`;
+    } else {
+      const imgHtml = resolvedImg
+        ? `<img class="pt-mi-sp-img" id="ptMiSpImg" src="${escAttr(resolvedImg)}" alt="" loading="lazy" style="opacity:0" onload="this.style.opacity='1'" onerror="this.closest('.pt-mi-sp-img-wrap').innerHTML='<div class=\\'pt-mi-sp-no-img\\'><i class=\\'fa-regular fa-image\\'></i><span>No OG image</span></div>'">`
+        : '<div class="pt-mi-sp-no-img"><i class="fa-regular fa-image"></i><span>No OG image</span></div>';
+      previewHtml = `
+        <div class="pt-mi-sp-card pt-mi-sp-${escAttr(platform)}">
+          <div class="pt-mi-sp-img-wrap">${imgHtml}</div>
+          <div class="pt-mi-sp-body">
+            <div class="pt-mi-sp-host">${escHtml((siteName || pageHost || 'example.com').toUpperCase())}</div>
+            <div class="pt-mi-sp-title">${escHtml(ogTitle || 'No title')}</div>
+            ${ogDesc ? `<div class="pt-mi-sp-desc">${escHtml(ogDesc)}</div>` : ''}
+          </div>
+        </div>`;
+    }
+
+    const tabs = platforms.map(p =>
+      `<button class="pt-mi-ptab${p.id === platform ? ' active' : ''}" onclick="PT.switchMiPlatform('${p.id}')">${p.label}</button>`
+    ).join('');
+
+    return `
+      <div class="pt-mi-social-head">Social Preview</div>
+      <div class="pt-mi-platform-tabs">${tabs}</div>
+      <div class="pt-mi-sbadges">
+        ${sb('Title', hasOgTitle)}${sb('Description', hasDesc)}${sb('Image', hasImg)}${sb('OG tags', ogTagCount > 0)}
+      </div>
+      ${previewHtml}`;
+  }
+
+  // Switch platform tab — re-renders right column without re-fetching.
+  function switchMiPlatform(platform) {
+    state.miPlatform = platform;
+    const rightEl = $('ptMiColRight');
+    if (rightEl && state.miPreviewData) rightEl.innerHTML = buildSocialPreviewHtml(platform);
+  }
+
   function renderMetaResults(data) {
     const groups = {
       basic:   { title: 'Basic',            icon: 'circle-info',  tags: [] },
@@ -497,7 +606,6 @@
       other:   { title: 'Other Meta',       icon: 'tag',          tags: [] },
     };
 
-    // Page title as a synthetic basic tag
     if (data.title) {
       groups.basic.tags.unshift({ type: 'synthetic', name: 'title', content: data.title, attr: 'element' });
     }
@@ -519,129 +627,92 @@
       }
     });
 
-    // ── Social link preview card ─────────────────────────────────────────────
-    const ogImg      = groups.og.tags.find(t => t.name === 'og:image')?.content ||
-                       groups.twitter.tags.find(t => t.name === 'twitter:image')?.content || '';
-    const ogTitle    = groups.og.tags.find(t => t.name === 'og:title')?.content || data.title || '';
-    const ogDesc     = groups.og.tags.find(t => t.name === 'og:description')?.content ||
-                       groups.basic.tags.find(t => t.name === 'description')?.content || '';
-    const siteName   = groups.og.tags.find(t => t.name === 'og:site_name')?.content || '';
-    const pageHost   = (() => { try { return new URL(data.url || '').hostname.replace(/^www\./, ''); } catch { return data.url || ''; } })();
+    const get = (grp, name) => groups[grp]?.tags.find(t => t.name === name)?.content || '';
 
-    const lpCard    = $('ptMiLinkPreview');
-    const lpImgWrap = $('ptMiLpImgWrap');
-    const lpImg     = $('ptMiLpImg');
-    const lpSite    = $('ptMiLpSite');
-    const lpTitleEl = $('ptMiLpTitle');
-    const lpDescEl  = $('ptMiLpDesc');
+    const ogImg    = get('og', 'og:image') || get('twitter', 'twitter:image');
+    const ogTitle  = get('og', 'og:title') || data.title || '';
+    const ogDesc   = get('og', 'og:description') || get('basic', 'description') || '';
+    const siteName = get('og', 'og:site_name');
+    const pageHost = (() => { try { return new URL(data.url || '').hostname.replace(/^www\./, ''); } catch { return data.url || ''; } })();
 
-    if (lpCard) {
-      if (lpSite)    lpSite.textContent    = siteName || pageHost;
-      if (lpTitleEl) lpTitleEl.textContent = ogTitle;
-      if (lpDescEl)  lpDescEl.textContent  = ogDesc;
+    const resolvedImg = resolveOgUrl(ogImg, data.url || '');
+    const hasOgTitle  = !!get('og', 'og:title');
+    const hasDesc     = !!(get('og', 'og:description') || get('basic', 'description'));
+    const hasImg      = !!ogImg;
+    const ogTagCount  = groups.og.tags.length;
 
-      // Resolve relative OG image URLs against the inspected page's origin
-      const resolvedImg = resolveOgUrl(ogImg, data.url || '');
+    // ── Score ──────────────────────────────────────────────────────────────
+    const { score, issues } = computeScore(groups);
+    const rating      = score >= 90 ? 'GREAT' : score >= 75 ? 'GOOD' : score >= 50 ? 'FAIR' : 'POOR';
+    const ratingColor = score >= 90 ? '#22c55e' : score >= 75 ? '#16a34a' : score >= 50 ? '#f59e0b' : '#ef4444';
 
-      const noImgFallback = '<div class="pt-mi-lp-no-img-msg"><i class="fa-regular fa-image"></i><span>This page has no OG image</span></div>';
-
-      if (resolvedImg && lpImg && lpImgWrap) {
-        lpImgWrap.style.display = '';
-        lpImgWrap.classList.remove('pt-mi-lp-no-img');
-        lpImgWrap.classList.add('pt-mi-lp-loading');
-        lpImg.style.display = '';
-        lpImg.style.opacity = '0';
-        lpImg.onload = () => {
-          lpImgWrap.classList.remove('pt-mi-lp-loading');
-          lpImg.style.opacity = '1';
-        };
-        lpImg.onerror = () => {
-          lpImgWrap.classList.remove('pt-mi-lp-loading');
-          lpImg.classList.add('pt-mi-lp-no-img');
-          lpImg.style.display = 'none';
-          lpImgWrap.innerHTML = noImgFallback;
-        };
-        lpImg.src = resolvedImg;
-      } else if (lpImgWrap) {
-        lpImgWrap.style.display = '';
-        lpImgWrap.classList.add('pt-mi-lp-no-img');
-        lpImgWrap.innerHTML = noImgFallback;
-      }
-      lpCard.style.display = '';
-    }
-
-    // ── Summary cards ────────────────────────────────────────────────────────
-    const summaryEl = $('ptMiSummaryInfo');
-    if (summaryEl) {
-      const ogTitle    = groups.og.tags.find(t => t.name === 'og:title')?.content || '';
-      const ogDesc     = groups.og.tags.find(t => t.name === 'og:description')?.content ||
-                         groups.basic.tags.find(t => t.name === 'description')?.content || '';
-      const canonical  = groups.link.tags.find(t => t.name === 'canonical')?.content || data.url;
-      const ogType     = groups.og.tags.find(t => t.name === 'og:type')?.content || '';
-      const siteName   = groups.og.tags.find(t => t.name === 'og:site_name')?.content || '';
-      const twCard     = groups.twitter.tags.find(t => t.name === 'twitter:card')?.content || '';
-      const charset    = groups.basic.tags.find(t => t.name === 'charset')?.content || '';
-      const viewport   = groups.basic.tags.find(t => t.name === 'viewport')?.content || '';
-      const robots     = groups.basic.tags.find(t => t.name === 'robots')?.content || '';
-
-      const badge = (label, val) => val
-        ? `<div class="pt-mi-badge"><span>${escHtml(label)}</span><div class="pt-mi-badge-val">${escHtml(val)}</div></div>`
-        : '';
-
-      summaryEl.innerHTML = `
-        <div class="pt-mi-card">
-          <div class="pt-mi-card-label"><i class="fa-solid fa-heading"></i> Page Title</div>
-          <div class="pt-mi-card-value">${escHtml(data.title || '—')}</div>
+    // ── Left column ────────────────────────────────────────────────────────
+    const leftEl = $('ptMiColLeft');
+    if (leftEl) {
+      leftEl.innerHTML = `
+        <div class="pt-mi-score-box" style="--sc:${ratingColor}">
+          <div class="pt-mi-score-num">${score}<span class="pt-mi-score-denom">/100</span></div>
+          <div class="pt-mi-score-rating">${rating}</div>
         </div>
-        ${ogTitle && ogTitle !== data.title ? `
-        <div class="pt-mi-card">
-          <div class="pt-mi-card-label"><i class="fa-solid fa-share-nodes"></i> OG Title</div>
-          <div class="pt-mi-card-value">${escHtml(ogTitle)}</div>
-        </div>` : ''}
-        ${ogDesc ? `
-        <div class="pt-mi-card">
-          <div class="pt-mi-card-label"><i class="fa-solid fa-align-left"></i> Description</div>
-          <div class="pt-mi-card-value">${escHtml(ogDesc)}</div>
-        </div>` : ''}
-        <div class="pt-mi-card">
-          <div class="pt-mi-card-label"><i class="fa-solid fa-link"></i> URL</div>
-          <div class="pt-mi-card-value pt-mi-card-url"><a href="${escAttr(canonical)}" target="_blank" rel="noopener noreferrer">${escHtml(canonical)}</a></div>
-        </div>
-        <div class="pt-mi-card-row">
-          ${badge('OG Type', ogType)}
-          ${badge('Site Name', siteName)}
-          ${badge('TW Card', twCard)}
-          ${badge('Charset', charset)}
-          ${badge('Robots', robots)}
-          ${viewport ? badge('Viewport', viewport.split(',')[0].trim()) : ''}
+        <div class="pt-mi-issues-box">
+          <div class="pt-mi-issues-head ${issues.length ? 'has-issues' : 'all-ok'}">
+            <i class="fa-solid fa-${issues.length ? 'triangle-exclamation' : 'circle-check'}"></i>
+            ${issues.length ? `${issues.length} Issue${issues.length !== 1 ? 's' : ''} Found` : 'No Issues Found'}
+          </div>
+          ${issues.length
+            ? `<div class="pt-mi-issues-list">${issues.map(iss => `
+                <div class="pt-mi-issue-item">
+                  <span class="pt-mi-sev pt-mi-sev-${iss.sev.toLowerCase()}">${iss.sev}</span>
+                  <div class="pt-mi-issue-body">
+                    <div class="pt-mi-issue-title">${escHtml(iss.title)}</div>
+                    <div class="pt-mi-issue-desc">${escHtml(iss.desc)}</div>
+                  </div>
+                </div>`).join('')}</div>`
+            : '<div class="pt-mi-issues-ok">All key Open Graph tags are present and look good.</div>'}
         </div>`;
     }
 
-    // ── Tag group tables ─────────────────────────────────────────────────────
-    const groupsEl = $('ptMiGroups');
-    if (groupsEl) {
+    // ── Right column ───────────────────────────────────────────────────────
+    state.miPlatform    = state.miPlatform || 'facebook';
+    state.miPreviewData = { resolvedImg, ogTitle, ogDesc, siteName, pageHost,
+                            hasOgTitle, hasDesc, hasImg, ogTagCount };
+
+    const rightEl = $('ptMiColRight');
+    if (rightEl) rightEl.innerHTML = buildSocialPreviewHtml(state.miPlatform);
+
+    // ── Raw tags accordion ─────────────────────────────────────────────────
+    const rawEl = $('ptMiRawWrap');
+    if (rawEl) {
       const filledGroups = Object.entries(groups).filter(([, g]) => g.tags.length > 0);
-      if (filledGroups.length === 0) {
-        groupsEl.innerHTML = `<div class="pt-mi-empty"><i class="fa-solid fa-circle-info" style="margin-right:8px;color:var(--pt-muted2)"></i>No meta or Open Graph tags were found on this page.</div>`;
-      } else {
-        groupsEl.innerHTML = filledGroups.map(([, g]) => `
-          <div class="pt-mi-group">
-            <div class="pt-mi-group-head">
-              <i class="fa-solid fa-${escAttr(g.icon)}"></i>
-              ${escHtml(g.title)}
-              <span class="pt-mi-group-count">${g.tags.length}</span>
-            </div>
-            <table class="pt-mi-table">
-              <thead><tr><th>Name / Property</th><th>Content / Value</th></tr></thead>
-              <tbody>${g.tags.map(tag => `
-                <tr class="pt-mi-tag-row">
-                  <td class="pt-mi-tag-name"><code>${escHtml(tag.name)}</code></td>
-                  <td class="pt-mi-tag-content">${renderTagContent(tag)}</td>
-                </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>`).join('');
-      }
+      const totalTags = (data.tags || []).length + (data.title ? 1 : 0);
+      rawEl.innerHTML = `
+        <div class="pt-mi-raw-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('hidden')">
+          <i class="fa-solid fa-code"></i>
+          Raw Meta Tags
+          <span class="pt-mi-raw-count">${totalTags}</span>
+          <i class="fa-solid fa-chevron-down pt-mi-raw-chevron"></i>
+        </div>
+        <div class="pt-mi-raw-body hidden">
+          ${filledGroups.length === 0
+            ? '<div class="pt-mi-empty">No meta tags found on this page.</div>'
+            : filledGroups.map(([, g]) => `
+              <div class="pt-mi-group">
+                <div class="pt-mi-group-head">
+                  <i class="fa-solid fa-${escAttr(g.icon)}"></i>
+                  ${escHtml(g.title)}
+                  <span class="pt-mi-group-count">${g.tags.length}</span>
+                </div>
+                <table class="pt-mi-table">
+                  <thead><tr><th>Name / Property</th><th>Content / Value</th></tr></thead>
+                  <tbody>${g.tags.map(tag => `
+                    <tr class="pt-mi-tag-row">
+                      <td class="pt-mi-tag-name"><code>${escHtml(tag.name)}</code></td>
+                      <td class="pt-mi-tag-content">${renderTagContent(tag)}</td>
+                    </tr>`).join('')}
+                  </tbody>
+                </table>
+              </div>`).join('')}
+        </div>`;
     }
 
     $('ptMiResults').style.display = '';
@@ -936,6 +1007,7 @@
     // Meta Inspector
     inspectMeta,
     miQuick,
+    switchMiPlatform,
   };
 
   // ── Wait for DOM ───────────────────────────────────────────────────────────
