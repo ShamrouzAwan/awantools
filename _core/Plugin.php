@@ -31,12 +31,6 @@ class Plugin {
         $manifest = self::getManifest($slug);
         if (empty($manifest)) return false;
 
-        // If the plugin directory contains icon.svg, embed its content into the manifest
-        $iconFile = PLUGINS_PATH . '/' . $slug . '/icon.svg';
-        if (file_exists($iconFile)) {
-            $manifest['icon'] = trim(file_get_contents($iconFile));
-        }
-
         $offered = max(1, (int)($manifest['offered'] ?? 1));
 
         if (!$db->exists('plugins', 'slug = ?', [$slug])) {

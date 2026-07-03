@@ -134,7 +134,7 @@ ob_start();
     <div id="plugins-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px">
         <?php foreach ($activePlugins as $plugin):
             $manifest    = json_decode($plugin['manifest'] ?? '{}', true) ?? [];
-            $icon        = $manifest['icon'] ?? '';
+            $ogIcon      = $manifest['og_icon'] ?? 'puzzle-piece';
             $categories  = $manifest['categories'] ?? (isset($manifest['category']) && $manifest['category'] ? [$manifest['category']] : []);
             $keywords    = array_map('strtolower', $manifest['keywords'] ?? []);
             $tags        = array_map('strtolower', $manifest['tags'] ?? []);
@@ -156,7 +156,7 @@ ob_start();
                 <div style="display:flex;align-items:flex-start;gap:14px">
                     <div style="width:48px;height:48px;background:var(--color-primary-light);border-radius:var(--radius-small);
                                 display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
-                        <?= $icon ?: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/></svg>' ?>
+                        <i class="fa-solid fa-<?= e($ogIcon) ?>" style="font-size:22px;color:var(--color-primary)"></i>
                     </div>
                     <div style="flex:1;min-width:0">
                         <div style="font-weight:700;font-size:15px;margin-bottom:4px"><?= e($plugin['name']) ?></div>

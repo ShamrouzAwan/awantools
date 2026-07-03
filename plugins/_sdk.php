@@ -250,10 +250,10 @@ function plugin_related_html(string $slug): string {
     $html  = '<div class="card" style="margin-top:24px"><div class="card-header"><span class="card-title" style="font-size:14px">Related Tools</span></div><div class="card-body" style="padding:0">';
     foreach ($related as $r) {
         $m    = json_decode($r['manifest'] ?? '{}', true) ?? [];
-        $icon = $m['icon'] ?? '';
+        $ogIcon = $m['og_icon'] ?? 'puzzle-piece';
         $html .= '<a href="/plugins/' . e($r['slug']) . '/" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-decoration:none;color:var(--color-text);border-bottom:1px solid var(--color-border);transition:background .1s" onmouseover="this.style.background=\'var(--color-background)\'" onmouseout="this.style.background=\'\'">';
         $html .= '<div style="width:32px;height:32px;border-radius:var(--radius-small);background:var(--color-primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--color-primary)">';
-        $html .= $icon ?: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg>';
+        $html .= '<i class="fa-solid fa-' . e($ogIcon) . '" style="font-size:16px"></i>';
         $html .= '</div>';
         $html .= '<div><div style="font-size:13px;font-weight:600">' . e($r['name']) . '</div>';
         $html .= '<div style="font-size:11px;color:var(--color-text-muted)">' . e(substr($r['description'] ?? '', 0, 60)) . '</div></div>';
