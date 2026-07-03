@@ -1058,16 +1058,139 @@ class PT_Icons
         'monero'             => 'bitcoin',
     ];
 
+    // ── Font Awesome CDN fallback ────────────────────────────────────────────
+
+    /**
+     * Fetch the SVG path data for any Font Awesome 6 Free solid icon.
+     * Results are cached in the system temp directory so the HTTP request
+     * only happens once per unique icon name.
+     *
+     * Returns SVG shape string ready for the 100×100 coordinate space
+     * (same format as entries in ICONS), or '' if not found.
+     */
+    /** Sentinel written to disk when a name is confirmed absent from FA (404). */
+    const FA_NOT_FOUND = "NOTFOUND";
+
+    /** Re-try confirmed-absent icons after this many seconds (1 hour). */
+    const FA_NEGATIVE_TTL = 3600;
+
+    /** Re-try network-failed fetches after this many seconds (5 minutes). */
+    const FA_ERROR_TTL = 300;
+
+    private static function fetch_fa_fallback(string $name): string
+    {
+        static $mem = [];           // in-request memory cache
+        if (array_key_exists($name, $mem)) return $mem[$name];
+
+        $safe = preg_replace('/[^a-z0-9-]/', '', strtolower($name));
+        if ($safe === '') return $mem[$name] = '';
+
+        // Disk cache alongside the image cache
+        $cache_dir = sys_get_temp_dir() . '/pt_fa_icons/';
+        if (!is_dir($cache_dir)) @mkdir($cache_dir, 0755, true);
+        $cfile = $cache_dir . $safe . '.txt';
+
+        if (file_exists($cfile)) {
+            $cached = (string) file_get_contents($cfile);
+            $age    = time() - (int) filemtime($cfile);
+
+            if ($cached === self::FA_NOT_FOUND) {
+                // Known 404 — respect TTL then retry
+                if ($age < self::FA_NEGATIVE_TTL) return $mem[$name] = '';
+                @unlink($cfile);
+            } elseif ($cached === '') {
+                // Network / parse error — retry sooner
+                if ($age < self::FA_ERROR_TTL) return $mem[$name] = '';
+                @unlink($cfile);
+            } else {
+                return $mem[$name] = $cached;   // valid cache hit
+            }
+        }
+
+        // Fetch from Font Awesome 6 Free (solid set) on GitHub CDN
+        $url = "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/{$safe}.svg";
+        $ctx = stream_context_create(['http' => [
+            'timeout'          => 6,
+            'header'           => "User-Agent: AwanTools-Previewer/1.0\r\n",
+            'ignore_errors'    => true,
+        ]]);
+        $svg = @file_get_contents($url, false, $ctx);
+
+        // Detect confirmed 404 (GitHub returns "404: Not Found" as body)
+        if ($svg === false || strlen($svg) < 50 || strpos($svg, '404') !== false) {
+            @file_put_contents($cfile, self::FA_NOT_FOUND);
+            return $mem[$name] = '';
+        }
+
+        if (strpos($svg, '<path') === false) {
+            @file_put_contents($cfile, '');   // parse error — retry soon
+            return $mem[$name] = '';
+        }
+
+        // ── Parse viewBox (full 4-value form: minX minY width height) ─────────
+        $minX = 0.0; $minY = 0.0; $vw = 512.0; $vh = 512.0;
+        if (preg_match('/viewBox=["\']([^"\']+)["\']/', $svg, $vb)) {
+            $parts = preg_split('/[\s,]+/', trim($vb[1]));
+            if (count($parts) === 4) {
+                $minX = (float) $parts[0]; $minY = (float) $parts[1];
+                $vw   = (float) $parts[2]; $vh   = (float) $parts[3];
+            }
+        }
+
+        // ── Extract all <path d="..."> elements ───────────────────────────────
+        preg_match_all('/<path\b[^>]*>/i', $svg, $pm);
+        $paths = '';
+        foreach ($pm[0] as $ptag) {
+            if (!preg_match('/\bd=(?:"([^"]+)"|\'([^\']+)\')/', $ptag, $dm)) continue;
+            $d = $dm[1] !== '' ? $dm[1] : $dm[2];
+            $paths .= "<path d='$d' fill='\$C'/>";
+        }
+
+        if ($paths === '') {
+            @file_put_contents($cfile, '');
+            return $mem[$name] = '';
+        }
+
+        // ── Map to 100×100, preserving aspect ratio, centred ─────────────────
+        // Uniform scale so the icon fits inside a 100×100 box without distortion
+        $scale  = ($vw > 0 && $vh > 0) ? round(100 / max($vw, $vh), 8) : 1.0;
+        $tx     = round(($minX !== 0.0 ? -$minX : 0) * $scale + (100 - $vw * $scale) / 2, 4);
+        $ty     = round(($minY !== 0.0 ? -$minY : 0) * $scale + (100 - $vh * $scale) / 2, 4);
+        $xform  = ($tx != 0 || $ty != 0)
+                ? "translate($tx,$ty) scale($scale)"
+                : "scale($scale)";
+        $result = "<g transform='$xform'>$paths</g>";
+
+        // Atomic-safe write: write to temp then rename
+        $tmp = $cfile . '.tmp.' . getmypid();
+        if (@file_put_contents($tmp, $result) !== false) {
+            @rename($tmp, $cfile);
+        } else {
+            @unlink($tmp);
+        }
+
+        return $mem[$name] = $result;
+    }
+
     // ── Public API ───────────────────────────────────────────────────────────
 
     /**
      * Render an icon as SVG elements, centered at (x, y) with given size.
+     *
+     * Resolution order:
+     *   1. ALIASES  → canonical name
+     *   2. ICONS    → hand-drawn SVG primitives (preferred, no network)
+     *   3. FA CDN   → fetched once and disk-cached for any other FA 6 solid name
+     *   4. _default → generic fallback shape
+     *
      * @return string SVG fragment
      */
     static function icon_svg(string $name, float $x, float $y, float $size, string $color): string
     {
         $canonical = self::ALIASES[$name] ?? $name;
-        $shapes    = self::ICONS[$canonical] ?? self::ICONS['_default'];
+        $shapes    = self::ICONS[$canonical]
+                  ?? (($fa = self::fetch_fa_fallback($canonical)) !== '' ? $fa : null)
+                  ?? self::ICONS['_default'];
 
         $col = strpos($color, '#') === 0 ? $color : '#' . $color;
         $sw  = max(4, round($size * 0.11));   // stroke width scales with icon size
