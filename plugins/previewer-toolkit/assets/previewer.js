@@ -116,7 +116,25 @@ const PT = (() => {
     });
   }
 
-  // ── Tab switching ──────────────────────────────────────────────
+  // ── Selector / tool open ───────────────────────────────────────
+  function openTool(tab) {
+    document.getElementById('ptSelector').style.display = 'none';
+    document.getElementById('ptTopbar').style.display   = 'flex';
+    document.querySelectorAll('.pt-tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('pt-' + tab).style.display = 'flex';
+    // sync active tab button
+    document.querySelectorAll('.pt-tab-btn').forEach(b => {
+      b.classList.toggle('pt-tab-active', b.dataset.tab === tab);
+    });
+  }
+
+  function backToSelector() {
+    document.querySelectorAll('.pt-tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('ptTopbar').style.display   = 'none';
+    document.getElementById('ptSelector').style.display = 'flex';
+  }
+
+  // ── Tab switching (when already inside a tool) ─────────────────
   function switchTab(tab, btn) {
     document.querySelectorAll('.pt-tab-btn').forEach(b => b.classList.remove('pt-tab-active'));
     btn.classList.add('pt-tab-active');
@@ -581,6 +599,8 @@ const PT = (() => {
   // ── Public API ─────────────────────────────────────────────────
   return {
     init,
+    openTool,
+    backToSelector,
     switchTab,
     selectCategory,
     selectTemplate,

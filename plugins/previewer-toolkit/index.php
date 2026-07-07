@@ -21,16 +21,95 @@ ob_start();
 
 <div class="pt-shell">
 
-  <!-- ══ Toolbar ══════════════════════════════════════════════════════════ -->
-  <div class="pt-topbar">
+  <!-- ══ Tool Selector ═════════════════════════════════════════════════════ -->
+  <div class="pt-selector" id="ptSelector">
+    <div class="pt-sel-header">
+      <h1 class="pt-sel-title">OG Image Generator &amp; Meta Inspector</h1>
+      <p class="pt-sel-subtitle">Design your Open Graph image, customize it to your brand, and get a permanent URL — no image hosting, no downloads required. Or inspect any site's OG &amp; meta tags in one click.</p>
+    </div>
+    <div class="pt-sel-cards">
+
+      <!-- Generator card -->
+      <div class="pt-sel-card pt-sel-card--gen">
+        <div class="pt-sel-card-inner">
+          <div class="pt-sel-card-icon pt-sel-card-icon--gen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          </div>
+          <div class="pt-sel-card-body">
+            <div class="pt-sel-card-title">OG Image Generator</div>
+            <div class="pt-sel-card-desc">Pick a template, set your colors and text, then copy the URL. Paste it as your <code class="pt-sel-code">og:image</code> meta tag — your server generates the image on demand, forever.</div>
+            <div class="pt-sel-chips">
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                Customize
+              </span>
+              <span class="pt-sel-chip-sep">›</span>
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy URL
+              </span>
+              <span class="pt-sel-chip-sep">›</span>
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Paste as ogimage
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="pt-sel-card-foot">
+          <button class="pt-sel-open pt-sel-open--gen" onclick="PT.openTool('generator')">Open Generator →</button>
+        </div>
+      </div>
+
+      <!-- Inspector card -->
+      <div class="pt-sel-card pt-sel-card--insp">
+        <div class="pt-sel-card-inner">
+          <div class="pt-sel-card-icon pt-sel-card-icon--insp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v3M11 14h.01"/></svg>
+          </div>
+          <div class="pt-sel-card-body">
+            <div class="pt-sel-card-title">Meta Inspector</div>
+            <div class="pt-sel-card-desc">Enter any URL to instantly reveal all its Open Graph tags, Twitter Card data, canonical links, favicon, and a live preview of the OG image.</div>
+            <div class="pt-sel-chips">
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Paste URL
+              </span>
+              <span class="pt-sel-chip-sep">›</span>
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                View All Tags
+              </span>
+              <span class="pt-sel-chip-sep">›</span>
+              <span class="pt-sel-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                See OG Preview
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="pt-sel-card-foot">
+          <button class="pt-sel-open pt-sel-open--insp" onclick="PT.openTool('inspector')">Open Inspector →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ In-tool top bar (shown when a tool is active) ═════════════════════ -->
+  <div class="pt-topbar" id="ptTopbar" style="display:none">
     <div class="pt-topbar-left">
-      <button class="pt-tab-btn pt-tab-active" data-tab="generator" onclick="PT.switchTab('generator', this)">
+      <button class="pt-back-btn" onclick="PT.backToSelector()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button class="pt-tab-btn pt-tab-active" id="ptTabGenerator" data-tab="generator" onclick="PT.switchTab('generator', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
         Image Generator
       </button>
-      <button class="pt-tab-btn" data-tab="inspector" onclick="PT.switchTab('inspector', this)">
+      <button class="pt-tab-btn" id="ptTabInspector" data-tab="inspector" onclick="PT.switchTab('inspector', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v3M11 14h.01"/></svg>
-        Metadata Inspector
+        Meta Inspector
       </button>
     </div>
     <div class="pt-topbar-right">
@@ -40,7 +119,7 @@ ob_start();
   </div>
 
   <!-- ══ GENERATOR TAB ════════════════════════════════════════════════════ -->
-  <div class="pt-tab-panel" id="pt-generator">
+  <div class="pt-tab-panel" id="pt-generator" style="display:none">
     <div class="pt-layout">
 
       <!-- Left: Category & Template selector -->
