@@ -1,0 +1,40 @@
+{
+    "name": "Previewer Toolkit",
+    "og_icon": "image",
+    "slug": "previewer-toolkit",
+    "version": "1.0.0",
+    "description": "OG image generator with 52 professional templates across 10 categories, plus a live metadata inspector. Generate social-ready images for Open Graph, Twitter Cards, Discord, LinkedIn and more — entirely from URL parameters.",
+    "author": "Shamrouz Awan",
+    "author_url": "https://shamrouzawan.com",
+    "homepage": "https://awantools.site/plugins/previewer-toolkit/",
+    "license": "MIT",
+    "min_php": "8.0",
+    "offered": 52,
+    "requires_login": false,
+    "stores_user_data": false,
+    "dashboard_enabled": false,
+    "analytics_enabled": true,
+    "permissions": [],
+    "categories": [
+        "Image Tools",
+        "SEO",
+        "Developer Tools",
+        "Social Media",
+        "Design"
+    ],
+    "keywords": [
+        "og image", "open graph", "social preview", "meta tags", "twitter card",
+        "discord embed", "image generator", "metadata inspector", "seo tools",
+        "preview image", "social share", "link preview", "og:image", "url preview"
+    ],
+    "tags": [
+        "og-image", "open-graph", "social-card", "meta-inspector", "seo",
+        "twitter-card", "discord-embed", "linkedin-preview", "image-generator",
+        "url-preview", "link-preview", "social-share", "developer-tools"
+    ],
+    "meta": {
+        "title": "Previewer Toolkit — OG Image Generator & Metadata Inspector",
+        "description": "Generate professional Open Graph images, Twitter cards, social previews and more from URL parameters. Inspect any URL's metadata, og:image, and social sharing tags instantly.",
+        "twitter_card": "summary_large_image"
+    }
+}

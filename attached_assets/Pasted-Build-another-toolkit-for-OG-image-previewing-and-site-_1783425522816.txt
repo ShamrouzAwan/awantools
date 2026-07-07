@@ -1,0 +1,474 @@
+Build another toolkit for OG:image previewing and site metadata inspection called **"Previewer Toolkit"**.
+
+The toolkit must be a production-ready, highly optimized, URL-driven image generation and metadata inspection system. It must function reliably on shared hosting environments and be designed for real-world usage where generated image URLs will be embedded directly inside HTML `<head>` tags as Open Graph images, Twitter cards, Discord embeds, LinkedIn previews, Telegram previews, and other social sharing systems.
+
+The toolkit must be completely stateless and should not require user accounts, saved projects, template storage, user databases, queues, background workers, or scheduled jobs.
+
+The system must generate images entirely from URL parameters and return the requested image immediately.
+
+Example:
+
+`https://awantools.site/plugins/preview/render?category=og&template=github_dark&heading=Developer%20Toolkit&description=200+%20Developer%20Tools&icon=code&format=png`
+
+The response must be a valid image file and not an HTML page.
+
+The image endpoint must be safe for use directly inside:
+
+```html
+<meta property="og:image" content="https://awantools.site/plugins/preview/render?...">
+<meta name="twitter:image" content="https://awantools.site/plugins/preview/render?...">
+```
+
+The toolkit must be designed around two major sections:
+
+1. Preview Image Generator
+2. Site Metadata Inspector
+
+---
+
+PREVIEW IMAGE GENERATOR
+
+The image generation engine must support multiple categories.
+
+Each category must contain between 5 and 8 professionally designed templates.
+
+Templates should not look like placeholders.
+
+Templates should look polished and production-ready.
+
+Design styles should include:
+
+* Minimalist
+* Modern
+* GitHub Style
+* Glassmorphism
+* Neomorphism
+* Corporate
+* Gradient
+* Neon
+* SaaS
+* Documentation
+* Dashboard
+* Editorial
+* Dark Mode
+* Light Mode
+* Premium Card
+* Startup Style
+
+---
+
+CATEGORY: OG IMAGES
+
+Templates:
+
+* GitHub Dark
+* GitHub Light
+* Glass Modern
+* Minimal Clean
+* Gradient Professional
+* Corporate
+* Neon Dark
+* Startup Landing
+
+Supported fields:
+
+* Heading
+* Description
+* Subtitle
+* Badge
+* Footer
+* Website Name
+* Category Label
+* Date
+* Author
+* Icon
+* Logo
+
+---
+
+CATEGORY: SOCIAL CARDS
+
+Templates:
+
+* Twitter Style
+* LinkedIn Style
+* Discord Style
+* Telegram Style
+* Modern Announcement
+* Product Launch
+* Feature Highlight
+* Blog Post
+
+---
+
+CATEGORY: PLACEHOLDERS
+
+Templates:
+
+* Simple
+* Grid
+* Pattern
+* Gradient
+* Glass
+* Minimal
+* Modern
+* Empty State
+
+Must support:
+
+* Custom dimensions
+* Custom colors
+* Text overlays
+* Icons
+* Branding
+
+---
+
+CATEGORY: BROWSER MOCKUPS
+
+Templates:
+
+* Chrome
+* Firefox
+* Safari
+* Edge
+* Arc
+* Generic Browser
+
+Must render:
+
+* Browser controls
+* URL bar
+* Tabs
+* Website screenshot placeholder
+* Window controls
+
+---
+
+CATEGORY: TERMINAL PREVIEWS
+
+Templates:
+
+* Linux Terminal
+* Modern Terminal
+* Hacker Theme
+* GitHub CLI
+* VS Code Terminal
+* Minimal Terminal
+
+---
+
+CATEGORY: PROFILE CARDS
+
+Templates:
+
+* Team Member
+* Author Card
+* Speaker Card
+* Business Card
+* Creator Card
+* Developer Profile
+
+---
+
+CATEGORY: CODE SNIPPETS
+
+Templates:
+
+* VS Code
+* GitHub
+* Monokai
+* Nord
+* Dracula
+* Minimal
+
+Must support:
+
+* Multi-line code
+* Syntax highlighting
+* Line numbers
+* File names
+
+---
+
+CATEGORY: DASHBOARD PREVIEWS
+
+Templates:
+
+* Analytics Dashboard
+* Admin Panel
+* SaaS Dashboard
+* Statistics View
+* KPI Dashboard
+* Revenue Dashboard
+
+---
+
+CATEGORY: DOCUMENTATION PREVIEWS
+
+Templates:
+
+* API Docs
+* README
+* Knowledge Base
+* Developer Docs
+* Product Docs
+* Changelog
+
+---
+
+CATEGORY: GITHUB PROJECT CARDS
+
+Templates:
+
+* Repository Card
+* Package Card
+* Release Card
+* Project Overview
+* Open Source Showcase
+* Organization Card
+
+---
+
+GLOBAL CUSTOMIZATION OPTIONS
+
+Every template must support a configurable subset of:
+
+* Width
+* Height
+* Format
+* Background color
+* Foreground color
+* Accent color
+* Border color
+* Border radius
+* Shadow intensity
+* Opacity
+* Font family
+* Font size
+* Font weight
+* Text alignment
+* Icon
+* Logo
+* Footer
+* Watermark
+* Padding
+* Margin
+* Theme
+* Dark mode
+* Light mode
+
+Supported output formats:
+
+* PNG
+* JPG
+* WEBP
+
+Default format:
+
+PNG
+
+---
+
+FONT AWESOME INTEGRATION
+
+Icons must use Font Awesome.
+
+Users should be able to specify:
+
+icon=github
+icon=code
+icon=globe
+icon=user
+icon=database
+icon=server
+icon=cloud
+
+The engine should automatically map icon names to the correct icon.
+
+Unknown icons should gracefully fall back to a default icon.
+
+---
+
+LIVE BUILDER INTERFACE
+
+Create a beautiful single-page toolkit interface.
+
+The interface should contain:
+
+Left Sidebar:
+
+* Category selector
+* Template selector
+* Template thumbnails
+
+Main Area:
+
+* Large live preview
+* Responsive preview canvas
+
+Right Panel:
+
+* Customization controls
+* Colors
+* Typography
+* Content fields
+* Dimensions
+* Advanced settings
+
+Bottom Area:
+
+* Generated URL
+* Copy URL button
+* Open URL button
+* Download PNG
+* Download JPG
+* Download WEBP
+
+The preview must update instantly when controls change.
+
+No page reloads.
+
+---
+
+METADATA INSPECTOR
+
+Add a metadata inspection tool.
+
+User enters a URL.
+
+The toolkit fetches and analyzes:
+
+* Page Title
+* Meta Description
+* Canonical URL
+* Open Graph Tags
+* Twitter Cards
+* Robots Tags
+* Author Tags
+* Favicon
+* OG Image
+* Structured Data
+
+Display:
+
+* Parsed metadata
+* Social preview simulation
+* Validation warnings
+* Missing tags
+* Recommendations
+
+The metadata inspector must be secure.
+
+Block:
+
+* Internal IPs
+* Loopback addresses
+* Localhost
+* Metadata services
+* Private network ranges
+
+Perform DNS validation before requests.
+
+---
+
+URL PARAMETER ENGINE
+
+Every generated image must be controllable via URL parameters.
+
+Example:
+
+`/plugins/preview/render?category=og&template=github_dark&heading=Developer%20Toolkit&description=200%20Developer%20Tools&icon=code&bg=111827&fg=ffffff&accent=3b82f6&width=1200&height=630&format=png`
+
+The engine must:
+
+* Validate all parameters
+* Sanitize all inputs
+* Apply defaults
+* Prevent malformed requests
+* Handle missing values gracefully
+
+---
+
+PERFORMANCE REQUIREMENTS
+
+The toolkit will be used inside social media crawlers and metadata scrapers.
+
+Performance is critical.
+
+Requirements:
+
+* Fast image generation
+* Efficient template rendering
+* Optimized memory usage
+* Shared-hosting friendly
+* Aggressive image caching
+* Cache identical requests
+* Proper cache headers
+* Proper content-type headers
+* Proper ETag support
+* Proper Last-Modified support
+* Low CPU usage
+* Low RAM usage
+
+The render endpoint must remain stable under heavy crawler traffic.
+
+---
+
+RELIABILITY REQUIREMENTS
+
+The image endpoint must:
+
+* Never output PHP errors
+* Never output warnings
+* Never output HTML
+* Never return partial images
+* Always return valid image responses
+* Return fallback images on failure
+* Handle invalid templates safely
+* Handle invalid dimensions safely
+* Handle invalid colors safely
+
+If generation fails, return a valid fallback image instead of an error page.
+
+---
+
+UI/UX REQUIREMENTS
+
+The interface must feel like a premium SaaS product.
+
+Requirements:
+
+* Fully responsive
+* Mobile friendly
+* Tablet friendly
+* Desktop optimized
+* Dark mode
+* Light mode
+* Beautiful spacing
+* Smooth animations
+* Accessible controls
+* Keyboard friendly
+* Fast interactions
+* Modern typography
+* Professional design system
+
+---
+
+ARCHITECTURE REQUIREMENTS
+
+Templates must be modular.
+
+Adding new templates should require minimal work.
+
+The rendering engine must separate:
+
+* Categories
+* Templates
+* Parameter definitions
+* Rendering logic
+* Validation logic
+
+Future template expansion should be simple and scalable.
+
+The final result should feel like a professional image-generation platform, not a basic placeholder generator.

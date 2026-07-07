@@ -25,6 +25,13 @@ if ($path === '/og-image.php') {
     exit;
 }
 
+// Previewer Toolkit image renderer — must run BEFORE _bootstrap.php to avoid session headers
+// corrupting the image binary response used by social crawlers
+if ($path === '/plugins/previewer-toolkit/render') {
+    require __DIR__ . '/plugins/previewer-toolkit/render.php';
+    exit;
+}
+
 // Block direct access to PHP files inside plugins/ — only index.php is served through the directory route
 if (preg_match('#^/plugins/[^/]+/.+\.php$#i', $path)) {
     http_response_code(403);
@@ -224,6 +231,13 @@ if ($path === '/blog' || $path === '/blog/') {
     if (file_exists(__DIR__ . '/blog/index.php')) {
         require __DIR__ . '/blog/index.php';
     }
+    exit;
+}
+
+// Previewer Toolkit metadata inspector API — returns JSON, runs after bootstrap for DB access
+if ($path === '/plugins/previewer-toolkit/meta') {
+    require_once __DIR__ . '/_bootstrap.php';
+    require __DIR__ . '/plugins/previewer-toolkit/meta.php';
     exit;
 }
 

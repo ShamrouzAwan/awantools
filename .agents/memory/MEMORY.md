@@ -2,3 +2,4 @@
 - [Previewer Toolkit OG image headers](previewer-toolkit-og-headers.md) — session headers (Set-Cookie, Pragma, Expires) broke og:image on social crawlers; fix: header_remove() at render entry point
 - [siteUrl Replit localhost fix](siteurl-replit-fix.md) — siteUrl() fell back to HTTP_HOST (127.0.0.1:5000) on Replit dev, making og:image URLs unreachable; fix: check REPLIT_DOMAINS env var
 - [Templates.php dead variable bug](templates-php-pd-y-warning.md) — every template function had 4 undefined-$pd_y lines; E_WARNING before ob_start corrupts image responses on shared hosting with display_errors=On
+- [Previewer Toolkit meta.php SSRF hardening](previewer-toolkit-meta-ssrf.md) — follow_location=true bypasses IP blocklist on redirects; always follow manually and validate each hop
