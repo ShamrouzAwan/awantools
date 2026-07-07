@@ -91,6 +91,9 @@ if (!headers_sent()) {
     // CSP — allows CDNs required by admin editors (Monaco, TinyMCE, Quill)
     // unsafe-eval is required by Monaco Editor's language services
     // unsafe-inline is required by inline admin scripts (cannot be nonce'd easily)
+    // header_remove() clears any host-injected CSP first; dual CSP headers cause browsers
+    // to enforce the intersection (most restrictive), which blocks cdnjs fonts/icons.
+    header_remove('Content-Security-Policy');
     header(
         "Content-Security-Policy: "
         . "default-src 'self'; "

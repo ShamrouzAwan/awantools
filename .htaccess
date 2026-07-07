@@ -33,4 +33,9 @@ RewriteRule ^ _router.php [QSA,L]
     <LocationMatch "^/plugins/scannable-codes(/.*)?$">
         Header always set Permissions-Policy "camera=(self), microphone=(), geolocation=()"
     </LocationMatch>
+
+    # CSP — set at Apache level so it overrides any host-injected CSP.
+    # Dual CSP headers cause browsers to enforce the most restrictive intersection,
+    # which blocks cdnjs.cloudflare.com fonts and breaks FontAwesome icons.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdn.quilljs.com cdn.tiny.cloud cdnjs.cloudflare.com chart.googleapis.com www.google.com www.gstatic.com www.googletagmanager.com www.clarity.ms pagead2.googlesyndication.com googleads.g.doubleclick.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdn.quilljs.com cdn.tiny.cloud cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com; worker-src 'self' blob: data:; connect-src 'self' https: wss:; frame-src 'self' www.google.com www.googletagmanager.com; object-src 'none'; base-uri 'self';"
 </IfModule>
