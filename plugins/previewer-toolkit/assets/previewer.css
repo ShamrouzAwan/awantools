@@ -287,24 +287,68 @@
   padding: 0 8px 12px;
 }
 .pt-tpl-btn {
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
   border-radius: 8px;
-  padding: 8px 6px;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.14s, transform 0.1s, box-shadow 0.14s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pt-tpl-btn:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99,102,241,.18);
+}
+.pt-tpl-btn.pt-tpl-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(99,102,241,.25);
+}
+.pt-tpl-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1200/630;
+  background: var(--color-background);
+  overflow: hidden;
+}
+.pt-tpl-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s;
+}
+.pt-tpl-thumb[data-src] { opacity: 0; }
+.pt-tpl-thumb:not([data-src]) { opacity: 1; }
+.pt-tpl-thumb-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: pt-shimmer 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Shimmer hides once thumb image is loaded (data-src removed by IntersectionObserver) */
+.pt-tpl-thumb-wrap:has(.pt-tpl-thumb:not([data-src])) .pt-tpl-thumb-shimmer { opacity: 0; }
+.pt-tpl-label {
   font-size: 10px;
   font-weight: 600;
   color: var(--color-text-muted);
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.12s;
+  padding: 4px 6px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1.3;
 }
-.pt-tpl-btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
-.pt-tpl-btn.pt-tpl-active {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
-}
+.pt-tpl-btn.pt-tpl-active .pt-tpl-label { color: var(--color-primary); }
+
+/* ── Field groups (show/hide by category) ──────────────────────── */
+.pt-fgroup { }
+.pt-fgroup[style*="display: none"],
+.pt-fgroup[style*="display:none"] { display: none !important; }
 
 /* ── Main center ───────────────────────────────────────────────── */
 .pt-main {

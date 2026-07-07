@@ -486,6 +486,19 @@ $OG_SPECS = [
         'icon_bg'=>'ffffff','icon_color'=>'be185d',
         'footer_color'=>'fbcfe8','radius'=>16,
     ],
+    // ── 12 new OG templates ──────────────────────────────────────
+    'retro_sunset'  => ['bg'=>'2d1b69','bg2'=>'c43b00','pattern'=>'gradient','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffd6c0','badge_bg'=>'c43b00','badge_color'=>'ffffff','accent_color'=>'ffd700','accent_pos'=>'none','icon_bg'=>'ffffff','icon_color'=>'2d1b69','footer_color'=>'ffd6c0','radius'=>0],
+    'ocean'         => ['bg'=>'0c1b33','bg2'=>'023e8a','pattern'=>'gradient','card_bg'=>'0077b6','card_alpha'=>30,'card_border'=>'48cae4','heading_color'=>'caf0f8','desc_color'=>'90e0ef','badge_bg'=>'00b4d8','badge_color'=>'ffffff','accent_color'=>'48cae4','accent_pos'=>'bottom','icon_bg'=>'00b4d8','icon_color'=>'caf0f8','footer_color'=>'90e0ef','radius'=>16],
+    'aurora'        => ['bg'=>'0a0f0d','bg2'=>'0d2b1a','pattern'=>'noise','card_bg'=>'0d1f15','card_alpha'=>0,'card_border'=>'1a4a2e','heading_color'=>'ecfdf5','desc_color'=>'6ee7b7','badge_bg'=>'064e3b','badge_color'=>'34d399','accent_color'=>'10b981','accent_pos'=>'left','icon_bg'=>'064e3b','icon_color'=>'34d399','footer_color'=>'34d399','radius'=>8],
+    'newspaper'     => ['bg'=>'fef9ef','bg2'=>null,'pattern'=>'none','card_bg'=>'fef9ef','card_alpha'=>0,'card_border'=>'1a1a1a','heading_color'=>'1a1a1a','desc_color'=>'333333','badge_bg'=>'1a1a1a','badge_color'=>'fef9ef','accent_color'=>'1a1a1a','accent_pos'=>'top','icon_bg'=>'e8e0d0','icon_color'=>'1a1a1a','footer_color'=>'777777','radius'=>0],
+    'blueprint'     => ['bg'=>'003580','bg2'=>'012a6b','pattern'=>'dots','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'a8c4f0','badge_bg'=>'ffffff','badge_color'=>'003580','accent_color'=>'4fc3f7','accent_pos'=>'left','icon_bg'=>'ffffff','icon_color'=>'003580','footer_color'=>'a8c4f0','radius'=>0],
+    'dark_amber'    => ['bg'=>'120e09','bg2'=>null,'pattern'=>'noise','card_bg'=>'1c1610','card_alpha'=>0,'card_border'=>'3d2f12','heading_color'=>'fef3c7','desc_color'=>'d97706','badge_bg'=>'3d2f12','badge_color'=>'f59e0b','accent_color'=>'f59e0b','accent_pos'=>'left','icon_bg'=>'3d2f12','icon_color'=>'f59e0b','footer_color'=>'78716c','radius'=>4],
+    'cyberpunk'     => ['bg'=>'0a0a0a','bg2'=>null,'pattern'=>'noise','card_bg'=>'111111','card_alpha'=>0,'card_border'=>'ffff00','heading_color'=>'ffffff','desc_color'=>'ff00ff','badge_bg'=>'ffff00','badge_color'=>'0a0a0a','accent_color'=>'00ffff','accent_pos'=>'left','icon_bg'=>'1a1a00','icon_color'=>'ffff00','footer_color'=>'ff00ff','radius'=>0],
+    'forest'        => ['bg'=>'14231b','bg2'=>'1a3a28','pattern'=>'none','card_bg'=>'1e3d2b','card_alpha'=>0,'card_border'=>'2d5a40','heading_color'=>'ecfdf5','desc_color'=>'86efac','badge_bg'=>'2d5a40','badge_color'=>'bbf7d0','accent_color'=>'22c55e','accent_pos'=>'left','icon_bg'=>'2d5a40','icon_color'=>'22c55e','footer_color'=>'4ade80','radius'=>4],
+    'indie'         => ['bg'=>'fef6ee','bg2'=>null,'pattern'=>'dots','card_bg'=>'ffffff','card_alpha'=>0,'card_border'=>'e8d5c0','heading_color'=>'1c0a00','desc_color'=>'7c4a1e','badge_bg'=>'c4600a','badge_color'=>'ffffff','accent_color'=>'c4600a','accent_pos'=>'none','icon_bg'=>'fde8d0','icon_color'=>'c4600a','footer_color'=>'a0816b','radius'=>12],
+    'mono'          => ['bg'=>'000000','bg2'=>null,'pattern'=>'none','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'999999','badge_bg'=>'ffffff','badge_color'=>'000000','accent_color'=>'ffffff','accent_pos'=>'none','icon_bg'=>'222222','icon_color'=>'ffffff','footer_color'=>'666666','radius'=>0],
+    'candy'         => ['bg'=>'fce4ec','bg2'=>'e8d5f0','pattern'=>'gradient','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'880e4f','desc_color'=>'ad1457','badge_bg'=>'ad1457','badge_color'=>'ffffff','accent_color'=>'e91e63','accent_pos'=>'none','icon_bg'=>'f8bbd0','icon_color'=>'ad1457','footer_color'=>'c2185b','radius'=>24],
+    'steel'         => ['bg'=>'1c2128','bg2'=>null,'pattern'=>'none','card_bg'=>'22272e','card_alpha'=>0,'card_border'=>'444c56','heading_color'=>'cdd9e5','desc_color'=>'768390','badge_bg'=>'316dca','badge_color'=>'ffffff','accent_color'=>'316dca','accent_pos'=>'left','icon_bg'=>'1f3051','icon_color'=>'4493f8','footer_color'=>'444c56','radius'=>6],
 ];
 
 function pt_render_og(GdImage $im, array $p, array $s): void {
@@ -549,10 +562,18 @@ function pt_render_og(GdImage $im, array $p, array $s): void {
 
     $curY = $oy + $iconBoxSize + (int)($H * 0.04);
 
-    // Badge
-    $badge = $p['badge'] ?: $p['category_label'];
-    if ($badge) {
-        pt_badge($im, PT_FONT_REG, strtoupper($badge), $ox, $curY, $s['badge_bg'], $s['badge_color'], 100, (int)($H * 0.022));
+    // Badges (comma-separated support)
+    $badgeStr = $p['badge'] ?: $p['category_label'];
+    if ($badgeStr) {
+        $badges   = array_filter(array_map('trim', explode(',', $badgeStr)));
+        $badgeFsz = (int)($H * 0.022);
+        $badgeX   = $ox;
+        foreach (array_slice($badges, 0, 5) as $bg_label) {
+            $bw = pt_badge_width(PT_FONT_REG, strtoupper($bg_label), $badgeFsz);
+            if ($badgeX + $bw > $ox + $ow) break;
+            pt_badge($im, PT_FONT_REG, strtoupper($bg_label), $badgeX, $curY, $s['badge_bg'], $s['badge_color'], 100, $badgeFsz);
+            $badgeX += $bw + 8;
+        }
         $curY += (int)($H * 0.06);
     }
 
@@ -649,6 +670,17 @@ $SOCIAL_SPECS = [
         'accent'=>'ef4444','badge_bg'=>'fef2f2','badge_color'=>'ef4444',
         'icon_bg'=>'fef2f2','icon_color'=>'ef4444','footer_color'=>'a1a1aa','radius'=>8,
     ],
+    // ── 10 new social templates ──────────────────────────────────
+    'youtube'       => ['bg'=>'0f0f0f','bg2'=>null,'card_bg'=>'212121','card_border'=>'3d3d3d','heading_color'=>'ffffff','desc_color'=>'aaaaaa','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff0000','badge_color'=>'ffffff','icon_bg'=>'330000','icon_color'=>'ff0000','footer_color'=>'717171','radius'=>4],
+    'instagram'     => ['bg'=>'833ab4','bg2'=>'fd1d1d','pattern'=>'gradient','card_bg'=>null,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffecd2','accent_color'=>'fcb045','accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'833ab4','icon_bg'=>'ffffff','icon_color'=>'fd1d1d','footer_color'=>'ffecd2','radius'=>20],
+    'facebook'      => ['bg'=>'1877f2','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'dde3ee','heading_color'=>'1c1e21','desc_color'=>'65676b','accent_color'=>'1877f2','accent_pos'=>'none','badge_bg'=>'1877f2','badge_color'=>'ffffff','icon_bg'=>'e7f3ff','icon_color'=>'1877f2','footer_color'=>'8a8d91','radius'=>8],
+    'reddit'        => ['bg'=>'1a1a1b','bg2'=>null,'card_bg'=>'272729','card_border'=>'343536','heading_color'=>'d7dadc','desc_color'=>'818384','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff4500','badge_color'=>'ffffff','icon_bg'=>'331400','icon_color'=>'ff4500','footer_color'=>'818384','radius'=>4],
+    'hackernews'    => ['bg'=>'f6f6ef','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e5e5e5','heading_color'=>'000000','desc_color'=>'828282','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff6600','badge_color'=>'ffffff','icon_bg'=>'fff0e6','icon_color'=>'ff6600','footer_color'=>'828282','radius'=>0],
+    'product_hunt'  => ['bg'=>'da552f','bg2'=>'c0392b','pattern'=>'gradient','card_bg'=>null,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffd0c0','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'da552f','icon_bg'=>'ffffff','icon_color'=>'da552f','footer_color'=>'ffd0c0','radius'=>16],
+    'dribbble'      => ['bg'=>'ea4c89','bg2'=>null,'card_bg'=>'f6478c','card_border'=>'f8a9c9','heading_color'=>'ffffff','desc_color'=>'fce4ef','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'ea4c89','icon_bg'=>'ffffff','icon_color'=>'ea4c89','footer_color'=>'fce4ef','radius'=>16],
+    'newsletter'    => ['bg'=>'faf7f2','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e8ddd0','heading_color'=>'1a1208','desc_color'=>'6b5a45','accent_color'=>'c17817','accent_pos'=>'none','badge_bg'=>'fef3e2','badge_color'=>'c17817','icon_bg'=>'fef3e2','icon_color'=>'c17817','footer_color'=>'9b8b78','radius'=>8],
+    'event'         => ['bg'=>'13001f','bg2'=>'2d0050','pattern'=>'gradient','card_bg'=>'1a0030','card_border'=>'c89600','heading_color'=>'ffffff','desc_color'=>'e2c8ff','accent_color'=>'c89600','accent_pos'=>'left','badge_bg'=>'c89600','badge_color'=>'000000','icon_bg'=>'c89600','icon_color'=>'13001f','footer_color'=>'9370db','radius'=>4],
+    'job_post'      => ['bg'=>'f0fdf4','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'bbf7d0','heading_color'=>'052e16','desc_color'=>'166534','accent_color'=>'16a34a','accent_pos'=>'none','badge_bg'=>'dcfce7','badge_color'=>'15803d','icon_bg'=>'dcfce7','icon_color'=>'16a34a','footer_color'=>'4ade80','radius'=>12],
 ];
 
 // Social cards use the same renderer as OG but with different default dimensions
@@ -762,7 +794,6 @@ function pt_render_placeholder(GdImage $im, array $p, string $template): void {
             break;
         case 'empty_state':
             imagefill($im, 0, 0, pt_color($im, $bg));
-            // Dashed border
             $bc = pt_color($im, $accent);
             for ($x = 0; $x < $W; $x += 20) {
                 if ((int)($x/10) % 2 === 0) {
@@ -776,17 +807,102 @@ function pt_render_placeholder(GdImage $im, array $p, string $template): void {
                     imagefilledrectangle($im, $W-7, $y, $W-4, min($H, $y+10), $bc);
                 }
             }
-            // Empty state icon area
             $cs = (int)($H*0.2);
             $cx = (int)(($W-$cs)/2); $cy = (int)($H*0.25);
             pt_rounded_rect($im, $cx, $cy, $cs, $cs, (int)($cs*0.2), pt_color($im, $accent, 110));
             pt_icon($im, 'image', $cx+(int)($cs*0.2), $cy+(int)($cs*0.2), (int)($cs*0.6), $accent);
+            if ($p['heading']) pt_text_block($im, PT_FONT_BOLD, (int)($H*0.05), $pad, (int)($H*0.57), $fg, $p['heading'], $W-$pad*2, (int)($H*0.07), 'center', 1);
+            if ($p['description']) pt_text_block($im, PT_FONT_REG, (int)($H*0.032), $pad, (int)($H*0.67), $fg.'99', $p['description'], $W-$pad*2, (int)($H*0.045), 'center', 2);
+            break;
+
+        // ── 10 new placeholder templates ─────────────────────────
+        case 'blueprint_grid':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $gc = pt_color($im, $fg, 45); $spacing = (int)(min($W,$H)/16);
+            for ($x=0; $x<=$W; $x+=$spacing) imageline($im,$x,0,$x,$H,$gc);
+            for ($y=0; $y<=$H; $y+=$spacing) imageline($im,0,$y,$W,$y,$gc);
+            $mgC = pt_color($im, $fg, 80);
+            for ($x=0; $x<=$W; $x+=$spacing*4) imageline($im,$x,0,$x,$H,$mgC);
+            for ($y=0; $y<=$H; $y+=$spacing*4) imageline($im,0,$y,$W,$y,$mgC);
+            $cxc=(int)($W/2); $cyc=(int)($H/2);
+            imageline($im,$cxc-24,$cyc,$cxc+24,$cyc,pt_color($im,$accent)); imageline($im,$cxc,$cyc-24,$cxc,$cyc+24,pt_color($im,$accent));
+            imagefilledellipse($im,$cxc,$cyc,8,8,pt_color($im,$accent));
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.055),$pad,(int)($H/2)-(int)($H*0.085),$fg,$p['heading'],$W-$pad*2,(int)($H*0.075),'center',1);
+            break;
+        case 'crosshatch':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $lc = pt_color($im, $fg, 90); $sp = (int)(min($W,$H)/14);
+            for ($i=-$H; $i<$W+$H; $i+=$sp) { imageline($im,$i,0,$i+$H,$H,$lc); imageline($im,$i+$H,0,$i,$H,$lc); }
             if ($p['heading']) {
-                pt_text_block($im, PT_FONT_BOLD, (int)($H*0.05), $pad, (int)($H*0.57), $fg, $p['heading'], $W-$pad*2, (int)($H*0.07), 'center', 1);
+                $hsz=(int)($H*0.055); $hbbox=imagettfbbox($hsz,0,PT_FONT_BOLD,$p['heading']); $hw=abs($hbbox[2]-$hbbox[0]);
+                $hx=(int)(($W-$hw)/2)-20; pt_rounded_rect($im,$hx,(int)($H*0.38),$hw+40,$hsz+28,6,pt_color($im,$bg));
+                pt_text_block($im,PT_FONT_BOLD,$hsz,$hx+20,(int)($H*0.38)+8,$fg,$p['heading'],$hw+4,$hsz*1.4,'center',1);
             }
-            if ($p['description']) {
-                pt_text_block($im, PT_FONT_REG, (int)($H*0.032), $pad, (int)($H*0.67), $fg . '99', $p['description'], $W-$pad*2, (int)($H*0.045), 'center', 2);
+            break;
+        case 'circuit':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $cc = pt_color($im, $accent, 80); $gS = (int)(min($W,$H)/10);
+            for ($row=0; $row<12; $row++) for ($col=0; $col<18; $col++) {
+                $x1=$col*$gS; $y1=$row*$gS;
+                if (($row+$col)%3===0) imageline($im,$x1,$y1,$x1+$gS,$y1,$cc);
+                if (($row+$col)%4===0) imageline($im,$x1,$y1,$x1,$y1+$gS,$cc);
+                if (($row+$col)%5===0) imagefilledellipse($im,$x1,$y1,7,7,pt_color($im,$accent));
             }
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.055),$pad,(int)($H/2)-(int)($H*0.04),$fg,$p['heading'],$W-$pad*2,(int)($H*0.075),'center',1);
+            break;
+        case 'polka_dots':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $dc=pt_color($im,$accent,90); $dsp=(int)(min($W,$H)/8); $dr=(int)($dsp*0.25);
+            for ($y=$dsp/2; $y<$H; $y+=$dsp) for ($x=$dsp/2; $x<$W; $x+=$dsp) imagefilledellipse($im,(int)$x,(int)$y,$dr*2,$dr*2,$dc);
+            if ($p['heading']) {
+                $hsz=(int)($H*0.055); $hb=imagettfbbox($hsz,0,PT_FONT_BOLD,$p['heading']); $hw=abs($hb[2]-$hb[0]);
+                $hx=(int)(($W-$hw)/2)-24; pt_rounded_rect($im,$hx,(int)($H*0.38),$hw+48,$hsz+28,$hsz+14,pt_color($im,$bg));
+                pt_text_block($im,PT_FONT_BOLD,$hsz,$hx+24,(int)($H*0.38)+8,$fg,$p['heading'],$hw+4,$hsz*1.4,'center',1);
+            }
+            break;
+        case 'diagonal_stripes':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $sc=pt_color($im,$accent,65); $sp=(int)(min($W,$H)/8);
+            for ($i=-$H; $i<$W+$H; $i+=$sp*2) imagefilledpolygon($im,[$i,0,$i+$sp,0,$i+$sp+$H,$H,$i+$H,$H],$sc);
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.06),$pad,(int)($H/2)-(int)($H*0.04),$fg,$p['heading'],$W-$pad*2,(int)($H*0.08),'center',1);
+            break;
+        case 'noise_field':
+            pt_gradient_diag($im, 0, 0, $W, $H, $bg, $accent);
+            pt_noise($im, 0, 0, $W, $H, 'ffffff', 0.025);
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.06),$pad,(int)($H/2)-(int)($H*0.04),$fg,$p['heading'],$W-$pad*2,(int)($H*0.08),'center',1);
+            if ($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.035),$pad,(int)($H/2)+(int)($H*0.05),$fg.'bb',$p['description'],$W-$pad*2,(int)($H*0.05),'center',2);
+            break;
+        case 'sketch':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            $lc=pt_color($im,$fg,85);
+            for ($y=0; $y<$H; $y+=(int)($H/20)) {
+                $prevX=0; $prevY=$y;
+                for ($x=10; $x<=$W; $x+=12) { $ny=$y+rand(-3,3); imageline($im,$prevX,$prevY,$x,$ny,$lc); $prevX=$x; $prevY=$ny; }
+            }
+            if ($p['heading']) {
+                $hs=(int)($H*0.055); $bb=imagettfbbox($hs,0,PT_FONT_BOLD,$p['heading']); $hw=abs($bb[2]-$bb[0]);
+                $hx=(int)(($W-$hw)/2)-20; pt_rounded_rect($im,$hx,(int)($H*0.38),$hw+40,$hs+28,4,pt_color($im,$bg));
+                pt_text_block($im,PT_FONT_BOLD,$hs,$hx+20,(int)($H*0.38)+8,$fg,$p['heading'],$hw+4,$hs*1.4,'center',1);
+            }
+            break;
+        case 'dots_dark':
+            imagefill($im, 0, 0, pt_color($im, $bg));
+            pt_dot_grid($im, 0, 0, $W, $H, $accent, 0.18);
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.06),$pad,(int)($H/2)-(int)($H*0.04),$fg,$p['heading'],$W-$pad*2,(int)($H*0.08),'center',1);
+            if ($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.035),$pad,(int)($H/2)+(int)($H*0.06),$fg.'aa',$p['description'],$W-$pad*2,(int)($H*0.05),'center',2);
+            break;
+        case 'gradient_mesh':
+            pt_gradient_diag($im, 0, 0, $W, $H, $bg, $accent);
+            pt_noise($im, 0, 0, $W, $H, 'ffffff', 0.01);
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.065),$pad,(int)($H/2)-(int)($H*0.05),$fg,$p['heading'],$W-$pad*2,(int)($H*0.085),'center',1);
+            break;
+        case 'marble':
+            pt_gradient_v($im, 0, 0, $W, $H, $bg, $fg.'22');
+            for ($v=0; $v<6; $v++) {
+                $vc=pt_color($im,$accent,(int)(25+$v*15)); $startY=(int)(($H/6)*$v); $prevX=0; $prevY=$startY;
+                for ($x=8; $x<=$W; $x+=8) { $y=$startY+(int)(sin($x*0.03+$v)*$H*0.07+cos($x*0.015)*$H*0.03); imageline($im,$prevX,$prevY,$x,$y,$vc); $prevX=$x; $prevY=$y; }
+            }
+            if ($p['heading']) pt_text_block($im,PT_FONT_BOLD,(int)($H*0.055),$pad,(int)($H/2)-(int)($H*0.04),$fg,$p['heading'],$W-$pad*2,(int)($H*0.075),'center',1);
             break;
     }
 }
@@ -808,7 +924,17 @@ function pt_render_browser(GdImage $im, array $p, string $template): void {
         'safari'  => ['chrome_bg'=>'ebebeb','tab_bg'=>'ffffff','bar_bg'=>'f5f5f5','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'1c1c1e','border'=>'d1d1d6','accent'=>'006aff'],
         'edge'    => ['chrome_bg'=>'202124','tab_bg'=>'2d2d2d','bar_bg'=>'171717','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'ffffff','border'=>'333333','accent'=>'0078d7'],
         'arc'     => ['chrome_bg'=>'1e1b2e','tab_bg'=>'2a2542','bar_bg'=>'1a1728','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'e8e6f0','border'=>'3d3a52','accent'=>'a78bfa'],
-        'generic' => ['chrome_bg'=>'f0f0f0','tab_bg'=>'ffffff','bar_bg'=>'e8e8e8','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'333333','border'=>'cccccc','accent'=>'4a90d9'],
+        'generic'         => ['chrome_bg'=>'f0f0f0','tab_bg'=>'ffffff','bar_bg'=>'e8e8e8','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'333333','border'=>'cccccc','accent'=>'4a90d9'],
+        // ── 9 new browser templates ──────────────────────────────
+        'brave'           => ['chrome_bg'=>'1a1a1a','tab_bg'=>'2a2a2a','bar_bg'=>'111111','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'ffffff','border'=>'333333','accent'=>'fb542b'],
+        'opera'           => ['chrome_bg'=>'2b2b2b','tab_bg'=>'363636','bar_bg'=>'1c1c1c','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'ffffff','border'=>'444444','accent'=>'ff1b2d'],
+        'vivaldi'         => ['chrome_bg'=>'2b1a2e','tab_bg'=>'3d2a42','bar_bg'=>'1f1224','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'e8d8f0','border'=>'4a3555','accent'=>'ef3939'],
+        'dark_mode'       => ['chrome_bg'=>'1e1e1e','tab_bg'=>'2d2d2d','bar_bg'=>'141414','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'e0e0e0','border'=>'3a3a3a','accent'=>'4fc3f7'],
+        'minimal_browser' => ['chrome_bg'=>'f8f8f8','tab_bg'=>'ffffff','bar_bg'=>'f0f0f0','dot_colors'=>['dddddd','dddddd','dddddd'],'txt_color'=>'333333','border'=>'e0e0e0','accent'=>'333333'],
+        'retro_browser'   => ['chrome_bg'=>'c0c0c0','tab_bg'=>'d4d0c8','bar_bg'=>'c0c0c0','dot_colors'=>['ff0000','ffff00','00ff00'],'txt_color'=>'000000','border'=>'808080','accent'=>'000080'],
+        'high_contrast'   => ['chrome_bg'=>'000000','tab_bg'=>'ffffff','bar_bg'=>'000000','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'ffffff','border'=>'ffffff','accent'=>'ffff00'],
+        'material'        => ['chrome_bg'=>'1565c0','tab_bg'=>'1976d2','bar_bg'=>'0d47a1','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'ffffff','border'=>'1e88e5','accent'=>'64b5f6'],
+        'warm_light'      => ['chrome_bg'=>'f5ede0','tab_bg'=>'fdfaf5','bar_bg'=>'ede5d8','dot_colors'=>['ff5f57','febc2e','28c840'],'txt_color'=>'3d2b1f','border'=>'d4c4b0','accent'=>'c17817'],
     ];
     $st = $styles[$template] ?? $styles['chrome'];
 
@@ -891,7 +1017,18 @@ function pt_render_terminal(GdImage $im, array $p, string $template): void {
         'modern'  => ['bg'=>'1e1e1e','body_bg'=>'1e1e1e','txt'=>'d4d4d4','prompt'=>'569cd6','path'=>'ce9178','comment'=>'6a9955','title_bg'=>'2d2d2d'],
         'hacker'  => ['bg'=>'000000','body_bg'=>'000000','txt'=>'00ff00','prompt'=>'00ff00','path'=>'00cc00','comment'=>'006600','title_bg'=>'001100'],
         'vscode'  => ['bg'=>'1e1e1e','body_bg'=>'1e1e1e','txt'=>'cccccc','prompt'=>'4ec9b0','path'=>'ce9178','comment'=>'6a9955','title_bg'=>'323232'],
-        'minimal' => ['bg'=>'0d1117','body_bg'=>'0d1117','txt'=>'c9d1d9','prompt'=>'79c0ff','path'=>'ffa657','comment'=>'8b949e','title_bg'=>'161b22'],
+        'minimal'      => ['bg'=>'0d1117','body_bg'=>'0d1117','txt'=>'c9d1d9','prompt'=>'79c0ff','path'=>'ffa657','comment'=>'8b949e','title_bg'=>'161b22'],
+        // ── 10 new terminal templates ────────────────────────────
+        'powerline'    => ['bg'=>'1a1a2e','body_bg'=>'1a1a2e','txt'=>'e0e0e0','prompt'=>'6272a4','path'=>'50fa7b','comment'=>'6272a4','title_bg'=>'282a36'],
+        'fish_shell'   => ['bg'=>'102030','body_bg'=>'102030','txt'=>'e0f0f8','prompt'=>'4ac6e8','path'=>'79e6f3','comment'=>'5a8a9a','title_bg'=>'0a1a28'],
+        'windows_cmd'  => ['bg'=>'0c0c0c','body_bg'=>'0c0c0c','txt'=>'cccccc','prompt'=>'cccccc','path'=>'cccccc','comment'=>'888888','title_bg'=>'0c0c0c'],
+        'powershell'   => ['bg'=>'012456','body_bg'=>'012456','txt'=>'eeedf0','prompt'=>'ffffff','path'=>'f3f99d','comment'=>'6a9fce','title_bg'=>'001a3d'],
+        'ubuntu_term'  => ['bg'=>'2c001e','body_bg'=>'300a24','txt'=>'ffffff','prompt'=>'00aa44','path'=>'4e9dc8','comment'=>'888888','title_bg'=>'3d1033'],
+        'matrix'       => ['bg'=>'000000','body_bg'=>'000000','txt'=>'00ff00','prompt'=>'00aa00','path'=>'00ff00','comment'=>'005500','title_bg'=>'001100'],
+        'amber'        => ['bg'=>'0a0700','body_bg'=>'0c0900','txt'=>'ffb000','prompt'=>'ffcc44','path'=>'ff8800','comment'=>'886600','title_bg'=>'060400'],
+        'iterm2'       => ['bg'=>'1e1f26','body_bg'=>'1e1f26','txt'=>'d8d8d8','prompt'=>'80bfff','path'=>'e0c97a','comment'=>'5e6d7a','title_bg'=>'282932'],
+        'p10k'         => ['bg'=>'1e1e2e','body_bg'=>'1e1e2e','txt'=>'cdd6f4','prompt'=>'89b4fa','path'=>'a6e3a1','comment'=>'6c7086','title_bg'=>'181825'],
+        'dracula_term' => ['bg'=>'282a36','body_bg'=>'282a36','txt'=>'f8f8f2','prompt'=>'50fa7b','path'=>'ff79c6','comment'=>'6272a4','title_bg'=>'21222c'],
     ];
     $t = $themes[$template] ?? $themes['modern'];
     $titleH = (int)($H * 0.09);
@@ -969,12 +1106,22 @@ function pt_render_terminal(GdImage $im, array $p, string $template): void {
 // ════════════════════════════════════════════════════════════════════════════
 
 $PROFILE_SPECS = [
-    'team_member' => ['bg'=>'ffffff','bg2'=>null,'card_bg'=>'f9fafb','card_border'=>'e5e7eb','name_color'=>'111827','role_color'=>'6b7280','accent'=>'4f46e5','stat_color'=>'111827','stat_label_color'=>'9ca3af','radius'=>16],
-    'author'      => ['bg'=>'fafaf9','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e7e5e4','name_color'=>'1c1917','role_color'=>'78716c','accent'=>'ea580c','stat_color'=>'1c1917','stat_label_color'=>'a8a29e','radius'=>12],
-    'developer'   => ['bg'=>'0d1117','bg2'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','name_color'=>'e6edf3','role_color'=>'8b949e','accent'=>'3fb950','stat_color'=>'e6edf3','stat_label_color'=>'6e7781','radius'=>8],
-    'business'    => ['bg'=>'f8fafc','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e2e8f0','name_color'=>'0f172a','role_color'=>'64748b','accent'=>'0ea5e9','stat_color'=>'0f172a','stat_label_color'=>'94a3b8','radius'=>8],
+    'team_member'   => ['bg'=>'ffffff','bg2'=>null,'card_bg'=>'f9fafb','card_border'=>'e5e7eb','name_color'=>'111827','role_color'=>'6b7280','accent'=>'4f46e5','stat_color'=>'111827','stat_label_color'=>'9ca3af','radius'=>16],
+    'author'        => ['bg'=>'fafaf9','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e7e5e4','name_color'=>'1c1917','role_color'=>'78716c','accent'=>'ea580c','stat_color'=>'1c1917','stat_label_color'=>'a8a29e','radius'=>12],
+    'developer'     => ['bg'=>'0d1117','bg2'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','name_color'=>'e6edf3','role_color'=>'8b949e','accent'=>'3fb950','stat_color'=>'e6edf3','stat_label_color'=>'6e7781','radius'=>8],
+    'business'      => ['bg'=>'f8fafc','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e2e8f0','name_color'=>'0f172a','role_color'=>'64748b','accent'=>'0ea5e9','stat_color'=>'0f172a','stat_label_color'=>'94a3b8','radius'=>8],
     'creator'     => ['bg'=>'fdf2f8','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'fce7f3','name_color'=>'831843','role_color'=>'9d174d','accent'=>'db2777','stat_color'=>'831843','stat_label_color'=>'be185d','radius'=>20],
-    'speaker'     => ['bg'=>'1e1b4b','bg2'=>'312e81','card_bg'=>'1e1b4b','card_border'=>'4338ca','name_color'=>'e0e7ff','role_color'=>'a5b4fc','accent'=>'818cf8','stat_color'=>'e0e7ff','stat_label_color'=>'6366f1','radius'=>16],
+    'speaker'      => ['bg'=>'1e1b4b','bg2'=>'312e81','card_bg'=>'1e1b4b','card_border'=>'4338ca','name_color'=>'e0e7ff','role_color'=>'a5b4fc','accent'=>'818cf8','stat_color'=>'e0e7ff','stat_label_color'=>'6366f1','radius'=>16],
+    // ── 9 new profile templates ──────────────────────────────────
+    'minimal_white' => ['bg'=>'ffffff','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'f0f0f0','name_color'=>'000000','role_color'=>'666666','accent'=>'000000','stat_color'=>'000000','stat_label_color'=>'999999','radius'=>0],
+    'dark_glass'    => ['bg'=>'0d1117','bg2'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','name_color'=>'ffffff','role_color'=>'8b949e','accent'=>'58a6ff','stat_color'=>'e6edf3','stat_label_color'=>'8b949e','radius'=>16],
+    'gradient_card' => ['bg'=>'667eea','bg2'=>'764ba2','card_bg'=>'ffffff','card_border'=>'ffffff','name_color'=>'1a202c','role_color'=>'4a5568','accent'=>'667eea','stat_color'=>'1a202c','stat_label_color'=>'718096','radius'=>20],
+    'resume_clean'  => ['bg'=>'f8f9fa','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'dee2e6','name_color'=>'212529','role_color'=>'495057','accent'=>'0d6efd','stat_color'=>'212529','stat_label_color'=>'6c757d','radius'=>4],
+    'podcast_card'  => ['bg'=>'1a1a2e','bg2'=>null,'card_bg'=>'16213e','card_border'=>'e94560','name_color'=>'ffffff','role_color'=>'a8b2d8','accent'=>'e94560','stat_color'=>'ffffff','stat_label_color'=>'627b9a','radius'=>12],
+    'athlete'       => ['bg'=>'0a0a0a','bg2'=>null,'card_bg'=>'1a1a1a','card_border'=>'ff4500','name_color'=>'ffffff','role_color'=>'ff8c42','accent'=>'ff4500','stat_color'=>'ffffff','stat_label_color'=>'999999','radius'=>0],
+    'musician'      => ['bg'=>'0d0208','bg2'=>null,'card_bg'=>'140310','card_border'=>'ff006e','name_color'=>'ffffff','role_color'=>'ff8fb1','accent'=>'ff006e','stat_color'=>'ffffff','stat_label_color'=>'cc6699','radius'=>12],
+    'freelancer'    => ['bg'=>'fff8f0','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'f0d8c0','name_color'=>'2d1b00','role_color'=>'7a5c3a','accent'=>'d97706','stat_color'=>'2d1b00','stat_label_color'=>'a0856b','radius'=>12],
+    'noir'          => ['bg'=>'0a0a0a','bg2'=>null,'card_bg'=>'1a1a1a','card_border'=>'333333','name_color'=>'ffffff','role_color'=>'aaaaaa','accent'=>'ffffff','stat_color'=>'ffffff','stat_label_color'=>'777777','radius'=>0],
 ];
 
 function pt_render_profile(GdImage $im, array $p, array $s): void {
@@ -1083,7 +1230,17 @@ function pt_render_code(GdImage $im, array $p, string $template): void {
         'monokai' => ['bg'=>'272822','header_bg'=>'3e3d32','gutter_bg'=>'2c2b26','gutter_color'=>'75715e','txt'=>'f8f8f2','string'=>'e6db74','keyword'=>'f92672','comment'=>'75715e','number'=>'ae81ff','function'=>'a6e22e','variable'=>'fd971f','operator'=>'f8f8f2','tab_active'=>'272822','tab_inactive'=>'3e3d32'],
         'nord'    => ['bg'=>'2e3440','header_bg'=>'3b4252','gutter_bg'=>'3b4252','gutter_color'=>'4c566a','txt'=>'d8dee9','string'=>'a3be8c','keyword'=>'81a1c1','comment'=>'4c566a','number'=>'b48ead','function'=>'88c0d0','variable'=>'d8dee9','operator'=>'81a1c1','tab_active'=>'2e3440','tab_inactive'=>'3b4252'],
         'dracula' => ['bg'=>'282a36','header_bg'=>'343746','gutter_bg'=>'343746','gutter_color'=>'6272a4','txt'=>'f8f8f2','string'=>'f1fa8c','keyword'=>'ff79c6','comment'=>'6272a4','number'=>'bd93f9','function'=>'50fa7b','variable'=>'8be9fd','operator'=>'ff79c6','tab_active'=>'282a36','tab_inactive'=>'343746'],
-        'minimal' => ['bg'=>'f8f8f8','header_bg'=>'f0f0f0','gutter_bg'=>'f0f0f0','gutter_color'=>'aaaaaa','txt'=>'333333','string'=>'448c27','keyword'=>'4b69c6','comment'=>'aaaaaa','number'=>'9c5d27','function'=>'7a3e9d','variable'=>'333333','operator'=>'333333','tab_active'=>'f8f8f8','tab_inactive'=>'f0f0f0'],
+        'minimal'    => ['bg'=>'f8f8f8','header_bg'=>'f0f0f0','gutter_bg'=>'f0f0f0','gutter_color'=>'aaaaaa','txt'=>'333333','string'=>'448c27','keyword'=>'4b69c6','comment'=>'aaaaaa','number'=>'9c5d27','function'=>'7a3e9d','variable'=>'333333','operator'=>'333333','tab_active'=>'f8f8f8','tab_inactive'=>'f0f0f0'],
+        // ── 9 new code themes ────────────────────────────────────
+        'one_dark'   => ['bg'=>'282c34','header_bg'=>'21252b','gutter_bg'=>'21252b','gutter_color'=>'495162','txt'=>'abb2bf','string'=>'98c379','keyword'=>'c678dd','comment'=>'5c6370','number'=>'d19a66','function'=>'61afef','variable'=>'e06c75','operator'=>'56b6c2','tab_active'=>'282c34','tab_inactive'=>'21252b'],
+        'synthwave'  => ['bg'=>'262335','header_bg'=>'1a1a2e','gutter_bg'=>'1a1a2e','gutter_color'=>'495495','txt'=>'ffffff','string'=>'ff8b39','keyword'=>'ff6bcb','comment'=>'848bbd','number'=>'f97583','function'=>'36f9f6','variable'=>'fede5d','operator'=>'ff6bcb','tab_active'=>'262335','tab_inactive'=>'1a1a2e'],
+        'gruvbox'    => ['bg'=>'282828','header_bg'=>'1d2021','gutter_bg'=>'282828','gutter_color'=>'504945','txt'=>'ebdbb2','string'=>'b8bb26','keyword'=>'fb4934','comment'=>'928374','number'=>'d3869b','function'=>'fabd2f','variable'=>'83a598','operator'=>'fe8019','tab_active'=>'282828','tab_inactive'=>'1d2021'],
+        'solarized'  => ['bg'=>'002b36','header_bg'=>'073642','gutter_bg'=>'073642','gutter_color'=>'586e75','txt'=>'839496','string'=>'2aa198','keyword'=>'859900','comment'=>'586e75','number'=>'d33682','function'=>'268bd2','variable'=>'b58900','operator'=>'cb4b16','tab_active'=>'002b36','tab_inactive'=>'073642'],
+        'tokyo_night'=> ['bg'=>'1a1b2e','header_bg'=>'16161e','gutter_bg'=>'16161e','gutter_color'=>'3b3d57','txt'=>'a9b1d6','string'=>'9ece6a','keyword'=>'7aa2f7','comment'=>'565f89','number'=>'ff9e64','function'=>'7dcfff','variable'=>'f7768e','operator'=>'bb9af7','tab_active'=>'1a1b2e','tab_inactive'=>'16161e'],
+        'catppuccin' => ['bg'=>'1e1e2e','header_bg'=>'181825','gutter_bg'=>'181825','gutter_color'=>'45475a','txt'=>'cdd6f4','string'=>'a6e3a1','keyword'=>'cba6f7','comment'=>'6c7086','number'=>'fab387','function'=>'89b4fa','variable'=>'f38ba8','operator'=>'89dceb','tab_active'=>'1e1e2e','tab_inactive'=>'181825'],
+        'atom_light' => ['bg'=>'fafafa','header_bg'=>'f0f0f0','gutter_bg'=>'f0f0f0','gutter_color'=>'9d9d9f','txt'=>'383a42','string'=>'50a14f','keyword'=>'a626a4','comment'=>'a0a1a7','number'=>'986801','function'=>'4078f2','variable'=>'e45649','operator'=>'0184bc','tab_active'=>'fafafa','tab_inactive'=>'f0f0f0'],
+        'sublime'    => ['bg'=>'23241f','header_bg'=>'272822','gutter_bg'=>'272822','gutter_color'=>'75715e','txt'=>'f8f8f2','string'=>'e6db74','keyword'=>'f92672','comment'=>'75715e','number'=>'ae81ff','function'=>'a6e22e','variable'=>'66d9ef','operator'=>'f92672','tab_active'=>'23241f','tab_inactive'=>'272822'],
+        'jetbrains'  => ['bg'=>'2b2b2b','header_bg'=>'3c3f41','gutter_bg'=>'313335','gutter_color'=>'606366','txt'=>'a9b7c6','string'=>'6a8759','keyword'=>'cc7832','comment'=>'629755','number'=>'6897bb','function'=>'ffc66d','variable'=>'a9b7c6','operator'=>'a9b7c6','tab_active'=>'2b2b2b','tab_inactive'=>'3c3f41'],
     ];
     $t = $themes[$template] ?? $themes['vscode'];
 
@@ -1171,7 +1328,17 @@ $DASHBOARD_SPECS = [
     'stats'     => ['bg'=>'18181b','sidebar_bg'=>'27272a','card_bg'=>'27272a','card_border'=>'3f3f46','txt'=>'fafafa','muted'=>'a1a1aa','accent'=>'f59e0b','positive'=>'4ade80','negative'=>'f87171'],
     'kpi'       => ['bg'=>'030712','sidebar_bg'=>'111827','card_bg'=>'111827','card_border'=>'1f2937','txt'=>'f9fafb','muted'=>'6b7280','accent'=>'a855f7','positive'=>'34d399','negative'=>'fb7185'],
     'revenue'   => ['bg'=>'fff7ed','sidebar_bg'=>'fff7ed','card_bg'=>'ffffff','card_border'=>'fed7aa','txt'=>'1c1917','muted'=>'78716c','accent'=>'ea580c','positive'=>'059669','negative'=>'dc2626'],
-    'admin'     => ['bg'=>'f1f5f9','sidebar_bg'=>'1e293b','card_bg'=>'ffffff','card_border'=>'e2e8f0','txt'=>'0f172a','muted'=>'64748b','accent'=>'0284c7','positive'=>'16a34a','negative'=>'dc2626'],
+    'admin'        => ['bg'=>'f1f5f9','sidebar_bg'=>'1e293b','card_bg'=>'ffffff','card_border'=>'e2e8f0','txt'=>'0f172a','muted'=>'64748b','accent'=>'0284c7','positive'=>'16a34a','negative'=>'dc2626'],
+    // ── 9 new dashboard templates ────────────────────────────────
+    'marketing'    => ['bg'=>'0d2137','sidebar_bg'=>'0a1a2e','card_bg'=>'0a1a2e','card_border'=>'1e3a5f','txt'=>'e2f0ff','muted'=>'7aa5cc','accent'=>'00d4ff','positive'=>'00ff88','negative'=>'ff4444'],
+    'crypto'       => ['bg'=>'0a0e1a','sidebar_bg'=>'10152a','card_bg'=>'10152a','card_border'=>'1e2a45','txt'=>'e8eaf6','muted'=>'7986cb','accent'=>'f7b731','positive'=>'26de81','negative'=>'fc5c65'],
+    'fitness'      => ['bg'=>'0d0d0d','sidebar_bg'=>'1a1a1a','card_bg'=>'1a1a1a','card_border'=>'2d2d2d','txt'=>'ffffff','muted'=>'888888','accent'=>'ff4500','positive'=>'ff6b35','negative'=>'e74c3c'],
+    'ecommerce'    => ['bg'=>'fafafa','sidebar_bg'=>'ffffff','card_bg'=>'ffffff','card_border'=>'eeeeee','txt'=>'212121','muted'=>'757575','accent'=>'00897b','positive'=>'43a047','negative'=>'e53935'],
+    'social_dash'  => ['bg'=>'f0e6ff','sidebar_bg'=>'e8d5ff','card_bg'=>'ffffff','card_border'=>'d4a6ff','txt'=>'1a0033','muted'=>'6b3399','accent'=>'9c27b0','positive'=>'4caf50','negative'=>'f44336'],
+    'devops'       => ['bg'=>'0c1920','sidebar_bg'=>'0f2030','card_bg'=>'0f2030','card_border'=>'1a3a50','txt'=>'c8e6f0','muted'=>'5a8a9e','accent'=>'00bcd4','positive'=>'4caf50','negative'=>'f44336'],
+    'project_dash' => ['bg'=>'f7f8fc','sidebar_bg'=>'2d3436','card_bg'=>'ffffff','card_border'=>'e4e7ef','txt'=>'2d3436','muted'=>'636e72','accent'=>'6c63ff','positive'=>'00b894','negative'=>'d63031'],
+    'finance'      => ['bg'=>'001233','sidebar_bg'=>'001a4d','card_bg'=>'001a4d','card_border'=>'002a70','txt'=>'e8f0ff','muted'=>'7a9acc','accent'=>'c9a84c','positive'=>'2ecc71','negative'=>'e74c3c'],
+    'monitoring'   => ['bg'=>'0e1117','sidebar_bg'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','txt'=>'c9d1d9','muted'=>'8b949e','accent'=>'f0883e','positive'=>'3fb950','negative'=>'f85149'],
 ];
 
 function pt_render_dashboard(GdImage $im, array $p, array $s): void {
@@ -1273,7 +1440,17 @@ $DOC_SPECS = [
     'changelog' => ['bg'=>'0f172a','sidebar_bg'=>'0f172a','card_bg'=>'1e293b','accent'=>'a855f7','txt'=>'f8fafc','muted'=>'94a3b8','method_get'=>'4ade80','method_post'=>'60a5fa','method_put'=>'fbbf24','method_del'=>'f87171'],
     'product'   => ['bg'=>'fafafa','sidebar_bg'=>'f4f4f5','card_bg'=>'ffffff','accent'=>'0ea5e9','txt'=>'0a0a0a','muted'=>'737373','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
     'developer' => ['bg'=>'1a1a2e','sidebar_bg'=>'16213e','card_bg'=>'0f3460','accent'=>'e94560','txt'=>'ffffff','muted'=>'a8b2d8','method_get'=>'4caf50','method_post'=>'2196f3','method_put'=>'ff9800','method_del'=>'f44336'],
-    'knowledge' => ['bg'=>'ffffff','sidebar_bg'=>'fafafa','card_bg'=>'f9f9f9','accent'=>'10b981','txt'=>'111827','muted'=>'6b7280','method_get'=>'059669','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    'knowledge'     => ['bg'=>'ffffff','sidebar_bg'=>'fafafa','card_bg'=>'f9f9f9','accent'=>'10b981','txt'=>'111827','muted'=>'6b7280','method_get'=>'059669','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    // ── 9 new documentation templates ───────────────────────────
+    'tutorial'      => ['bg'=>'fff9f0','sidebar_bg'=>'1c1c1c','card_bg'=>'fff9f0','accent'=>'f59e0b','txt'=>'1c1c1c','muted'=>'6b5b45','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    'component_doc' => ['bg'=>'fafafa','sidebar_bg'=>'2d2d2d','card_bg'=>'ffffff','accent'=>'818cf8','txt'=>'111827','muted'=>'6b7280','method_get'=>'059669','method_post'=>'4f46e5','method_put'=>'d97706','method_del'=>'dc2626'],
+    'library_pkg'   => ['bg'=>'0a0a0a','sidebar_bg'=>'141414','card_bg'=>'1a1a1a','accent'=>'c2410c','txt'=>'e5e5e5','muted'=>'737373','method_get'=>'4ade80','method_post'=>'60a5fa','method_put'=>'fbbf24','method_del'=>'f87171'],
+    'cli_doc'       => ['bg'=>'0d1117','sidebar_bg'=>'0d1117','card_bg'=>'161b22','accent'=>'3fb950','txt'=>'c9d1d9','muted'=>'8b949e','method_get'=>'3fb950','method_post'=>'58a6ff','method_put'=>'ffa657','method_del'=>'ff7b72'],
+    'guide_doc'     => ['bg'=>'fff7ed','sidebar_bg'=>'fff7ed','card_bg'=>'ffffff','accent'=>'ea580c','txt'=>'1c1917','muted'=>'78716c','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    'reference_doc' => ['bg'=>'ffffff','sidebar_bg'=>'f8fafc','card_bg'=>'ffffff','accent'=>'334155','txt'=>'0f172a','muted'=>'64748b','method_get'=>'059669','method_post'=>'3b82f6','method_put'=>'f59e0b','method_del'=>'ef4444'],
+    'faq_doc'       => ['bg'=>'f0fdf4','sidebar_bg'=>'f0fdf4','card_bg'=>'ffffff','accent'=>'059669','txt'=>'052e16','muted'=>'166534','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    'notes_doc'     => ['bg'=>'fefce8','sidebar_bg'=>'fef9c3','card_bg'=>'fefce8','accent'=>'ca8a04','txt'=>'1a2000','muted'=>'713f12','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
+    'quickstart'    => ['bg'=>'f0fdf4','sidebar_bg'=>'166534','card_bg'=>'ffffff','accent'=>'16a34a','txt'=>'052e16','muted'=>'166534','method_get'=>'16a34a','method_post'=>'2563eb','method_put'=>'d97706','method_del'=>'dc2626'],
 ];
 
 function pt_render_doc(GdImage $im, array $p, array $s): void {
@@ -1365,7 +1542,17 @@ $GITHUB_SPECS = [
     'release'       => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1f3a1f','badge_color'=>'3fb950','stat_color'=>'8b949e','accent'=>'3fb950','lang_color'=>'f97316','radius'=>6],
     'open_source'   => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1a1f2e','badge_color'=>'79c0ff','stat_color'=>'8b949e','accent'=>'79c0ff','lang_color'=>'e34c26','radius'=>6],
     'org'           => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'21262d','badge_color'=>'d2a8ff','stat_color'=>'8b949e','accent'=>'d2a8ff','lang_color'=>'d2a8ff','radius'=>6],
-    'project'       => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1a1a2e','badge_color'=>'818cf8','stat_color'=>'8b949e','accent'=>'818cf8','lang_color'=>'563d7c','radius'=>6],
+    'project'            => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1a1a2e','badge_color'=>'818cf8','stat_color'=>'8b949e','accent'=>'818cf8','lang_color'=>'563d7c','radius'=>6],
+    // ── 9 new GitHub templates ───────────────────────────────────
+    'stars_showcase'     => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'f1e05a','desc_color'=>'8b949e','badge_bg'=>'2d2a00','badge_color'=>'f1e05a','stat_color'=>'f1e05a','accent'=>'f1e05a','lang_color'=>'f1e05a','radius'=>6],
+    'npm_card'           => ['bg'=>'1a0000','card_bg'=>'2b0000','card_border'=>'4a0000','heading_color'=>'cb0000','desc_color'=>'cc4444','badge_bg'=>'2b0000','badge_color'=>'cb0000','stat_color'=>'aaaaaa','accent'=>'cb0000','lang_color'=>'cb0000','radius'=>4],
+    'contribution_card'  => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'033a16','badge_color'=>'3fb950','stat_color'=>'39d353','accent'=>'39d353','lang_color'=>'39d353','radius'=>6],
+    'profile_readme'     => ['bg'=>'ffffff','card_bg'=>'f6f8fa','card_border'=>'d0d7de','heading_color'=>'1f2328','desc_color'=>'656d76','badge_bg'=>'fff8c5','badge_color'=>'9a6700','stat_color'=>'24292f','accent'=>'0969da','lang_color'=>'f1e05a','radius'=>6],
+    'docker_card'        => ['bg'=>'0b1d32','card_bg'=>'0a2c4e','card_border'=>'1967a4','heading_color'=>'ffffff','desc_color'=>'7ab7e8','badge_bg'=>'003f75','badge_color'=>'2496ed','stat_color'=>'7ab7e8','accent'=>'2496ed','lang_color'=>'2496ed','radius'=>8],
+    'pr_card'            => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1c2a1c','badge_color'=>'3fb950','stat_color'=>'8b949e','accent'=>'3fb950','lang_color'=>'a371f7','radius'=>6],
+    'issue_card'         => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'1c2a00','badge_color'=>'57ab5a','stat_color'=>'8b949e','accent'=>'57ab5a','lang_color'=>'ff7b72','radius'=>6],
+    'workflow_card'      => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'221a00','badge_color'=>'e3b341','stat_color'=>'8b949e','accent'=>'e3b341','lang_color'=>'f97316','radius'=>6],
+    'monorepo'           => ['bg'=>'0d1117','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'002030','badge_color'=>'79c0ff','stat_color'=>'8b949e','accent'=>'79c0ff','lang_color'=>'22d3ee','radius'=>6],
 ];
 
 function pt_render_github(GdImage $im, array $p, array $s): void {
@@ -1448,16 +1635,16 @@ function pt_render_github(GdImage $im, array $p, array $s): void {
 // ════════════════════════════════════════════════════════════════════════════
 
 $registry = [
-    'og'        => ['templates' => array_keys($OG_SPECS),      'default_w' => 1200, 'default_h' => 630],
-    'social'    => ['templates' => array_keys($SOCIAL_SPECS),  'default_w' => 1200, 'default_h' => 630],
-    'placeholder'  => ['templates' => ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state'], 'default_w' => 800, 'default_h' => 600],
-    'browser'   => ['templates' => ['chrome','firefox','safari','edge','arc','generic'], 'default_w' => 1200, 'default_h' => 800],
-    'terminal'  => ['templates' => ['linux','modern','hacker','vscode','minimal'],       'default_w' => 900, 'default_h' => 600],
-    'profile'   => ['templates' => array_keys($PROFILE_SPECS), 'default_w' => 900, 'default_h' => 500],
-    'code'      => ['templates' => ['vscode','github','monokai','nord','dracula','minimal'], 'default_w' => 1000, 'default_h' => 600],
-    'dashboard' => ['templates' => array_keys($DASHBOARD_SPECS), 'default_w' => 1200, 'default_h' => 630],
-    'docs'      => ['templates' => array_keys($DOC_SPECS),      'default_w' => 1200, 'default_h' => 630],
-    'github'    => ['templates' => array_keys($GITHUB_SPECS),   'default_w' => 1200, 'default_h' => 630],
+    'og'          => ['templates' => array_keys($OG_SPECS),       'default_w' => 1200, 'default_h' => 630],
+    'social'      => ['templates' => array_keys($SOCIAL_SPECS),   'default_w' => 1200, 'default_h' => 630],
+    'placeholder' => ['templates' => ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], 'default_w' => 800, 'default_h' => 600],
+    'browser'     => ['templates' => ['chrome','firefox','safari','edge','arc','generic','brave','opera','vivaldi','dark_mode','minimal_browser','retro_browser','high_contrast','material','warm_light'], 'default_w' => 1200, 'default_h' => 800],
+    'terminal'    => ['templates' => ['linux','modern','hacker','vscode','minimal','powerline','fish_shell','windows_cmd','powershell','ubuntu_term','matrix','amber','iterm2','p10k','dracula_term'], 'default_w' => 900, 'default_h' => 600],
+    'profile'     => ['templates' => array_keys($PROFILE_SPECS),  'default_w' => 900, 'default_h' => 500],
+    'code'        => ['templates' => ['vscode','github','monokai','nord','dracula','minimal','one_dark','synthwave','gruvbox','solarized','tokyo_night','catppuccin','atom_light','sublime','jetbrains'], 'default_w' => 1000, 'default_h' => 600],
+    'dashboard'   => ['templates' => array_keys($DASHBOARD_SPECS),'default_w' => 1200, 'default_h' => 630],
+    'docs'        => ['templates' => array_keys($DOC_SPECS),       'default_w' => 1200, 'default_h' => 630],
+    'github'      => ['templates' => array_keys($GITHUB_SPECS),    'default_w' => 1200, 'default_h' => 630],
 ];
 
 // ════════════════════════════════════════════════════════════════════════════

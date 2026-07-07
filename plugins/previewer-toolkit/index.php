@@ -248,47 +248,62 @@ ob_start();
           <!-- Content -->
           <div class="pt-section" id="ptContentSection">
             <div class="pt-section-title">Content</div>
-            <div class="pt-field">
-              <label>Heading <span class="pt-field-hint">main title</span></label>
-              <input type="text" id="p_heading" value="Developer Toolkit" class="pt-input" oninput="PT.debounce()" placeholder="Main heading…">
+            <!-- base: heading + description -->
+            <div class="pt-fgroup" data-group="base">
+              <div class="pt-field">
+                <label>Heading <span class="pt-field-hint">main title</span></label>
+                <input type="text" id="p_heading" value="Developer Toolkit" class="pt-input" oninput="PT.debounce()" placeholder="Main heading…">
+              </div>
+              <div class="pt-field">
+                <label>Description</label>
+                <input type="text" id="p_description" value="200+ free online tools for developers" class="pt-input" oninput="PT.debounce()" placeholder="Short description…">
+              </div>
             </div>
-            <div class="pt-field">
-              <label>Description</label>
-              <input type="text" id="p_description" value="200+ free online tools for developers" class="pt-input" oninput="PT.debounce()" placeholder="Short description…">
+            <!-- badge -->
+            <div class="pt-fgroup" data-group="badge">
+              <div class="pt-field">
+                <label>Badge / Label <span class="pt-field-hint">comma-separate for multiple</span></label>
+                <input type="text" id="p_badge" value="" class="pt-input" oninput="PT.debounce()" placeholder="e.g. Open Source, v2.0, New">
+              </div>
             </div>
-            <div class="pt-field">
-              <label>Badge / Label</label>
-              <input type="text" id="p_badge" value="" class="pt-input" oninput="PT.debounce()" placeholder="e.g. Open Source, v2.0">
-            </div>
-            <div class="pt-field">
-              <label>Icon <span class="pt-field-hint">Font Awesome name</span></label>
-              <div class="pt-icon-row">
-                <input type="text" id="p_icon" value="code" class="pt-input" oninput="PT.debounce()" placeholder="e.g. code, globe, star">
-                <div class="pt-icon-chips" id="ptIconChips">
-                  <?php foreach (['code','globe','user','database','server','cloud','star','rocket','bolt','fire','gear','lock','shield','chart-bar','book','file-code'] as $ic): ?>
-                  <button class="pt-chip" onclick="PT.setIcon('<?= $ic ?>')" title="<?= $ic ?>"><i class="fa-solid fa-<?= $ic ?>"></i></button>
-                  <?php endforeach; ?>
+            <!-- icon -->
+            <div class="pt-fgroup" data-group="icon">
+              <div class="pt-field">
+                <label>Icon <span class="pt-field-hint">Font Awesome name</span></label>
+                <div class="pt-icon-row">
+                  <input type="text" id="p_icon" value="code" class="pt-input" oninput="PT.debounce()" placeholder="e.g. code, globe, star">
+                  <div class="pt-icon-chips" id="ptIconChips">
+                    <?php foreach (['code','globe','user','database','server','cloud','star','rocket','bolt','fire','gear','lock','shield','chart-bar','book','file-code'] as $ic): ?>
+                    <button class="pt-chip" onclick="PT.setIcon('<?= $ic ?>')" title="<?= $ic ?>"><i class="fa-solid fa-<?= $ic ?>"></i></button>
+                    <?php endforeach; ?>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="pt-row">
-              <div class="pt-field">
-                <label>Website</label>
-                <input type="text" id="p_website" value="" class="pt-input" oninput="PT.debounce()" placeholder="awantools.site">
-              </div>
-              <div class="pt-field">
-                <label>Author</label>
-                <input type="text" id="p_author" value="" class="pt-input" oninput="PT.debounce()" placeholder="@username">
+            <!-- author: website + author name -->
+            <div class="pt-fgroup" data-group="author">
+              <div class="pt-row">
+                <div class="pt-field">
+                  <label>Website</label>
+                  <input type="text" id="p_website" value="" class="pt-input" oninput="PT.debounce()" placeholder="awantools.site">
+                </div>
+                <div class="pt-field">
+                  <label>Author</label>
+                  <input type="text" id="p_author" value="" class="pt-input" oninput="PT.debounce()" placeholder="@username">
+                </div>
               </div>
             </div>
-            <div class="pt-row">
-              <div class="pt-field">
-                <label>Footer text</label>
-                <input type="text" id="p_footer" value="" class="pt-input" oninput="PT.debounce()" placeholder="Footer note…">
-              </div>
-              <div class="pt-field">
-                <label>Watermark</label>
-                <input type="text" id="p_watermark" value="" class="pt-input" oninput="PT.debounce()" placeholder="Small watermark…">
+            <!-- extra: footer + watermark -->
+            <div class="pt-fgroup" data-group="extra">
+              <div class="pt-row">
+                <div class="pt-field">
+                  <label>Footer text</label>
+                  <input type="text" id="p_footer" value="" class="pt-input" oninput="PT.debounce()" placeholder="Footer note…">
+                </div>
+                <div class="pt-field">
+                  <label>Watermark</label>
+                  <input type="text" id="p_watermark" value="" class="pt-input" oninput="PT.debounce()" placeholder="Small watermark…">
+                </div>
               </div>
             </div>
           </div>
