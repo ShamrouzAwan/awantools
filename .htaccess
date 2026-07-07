@@ -1,0 +1,36 @@
+# AWAN Tools Platform — Apache configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Routing ──────────────────────────────────────────────────────────────────
+Options -Indexes
+RewriteEngine On
+
+# Block direct access to sensitive directories/files
+RewriteRule ^(_core|_database|_lang|_bootstrap|_config|start\.sh|README) - [F,L]
+
+# Block direct access to PHP files inside plugins/ (only index.php served via directory route)
+RewriteRule ^plugins/[^/]+/.+\.php$ - [F,L]
+
+# Block storage/ except uploads/
+RewriteRule ^storage/(?!uploads/) - [F,L]
+
+# Route all requests through _router.php (built-in server already uses it)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ _router.php [QSA,L]
+
+# Also route directory requests to _router.php
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_URI} !^/$
+RewriteRule ^ _router.php [QSA,L]
+
+# ── Security Headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Default: block camera everywhere
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+    # Allow camera only on the scannable-codes plugin (needed for QR/barcode scanner)
+    <LocationMatch "^/plugins/scannable-codes(/.*)?$">
+        Header always set Permissions-Policy "camera=(self), microphone=(), geolocation=()"
+    </LocationMatch>
+</IfModule>

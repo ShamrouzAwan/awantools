@@ -79,11 +79,14 @@ if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
     header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    // Allow camera only on the scannable-codes plugin page (needed for QR/barcode scanner)
+    // Allow camera only on the scannable-codes plugin page (needed for QR/barcode scanner).
+    // header_remove() clears any server-level Permissions-Policy set by Apache/hosting before
+    // we send our own, preventing duplicate/conflicting headers.
     $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
     $isScannableCodes = ($requestPath === '/plugins/scannable-codes'
         || strpos($requestPath, '/plugins/scannable-codes/') === 0);
     $cameraPolicy = $isScannableCodes ? 'camera=(self)' : 'camera=()';
+    header_remove('Permissions-Policy');
     header('Permissions-Policy: ' . $cameraPolicy . ', microphone=(), geolocation=()');
     // CSP — allows CDNs required by admin editors (Monaco, TinyMCE, Quill)
     // unsafe-eval is required by Monaco Editor's language services
