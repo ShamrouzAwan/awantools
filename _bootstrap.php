@@ -265,9 +265,24 @@ function siteUrl(string $path = ''): string {
     global $settings;
     $base = rtrim($settings->get('site_url', ''), '/');
     if (!$base) {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base   = $scheme . '://' . $host;
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        // On Replit dev, HTTP_HOST is 127.0.0.1:5000 (not publicly reachable).
+        // Use the REPLIT_DOMAINS env var (the real proxied hostname) when present.
+        $hostBare = strtolower(explode(':', $host)[0]); // strip port for matching
+        if (in_array($hostBare, ['127.0.0.1','localhost','::1','0.0.0.0'], true)
+            || str_starts_with($hostBare, '127.')) {
+            $replitDomains = $_ENV['REPLIT_DOMAINS'] ?? getenv('REPLIT_DOMAINS');
+            if ($replitDomains) {
+                $host = trim(explode(',', $replitDomains)[0]);
+                $base = 'https://' . $host;
+            } else {
+                $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $base   = $scheme . '://' . $host;
+            }
+        } else {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $base   = $scheme . '://' . $host;
+        }
     }
     return $path !== '' ? $base . '/' . ltrim($path, '/') : $base;
 }

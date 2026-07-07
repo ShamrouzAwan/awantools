@@ -1,2 +1,3 @@
 - [Workflow rules](workflow-rules.md) — shared hosting deploy: report changed files, no schema changes without approval, minimal edits, prefer existing data sources over new files
 - [Previewer Toolkit OG image headers](previewer-toolkit-og-headers.md) — session headers (Set-Cookie, Pragma, Expires) broke og:image on social crawlers; fix: header_remove() at render entry point
+- [siteUrl Replit localhost fix](siteurl-replit-fix.md) — siteUrl() fell back to HTTP_HOST (127.0.0.1:5000) on Replit dev, making og:image URLs unreachable; fix: check REPLIT_DOMAINS env var

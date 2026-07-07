@@ -990,10 +990,9 @@ if (empty($sectionOrder) && isset($sectionHtml['hero'])) {
 $content = ob_get_clean();
 
 // --- Dynamic OG Image (Previewer Toolkit profile card) ---
-// Build an absolute base URL so the og:image works everywhere (social crawlers, etc.)
-$_ogScheme  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$_ogHost    = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$_ogBase    = $_ogScheme . '://' . $_ogHost;
+// Use siteUrl() so the URL is always the public-facing host (respects site_url DB
+// setting, falls back to REPLIT_DOMAINS on Replit dev, then HTTP_HOST elsewhere).
+$_ogBase    = rtrim(siteUrl(), '/');
 // Tool count: real sum of offered tools for active plugins, rounded down to nearest 10
 $_ogCount   = max(10, (int)(floor(max(1, $totalPlugins) / 10) * 10));
 $_ogBadge   = $_ogCount . '+ Active Tools,No Subscriptions,Free Forever';
