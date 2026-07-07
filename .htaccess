@@ -14,14 +14,10 @@ RewriteRule ^plugins/[^/]+/.+\.php$ - [F,L]
 # Block storage/ except uploads/
 RewriteRule ^storage/(?!uploads/) - [F,L]
 
-# Route all requests through _router.php (built-in server already uses it)
+# Route all non-file requests through _router.php.
+# index.php and all other PHP entry points require AWAN to be defined by the router,
+# so they cannot be served directly by Apache — everything must go through _router.php.
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ _router.php [QSA,L]
-
-# Also route directory requests to _router.php
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteCond %{REQUEST_URI} !^/$
 RewriteRule ^ _router.php [QSA,L]
 
 # ── Security Headers ──────────────────────────────────────────────────────────
