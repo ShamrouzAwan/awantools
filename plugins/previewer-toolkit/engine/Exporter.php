@@ -29,30 +29,28 @@ class PT_Exporter
 
         // Try ImageMagick only when exec() is available
         if (self::exec_available()) {
-            // tempnam() creates the base file; rename it so it has the right
-            // extension — avoids leaking the extensionless temp file.
-            $base_svg = tempnam(sys_get_temp_dir(), 'pt_');
-            $tmp_svg  = $base_svg . '.svg';
-            rename($base_svg, $tmp_svg);
+            // Use random_bytes() to generate unguessable temp filenames in one
+            // step — avoids the TOCTOU window that tempnam()+rename() creates.
+            $rnd     = bin2hex(random_bytes(8));
+            $tmp_dir = sys_get_temp_dir();
+            $tmp_svg = $tmp_dir . '/pt_' . $rnd . '_in.svg';
             file_put_contents($tmp_svg, $svg);
 
             $ext     = $fmt === 'jpg' ? 'jpg' : $fmt;
-            $base_out = tempnam(sys_get_temp_dir(), 'pt_');
-            $tmp_out  = $base_out . '.' . $ext;
-            rename($base_out, $tmp_out);
+            $tmp_out = $tmp_dir . '/pt_' . $rnd . '_out.' . $ext;
 
             $quality_flag = '';
             if ($fmt === 'jpg' || $fmt === 'webp') {
-                $quality_flag = "-quality $quality";
+                $quality_flag = '-quality ' . escapeshellarg((string)$quality);
             }
 
             $density = 96;
-            $cmd = escapeshellcmd('magick')
-                 . " -density $density"
+            $cmd = 'magick'
+                 . ' -density ' . escapeshellarg((string)$density)
                  . ' -background ' . ($p['transparent'] ? 'none' : escapeshellarg('#' . $p['bg_color']))
                  . ' ' . escapeshellarg($tmp_svg)
-                 . " -resize {$w}x{$h}"
-                 . " $quality_flag"
+                 . ' -resize ' . escapeshellarg("{$w}x{$h}")
+                 . ($quality_flag !== '' ? ' ' . $quality_flag : '')
                  . ' ' . escapeshellarg($tmp_out)
                  . ' 2>&1';
 

@@ -14,7 +14,9 @@ require_once __DIR__ . '/engine/Renderer.php';
 require_once __DIR__ . '/engine/Exporter.php';
 require_once __DIR__ . '/engine/Cache.php';
 
-$raw = array_map('strval', $_GET);
+// Cap the number of accepted GET entries to prevent large-payload abuse before
+// any parsing happens.  Legitimate render calls use at most ~35 params.
+$raw = array_map('strval', array_slice($_GET, 0, 60, true));
 
 // ── Shared helper: parse an HTML attribute string into a key→value array ──────
 function pt_parse_attrs(string $attrs): array {
