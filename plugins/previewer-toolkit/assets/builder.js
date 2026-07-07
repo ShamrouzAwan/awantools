@@ -115,8 +115,7 @@
     clearTimeout(state.debounceTimer);
     state.debounceTimer = setTimeout(() => {
       const img   = $('ptPreviewImg');
-      const url   = buildURL('svg');
-      const pngUrl = buildURL('png');
+      const displayUrl = buildURL($('f_format').value);
 
       // Show loading indicator
       $('ptLoading').style.display = 'flex';
@@ -130,10 +129,8 @@
         $('ptLoading').style.display = 'none';
         img.style.opacity = '1';
       };
-      img.src = url;
-
-      // Update outputs
-      const displayUrl = buildURL($('f_format').value);
+      // Preview uses the same format as the output URL so what you see matches what you get.
+      img.src = displayUrl;
       $('ptUrlOut').value = displayUrl;
       $('ptHtmlOut').value = `<img src="${displayUrl}" alt="${$('f_heading')?.value || 'Preview'}" width="${$('f_width')?.value}" height="${$('f_height')?.value}">`;
       $('ptMdOut').value = `![${$('f_heading')?.value || 'Preview'}](${displayUrl})`;
