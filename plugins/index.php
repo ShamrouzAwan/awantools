@@ -124,7 +124,7 @@ ob_start();
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
             <button class="btn btn-sm plugin-cat-btn plugin-cat-active" data-cat="all" onclick="setCat('all',this)">All</button>
             <?php foreach ($allCategories as $cat): ?>
-            <button style="cursor: default;" class="btn btn-sm btn-ghost plugin-cat-btn" data-cat="<?= e($cat) ?>" onclick="setCat(<?= json_encode($cat) ?>,this)"><?= e($cat) ?></button>
+            <button class="btn btn-sm btn-ghost plugin-cat-btn" data-cat="<?= e($cat) ?>" onclick="setCat(<?= htmlspecialchars(json_encode($cat), ENT_QUOTES) ?>,this)"><?= e($cat) ?></button>
             <?php endforeach ?>
         </div>
         <?php endif ?>
