@@ -62,40 +62,193 @@ if ($action === 'inspect_meta') {
         echo json_encode(['ok' => false, 'error' => 'Invalid URL. Make sure to include https://']);
         exit;
     }
-    // ── SSRF guard: block private / loopback / reserved IP ranges ─────────────
-    $host = parse_url($url, PHP_URL_HOST);
-    if ($host) {
-        $host = trim($host, '[]'); // strip IPv6 brackets
-        $ip   = gethostbyname($host);
-        if ($ip !== $host) { // resolution succeeded
-            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                echo json_encode(['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.']);
-                exit;
+    // ── SSRF guard helpers ────────────────────────────────────────────────────
+    //
+    // Policy (two tiers):
+    //
+    //  • Raw IP literals   → block ALL private + reserved ranges (strict).
+    //  • Domain names      → block only loopback (127.x / ::1) and cloud-metadata
+    //                        services (169.254.x / fe80:). RFC 1918 ranges
+    //                        (10.x, 172.16-31.x, 192.168.x) are intentionally
+    //                        NOT blocked for domain names because:
+    //                          - Shared hosting may resolve the server's own domain
+    //                            to an internal IP (split-horizon / hairpin NAT).
+    //                          - Container runtimes (e.g. Replit) route public
+    //                            *.replit.dev domains through private 172.24.x.x.
+    //                        Both patterns produce false positives for legitimate
+    //                        use of the inspector on the owner's own site.
+    //
+    // DNS-rebinding / TOCTOU mitigation: $ssrf_check resolves the hostname and
+    // returns the first IP; that IP is then pinned via CURLOPT_RESOLVE for every
+    // fetch hop so cURL connects to the already-validated IP regardless of any
+    // subsequent DNS changes.
+
+    // Resolve both A and AAAA records; fallback to gethostbyname if unavailable.
+    $resolve_all_ips = static function(string $hostname): array {
+        $ips = [];
+        if (function_exists('dns_get_record')) {
+            foreach (@dns_get_record($hostname, DNS_A)    ?: [] as $r) {
+                if (!empty($r['ip']))   $ips[] = $r['ip'];
+            }
+            foreach (@dns_get_record($hostname, DNS_AAAA) ?: [] as $r) {
+                if (!empty($r['ipv6'])) $ips[] = $r['ipv6'];
             }
         }
-        // Explicit loopback / metadata-service block regardless of resolution
-        if (preg_match('/^(localhost|127\.|::1|169\.254\.|0\.0\.0\.0)/i', $host) ||
-            preg_match('/^(localhost|127\.|::1|169\.254\.|0\.0\.0\.0)/i', $ip)) {
-            echo json_encode(['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.']);
-            exit;
+        if (empty($ips)) { // fallback to IPv4-only gethostbyname
+            $v4 = gethostbyname($hostname);
+            if ($v4 !== $hostname) $ips[] = $v4;
         }
+        return $ips;
+    };
+
+    // Is a single resolved IP blocked under the domain-name policy?
+    // Blocks: IPv4 loopback (127.x), metadata (169.254.x), unspecified (0.0.0.0)
+    //         IPv6 loopback (::1), link-local (fe80:), ULA (fc00::/7 → fc/fd prefix)
+    // NOTE: IPv4 RFC1918 (10.x, 172.16-31.x, 192.168.x) is intentionally NOT blocked
+    // here — see policy comment above. IPv6 ULA IS blocked because shared hosting
+    // environments rarely assign ULA addresses in a way that would cause false positives.
+    $ip_blocked_domain = static function(string $ip): bool {
+        return (bool)preg_match('/^(127\.|169\.254\.|0\.0\.0\.0|::1$|fe80:|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)/i', $ip);
+    };
+
+    // Is a single IP blocked under the strict (raw-IP-literal) policy?
+    // Blocks ALL private + reserved (RFC 1918, loopback, link-local, etc.).
+    $ip_blocked_strict = static function(string $ip): bool {
+        return !filter_var($ip, FILTER_VALIDATE_IP,
+                           FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    };
+
+    // Unified per-URL SSRF check — used for every hop (initial + redirects).
+    // Returns ['ok' => true,  'pin' => string|null]  on pass (pin = IP for CURLOPT_RESOLVE)
+    //      or ['ok' => false, 'error' => string]     on block.
+    $ssrf_check = static function(string $hop_url)
+        use ($resolve_all_ips, $ip_blocked_domain, $ip_blocked_strict): array
+    {
+        $h = parse_url($hop_url, PHP_URL_HOST);
+        if (!$h) return ['ok' => false, 'error' => 'Invalid URL.'];
+        $h = trim($h, '[]');
+
+        // ① Hostname-level loopback / metadata patterns
+        if (preg_match('/^(localhost|127\.|::1$|169\.254\.|0\.0\.0\.0|fe80:)/i', $h)) {
+            return ['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.'];
+        }
+        // ② Internal hostname suffixes
+        if (preg_match('/\.(local|internal|corp|intranet|lan|localdomain|home\.arpa)$/i', $h)) {
+            return ['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.'];
+        }
+
+        // ③ Raw IP literal → strict policy
+        if (filter_var($h, FILTER_VALIDATE_IP)) {
+            if ($ip_blocked_strict($h)) {
+                return ['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.'];
+            }
+            return ['ok' => true, 'pin' => $h];
+        }
+
+        // ④ Domain name → resolve A + AAAA, domain-name policy
+        $ips = $resolve_all_ips($h);
+        if (empty($ips)) {
+            // Cannot resolve → fail closed. An unresolvable host at check time could
+            // resolve to an internal IP at connect time (TOCTOU window without a pin).
+            return ['ok' => false, 'error' => 'Could not resolve the hostname. Check the URL and try again.'];
+        }
+        foreach ($ips as $ip) {
+            if ($ip_blocked_domain($ip)) {
+                return ['ok' => false, 'error' => 'Requests to private or internal addresses are not allowed.'];
+            }
+        }
+        return ['ok' => true, 'pin' => $ips[0]]; // first resolved IP for CURLOPT_RESOLVE pin
+    };
+
+    // Initial URL check (fast-fail before attempting any network I/O)
+    $init_check = $ssrf_check($url);
+    if (!$init_check['ok']) {
+        echo json_encode(['ok' => false, 'error' => $init_check['error']]);
+        exit;
     }
-    $ctx = stream_context_create([
-        'http' => [
-            'timeout'         => 12,
-            'method'          => 'GET',
-            'follow_location' => true,
-            'max_redirects'   => 5,
-            'header'          => implode("\r\n", [
-                'User-Agent: Mozilla/5.0 (compatible; AwanTools MetaBot/1.0; +https://awantools.site)',
+
+    // ── cURL availability guard ───────────────────────────────────────────────
+    if (!function_exists('curl_init')) {
+        echo json_encode(['ok' => false, 'error' => 'cURL extension is required but not available on this server.']);
+        exit;
+    }
+
+    // ── Fetch loop — manual redirect handling with per-hop SSRF re-validation ─
+    // CURLOPT_RESOLVE pins every request to the IP validated just above, so DNS
+    // cannot change under us between check and connect (TOCTOU / rebinding guard).
+    $html      = false;
+    $fetch_url = $url;
+    $hop_pin   = $init_check['pin']; // IP validated for this hop's hostname
+    $max_hops  = 6;                  // initial request + up to 5 redirects
+
+    for ($hop = 0; $hop < $max_hops; $hop++) {
+        $fhost   = (string)parse_url($fetch_url, PHP_URL_HOST);
+        $fport   = (int)(parse_url($fetch_url, PHP_URL_PORT)
+                 ?: (preg_match('/^https/i', $fetch_url) ? 443 : 80));
+        $resolve = ($hop_pin !== null && $fhost !== '')
+                 ? ["$fhost:$fport:$hop_pin"]
+                 : [];
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $fetch_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => true,      // headers prepended to body (needed for Location)
+            CURLOPT_TIMEOUT        => 12,
+            CURLOPT_FOLLOWLOCATION => false,      // redirects handled manually
+            CURLOPT_RESOLVE        => $resolve,   // pin to validated IP — TOCTOU guard
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; AwanTools MetaBot/1.0; +https://awantools.site)',
+            CURLOPT_HTTPHEADER     => [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language: en-US,en;q=0.5',
-            ]),
-        ],
-        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
-    ]);
-    $html = @file_get_contents($url, false, $ctx);
-    if ($html === false) {
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        $response    = curl_exec($ch);
+        $errno       = curl_errno($ch);
+        $http_code   = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $header_size = (int)curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        curl_close($ch);
+
+        if ($response === false || $errno) break; // network / TLS error
+
+        // ── Redirect handling ─────────────────────────────────────────────────
+        if ($http_code >= 300 && $http_code < 400) {
+            $resp_headers = substr($response, 0, $header_size);
+            if (!preg_match('/^Location:\s*(\S+)/im', $resp_headers, $lm)) break;
+            $location = trim($lm[1]);
+
+            // Resolve relative/scheme-relative Location to absolute URL
+            if (preg_match('/^\/\//', $location)) {
+                // Scheme-relative: //host/path — prepend current scheme
+                $scheme   = parse_url($fetch_url, PHP_URL_SCHEME) ?? 'https';
+                $location = $scheme . ':' . $location;
+            } elseif (!preg_match('/^https?:\/\//i', $location)) {
+                // Root-relative or path-relative — resolve against current base
+                $base     = parse_url($fetch_url);
+                $location = ($base['scheme'] ?? 'https') . '://' . ($base['host'] ?? '')
+                          . (isset($base['port']) ? ':' . $base['port'] : '')
+                          . (str_starts_with($location, '/') ? '' : '/') . $location;
+            }
+
+            // SSRF-check + pin the redirect target before following
+            $redir = $ssrf_check($location);
+            if (!$redir['ok']) break; // blocked — silently refuse the redirect
+
+            $fetch_url = $location;
+            $hop_pin   = $redir['pin']; // new IP pin for the redirect destination
+            continue;
+        }
+
+        // ── Success ───────────────────────────────────────────────────────────
+        if ($http_code >= 200 && $http_code < 300) {
+            $html = substr($response, $header_size);
+        }
+        break;
+    }
+
+    if ($html === false || $html === '') {
         echo json_encode(['ok' => false, 'error' => 'Could not fetch the URL. The site may block bots, require a login, or be unavailable.']);
         exit;
     }
