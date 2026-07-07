@@ -8,10 +8,12 @@ $slug      = 'previewer-toolkit';
 $_manifest = plugin_manifest($slug);
 plugin_track('plugin_view', '/plugins/previewer-toolkit/', ['plugin_slug' => $slug]);
 
-// Build absolute render base URL using the platform's siteUrl() helper.
-// siteUrl() already handles REPLIT_DOMAINS fallback, site_url setting, and scheme detection.
-$renderBase = siteUrl('/plugins/previewer-toolkit/render');
-$metaBase   = '/plugins/previewer-toolkit/meta';
+// For the JS preview, use a root-relative path so the browser resolves it against
+// whatever origin it is currently on (dev proxy, production, etc.) without going
+// cross-origin to the site_url setting. The absolute URL is only needed for og:image.
+$renderBase    = '/plugins/previewer-toolkit/render';
+$renderBaseAbs = siteUrl('/plugins/previewer-toolkit/render'); // used for og_image only
+$metaBase      = '/plugins/previewer-toolkit/meta';
 
 ob_start();
 ?>
@@ -340,5 +342,5 @@ $content = ob_get_clean();
 
 plugin_render('Previewer Toolkit', $content, [
     'description' => 'Generate professional OG images, Twitter cards, social previews and more. Plus inspect any URL\'s metadata and social tags.',
-    'og_image'    => $renderBase . '?category=og&template=github_dark&heading=Previewer+Toolkit&description=52+templates+%C2%B7+OG+images+%C2%B7+Social+cards+%C2%B7+Metadata+inspector&icon=image&badge=Free+Tool&website=awantools.site&format=webp',
+    'og_image'    => $renderBaseAbs . '?category=og&template=github_dark&heading=Previewer+Toolkit&description=52+templates+%C2%B7+OG+images+%C2%B7+Social+cards+%C2%B7+Metadata+inspector&icon=image&badge=Free+Tool&website=awantools.site&format=webp',
 ]);
