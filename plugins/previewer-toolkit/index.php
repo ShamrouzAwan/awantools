@@ -154,6 +154,27 @@ $is_render = isset($raw['category']) && isset($raw['template']);
 
 if ($is_render) {
 
+    // ── Strip session/no-cache headers before any image output ────────────────
+    // _bootstrap.php calls session_start(), which queues three problematic
+    // headers on every response:
+    //   • Set-Cookie: AWAN_SESSION=…   (session identification)
+    //   • Pragma: no-cache             (PHP "nocache" cache-limiter default)
+    //   • Expires: Thu, 19 Nov 1981 … (PHP "nocache" cache-limiter default)
+    //
+    // Social-media OG crawlers (Facebook, Twitter/X, LinkedIn, Slack, …) treat
+    // any response carrying Set-Cookie or Pragma: no-cache as non-cacheable /
+    // private and either refuse to render it as an og:image or display it with
+    // no styling.  We don't need session state to generate an image, so we
+    // close the session immediately and remove those headers before anything
+    // else is sent.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();   // flush & release — no session writes needed here
+    }
+    header_remove('Set-Cookie');   // no session cookie on image responses
+    header_remove('Pragma');       // remove Pragma: no-cache
+    header_remove('Expires');      // remove Expires: (past date)
+    header_remove('Cache-Control');// let PT_Exporter set the correct Cache-Control
+
     $cache_key = PT_Cache::key($raw);
     $cache_fmt = PT_Cache::fmt($raw);
 

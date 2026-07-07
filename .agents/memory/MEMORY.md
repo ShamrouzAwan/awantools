@@ -1,1 +1,2 @@
 - [Workflow rules](workflow-rules.md) — shared hosting deploy: report changed files, no schema changes without approval, minimal edits, prefer existing data sources over new files
+- [Previewer Toolkit OG image headers](previewer-toolkit-og-headers.md) — session headers (Set-Cookie, Pragma, Expires) broke og:image on social crawlers; fix: header_remove() at render entry point
