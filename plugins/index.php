@@ -412,7 +412,7 @@ function setCat(cat, btn) {
 
 function liveFilter() {
     var q = (document.getElementById('plugin-search').value || '').toLowerCase().trim();
-    var cards = document.querySelectorAll('.plugin-card');
+    var cards = document.querySelectorAll('.pc-card');
     var visible = 0;
     cards.forEach(function(card) {
         var matchCat = (_activeCat === 'all' || card.dataset.cat.split('|').indexOf(_activeCat) !== -1);

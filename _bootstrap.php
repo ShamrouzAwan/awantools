@@ -100,7 +100,7 @@ if (!headers_sent()) {
         . "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
         .     "cdn.jsdelivr.net cdn.quilljs.com cdn.tiny.cloud cdnjs.cloudflare.com "
         .     "chart.googleapis.com www.google.com www.gstatic.com "
-        .     "www.googletagmanager.com www.clarity.ms pagead2.googlesyndication.com "
+        .     "www.googletagmanager.com www.clarity.ms scripts.clarity.ms pagead2.googlesyndication.com "
         .     "googleads.g.doubleclick.net; "
         . "style-src 'self' 'unsafe-inline' "
         .     "cdn.jsdelivr.net cdn.quilljs.com cdn.tiny.cloud cdnjs.cloudflare.com; "
