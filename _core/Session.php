@@ -30,6 +30,11 @@ class Session {
         }
 
         if (session_status() === PHP_SESSION_NONE) {
+            // Prevent PHP from auto-adding Pragma: no-cache / Expires: (past date) /
+            // Cache-Control: no-store headers via the session cache limiter.
+            // These legacy headers corrupt image responses on shared hosting and
+            // are handled explicitly by each endpoint that needs them.
+            session_cache_limiter('');
             session_start();
         }
 

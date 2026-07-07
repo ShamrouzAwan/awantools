@@ -127,10 +127,6 @@ function pt_og_github_dark(array $p): string
     $fe   = PT_Text::e($p['footer']);
     $badge = pt_badge($p, $pad, $dy + count($dl)*$dlh + 22, $ac, $font);
     $line_x2 = $w - $pad; $text_y = $h - $pad + 22;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -167,10 +163,6 @@ function pt_og_github_light(array $p): string
     $line_y  = $h - $pad - 10;
     $line_x2 = $w - $pad;
     $text_y  = $h - $pad + 14;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -209,10 +201,6 @@ function pt_og_glassmorphism(array $p): string
     $inner_x = (int)($pad);   $inner_y = (int)($pad);
     $inner_w = $w - $pad*2;   $inner_h = $h - $pad*2;
     $footer_y = $h - $pad + 12;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -254,10 +242,6 @@ function pt_og_gradient(array $p): string
     $text_y  = $h - $pad - 12;
     $circ1_r = (int)($h * 0.9);
     $circ2_r = (int)($h * 0.6);
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -298,10 +282,6 @@ function pt_og_minimal(array $p): string
     $text_y  = $h - $pad + 18;
     $inner_x = (int)($pad/2); $inner_y = (int)($pad/2);
     $inner_w = $w - $pad;     $inner_h = $h - $pad;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -338,10 +318,6 @@ function pt_og_neon(array $p): string
     $bar_y  = $h - $pad - 32;
     $text_x = $pad + 216;
     $text_y = $h - $pad - 14;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -401,10 +377,6 @@ function pt_social_twitter_dark(array $p): string
     $fe   = PT_Text::e($p['footer']);
     $dots = PT_Renderer::dots(6, 8, $w-200, 20, 26, $ac, 0.18, 2);
     $fy   = $h - $pad + 8;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -438,10 +410,6 @@ function pt_social_linkedin(array $p): string
     $bar_rect_y = $h - $pad - 28;
     $bar_text_x = $pad + 60;
     $bar_text_y = $h - $pad - 10;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -477,10 +445,6 @@ function pt_social_modern_dark(array $p): string
     $bg2  = PT_Color::h(PT_Color::lighten($p['bg_color'], 0.06));
     $wr   = (int)($w * 0.4);
     $fy   = $h - $pad + 8;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -517,10 +481,6 @@ function pt_social_split(array $p): string
     $border  = PT_Color::h(PT_Color::darken($p['bg_color'], 0.1));
     $right_w = $w - $half;
     $fy   = $h - $pad + 6;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -552,10 +512,6 @@ function pt_social_corporate(array $p): string
     $border  = PT_Color::h(PT_Color::darken($p['bg_color'], 0.08));
     $bot_sep = $h - 70;
     $fy      = $h - $pad + 2;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -603,10 +559,6 @@ function pt_placeholder_simple(array $p): string
     $se  = PT_Text::e($sub);
     $ty1 = $cy - (int)($fs2/2) - 4;
     $ty2 = $cy + $fs2 + 6;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -640,10 +592,6 @@ function pt_placeholder_grid(array $p): string
     $icy = $cy - $fs - 20;
     $icon = PT_Icons::icon_block($p['icon'], $cx, $icy, 34, $p['accent_color'], $p['accent_color'], 22);
     $ty = $cy + 24;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -674,10 +622,6 @@ function pt_placeholder_glass(array $p): string
     $c2cx = (int)($w * 0.1); $c2cy = (int)($h * 0.8); $c2r = (int)($w * 0.25);
     $bx = $cx - 180; $by = $cy - 100;
     $ty1 = $cy + 20; $ty2 = $cy + 50;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -708,10 +652,6 @@ function pt_placeholder_gradient(array $p): string
     $icy = $cy - $fs - 18;
     $icon = PT_Icons::icon_block($p['icon'], $cx, $icy, 36, $p['heading_color'], $p['heading_color'], 24);
     $ty = $cy + 20;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -739,10 +679,6 @@ function pt_placeholder_pattern(array $p): string
     $icon = PT_Icons::icon_block($p['icon'], $cx, $icy, 36, $p['accent_color'], $p['accent_color'], 24);
     $bx   = $cx - 220; $by = $cy - 110;
     $ty   = $cy + 22;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -794,10 +730,6 @@ function pt_github_repo_dark(array $p): string
     $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*10 + 32;
     $line_y  = $h - $pad - 70;
     $line_x2 = $w - $pad;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -839,10 +771,6 @@ function pt_github_repo_light(array $p): string
     $tag_x  = $pad + 70 + mb_strlen($p['footer'] ?: $p['username'])*10 + 32;
     $line_y  = $h - $pad - 70;
     $line_x2 = $w - $pad;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -886,10 +814,6 @@ function pt_github_stats(array $p): string
     $sep2x     = $pad + $col_w*2;
     $lang_cx   = $pad; $lang_cy = $h - $pad - 20;
     $lang_tx   = $pad + 14; $lang_ty = $h - $pad - 13;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -928,10 +852,6 @@ function pt_github_compact(array $p): string
     $stats = pt_gh_stats_row($p, $pad, $h - $pad - 22, $hc, $dc, $ac, $font);
     $border  = '#30363d';
     $line_y  = $h - $pad - 54; $line_x2 = $w - $pad;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -963,10 +883,6 @@ function pt_github_gradient(array $p): string
     $stats = pt_gh_stats_row($p, $pad, $h - $pad - 30, $hc, $dc, '#'.$p['heading_color'], $font);
     $cx   = (int)($w * 0.85); $cy = (int)($h * 0.2); $cr = (int)($h * 0.5);
     $line_y  = $h - $pad - 65; $line_x2 = $w - $pad;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1033,10 +949,6 @@ function pt_browser_chrome_dark(array $p): string
     $url_x   = 130; $url_w = $w - 280;
     $url_by  = $tab_h + 10; $url_tx = (int)($w/2); $url_ty = $tab_h + 31;
     $bot_y   = $h - 1;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1070,10 +982,6 @@ function pt_browser_chrome_light(array $p): string
     $tab_h4  = $tab_h - 4;
     $url_x   = 130; $url_w = $w - 280;
     $url_by  = $tab_h + 10; $url_tx = (int)($w/2); $url_ty = $tab_h + 31;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1104,10 +1012,6 @@ function pt_browser_safari(array $p): string
     $uhalf   = (int)($w/2);
     $urx     = $uhalf - 240; $ury = (int)($tb_h/2) - 16;
     $uty     = (int)($tb_h/2) + 6;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1136,10 +1040,6 @@ function pt_browser_minimal(array $p): string
     $dots    = PT_Renderer::traffic_lights(14, (int)($tb_h/2), 6, 17);
     $cx      = (int)($w/2);
     $tb_mid  = (int)($tb_h/2) + 5;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1216,10 +1116,6 @@ function pt_terminal_macos(array $p): string
     $title   = PT_Text::e($p['heading'] ?: 'Terminal');
     $lines   = pt_term_build_lines($p, $w - 60, $font);
     $content = pt_term_lines_svg($lines, 40, $tb_h + 20, $dc, $ac, $hc, $font, $h);
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1242,10 +1138,6 @@ function pt_terminal_linux(array $p): string
     $title   = PT_Text::e($p['heading'] ?: 'bash');
     $lines   = pt_term_build_lines($p, $w - 60, $font);
     $content = pt_term_lines_svg($lines, 40, $tb_h + 16, $dc, $ac, $hc, $font, $h);
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1272,10 +1164,6 @@ function pt_terminal_dark(array $p): string
     $dots   = PT_Renderer::traffic_lights(18, (int)($tb_h/2), 7, 22);
     $lines  = pt_term_build_lines($p, $w - 60, $font);
     $content = pt_term_lines_svg($lines, 40, $tb_h + 20, $dc, $ac, $hc, $font, $h);
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1296,10 +1184,6 @@ function pt_terminal_minimal(array $p): string
     [$w,$h,$bg,$hc,$dc,$ac,$r,$font] = pt_vars_np($p);
     $lines   = pt_term_build_lines($p, $w - 60, $font);
     $content = pt_term_lines_svg($lines, 40, 30, $dc, $ac, $hc, $font, $h);
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1390,10 +1274,6 @@ function pt_profile_minimal(array $p): string
     $icon_s = PT_Icons::icon_block($p['icon'], $cx, $av_cy, $av_r, $p['accent_color'], $p['accent_color'], $icon_r);
     $role_y  = $name_y + 26;
     $foot_y  = $h - $pad + 10;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1430,10 +1310,6 @@ function pt_profile_modern(array $p): string
     $role_y  = $name_y + 26; $desc_y = $name_y + 56; $foot_y = $h - $pad + 10;
     // Card bg: always white for the split-card design; derive text colors from user params.
     $card_bg = '#ffffff';
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1472,10 +1348,6 @@ function pt_profile_dark(array $p): string
     $icon_s = PT_Icons::icon_block($p['icon'], $cx, $av_cy, $av_r, $p['accent_color'], $p['accent_color'], (int)($av_r * 0.55));
     $name_y = (int)($h * 0.35); $role_y = $name_y + 32;
     $desc_y = $name_y + 72; $foot_y = $h - $pad + 10;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1511,10 +1383,6 @@ function pt_profile_glass(array $p): string
     $icon_s = PT_Icons::icon_block($p['icon'], $cx, $av_cy, $av_r, $p['accent_color'], $p['accent_color'], (int)($av_r * 0.58));
     $c02w = (int)($w * 0.2); $c02h = (int)($h * 0.2);
     $role_y = $name_y + 26; $desc_y = $name_y + 54; $foot_y = $h - $pad + 10;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1555,10 +1423,6 @@ function pt_profile_corporate(array $p): string
     $name_y = (int)($h * 0.3); $role_y = $name_y + 28;
     $line_y = $name_y + 44; $line_x2 = $name_x + 60;
     $desc_y = $name_y + 72; $foot_y = $h - $pad + 10;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1632,10 +1496,6 @@ function pt_code_dark(array $p): string
     $gutter_h = $h - $tb_h;
     $badge_x  = $w - 70; $badge_y = $h - 30;
     $badge_tx = $w - 40; $badge_ty = $h - 15;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1666,10 +1526,6 @@ function pt_code_github_dark(array $p): string
     $badge_x = $w - 100; $badge_y = (int)($tb_h/2) - 12;
     $badge_tx = $w - 60;  $badge_ty = (int)($tb_h/2) + 5;
     $gutter_h = $h - $tb_h;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1698,10 +1554,6 @@ function pt_code_dracula(array $p): string
     $svg_l   = pt_code_lines_svg($lines, 40, $tb_h + 18, 26, $font, 15, $h - 20);
     $cx      = (int)($w/2); $tb_mid = (int)($tb_h/2) + 5;
     $gutter_h = $h - $tb_h; $bar_y = $h - 3;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
@@ -1729,10 +1581,6 @@ function pt_code_minimal(array $p): string
     $svg_l   = pt_code_lines_svg($lines, 40, $tb_h + 18, 26, $font, 15, $h - 20);
     $cx      = (int)($w/2); $tb_mid = (int)($tb_h/2) + 5;
     $gutter_h = $h - $tb_h;
-    $pd_badge_y = $pd_y + 8;
-    $pd_line1_y = $pd_y + 32;
-    $pd_line2_y = $pd_y + 44;
-    $pd_line3_y = $pd_y + 56;
 
     return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">

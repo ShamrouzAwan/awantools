@@ -360,12 +360,10 @@ if ($is_render) {
 $cats = PT_Registry::categories();
 
 // Current URL base for generating preview URLs.
-// Build a full absolute URL so the generated image URLs work anywhere
-// (og:image tags, external tools, and embed contexts all need absolute URLs).
+// Use siteUrl() so the host is always the public-facing domain (respects site_url
+// DB setting, falls back to REPLIT_DOMAINS on Replit dev, then HTTP_HOST elsewhere).
 $path     = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');  // strip query string
-$_scheme  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$_host    = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$base_url = $_scheme . '://' . $_host . rtrim($path, '/') . '/';
+$base_url = rtrim(siteUrl(), '/') . rtrim($path, '/') . '/';
 
 // Serialize categories for JS
 $cats_json = json_encode($cats, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
