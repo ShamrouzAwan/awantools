@@ -419,8 +419,9 @@ if (!empty($recentPlugins)): ?>
             <?php $manifest = json_decode($plugin['manifest'] ?? '{}', true); ?>
             <a href="/plugins/<?= e($plugin['slug']) ?>" class="tool-card">
                 <div class="tool-card-icon">
-                    <?php if (!empty($manifest['icon'])): ?>
-                    <?= $manifest['icon'] ?>
+                    <?php $iconName = $manifest['og_icon'] ?? $manifest['icon'] ?? ''; ?>
+                    <?php if ($iconName): ?>
+                    <i class="fa-solid fa-<?= e($iconName) ?>" style="font-size:22px"></i>
                     <?php else: ?>
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/></svg>
                     <?php endif ?>
@@ -565,7 +566,8 @@ try {
                    onmouseover="this.style.borderColor='var(--color-primary)'"
                    onmouseout="this.style.borderColor=''">
                     <div style="width:36px;height:36px;background:var(--color-primary-light);border-radius:var(--radius-small);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">
-                        <?= $fm['icon'] ?: '<svg width="16" height="16" fill="none" stroke="var(--color-primary)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>' ?>
+                        <?php $fmIcon = $fm['og_icon'] ?? $fm['icon'] ?? ''; ?>
+                        <?= $fmIcon ? '<i class="fa-solid fa-' . e($fmIcon) . '" style="font-size:18px;color:var(--color-primary)"></i>' : '<svg width="16" height="16" fill="none" stroke="var(--color-primary)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>' ?>
                     </div>
                     <div>
                         <div style="font-size:13px;font-weight:600"><?= e($fp['name']) ?></div>
@@ -592,7 +594,8 @@ try {
                     $rm = json_decode($rp['manifest'] ?? '{}', true) ?? [];
                 ?>
                 <a href="/plugins/<?= e($rp['slug']) ?>/" class="tool-card">
-                    <div class="tool-card-icon"><?= $rm['icon'] ?: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/></svg>' ?></div>
+                    <?php $rmIcon = $rm['og_icon'] ?? $rm['icon'] ?? ''; ?>
+                    <div class="tool-card-icon"><?= $rmIcon ? '<i class="fa-solid fa-' . e($rmIcon) . '" style="font-size:20px"></i>' : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/></svg>' ?></div>
                     <div class="tool-card-name"><?= e($rp['name']) ?></div>
                     <div class="tool-card-desc"><?= e(substr($rp['description'] ?? '', 0, 60)) ?></div>
                 </a>
