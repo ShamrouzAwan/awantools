@@ -412,6 +412,88 @@ $GITHUB_SPECS = [
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
+// CUSTOM TEMPLATES — your own rich, freeform designs (flex boxes, gradients,
+// shadows, rounded corners, icons, multi-line text), built without touching
+// GD code directly.
+// ────────────────────────────────────────────────────────────────────────────
+// HOW TO ADD ONE
+// 1. Open tools/custom-template-builder.html (in this same folder) in any
+//    browser — it's a standalone file, no server/install needed. Design your
+//    card visually, then click "Export PHP".
+// 2. Paste the exported `$CUSTOM_SPECS['your_id'] = [...]` block below, above
+//    the closing `];` — or just before this comment if this is your first one.
+// 3. Save. It appears automatically under a new "Custom Templates" category —
+//    nothing else needs to change (same auto-registration as every other
+//    category, see $CATEGORIES/$PT_REGISTRY below).
+// ────────────────────────────────────────────────────────────────────────────
+// SHAPE of one entry — see the builder's own on-page docs for full property
+// reference; this is the short version:
+//   $CUSTOM_SPECS['my_card'] = [
+//       'name'       => 'My Card',      // shown in the UI
+//       'default_w'  => 1200,
+//       'default_h'  => 630,
+//       'root'       => [ ... a node tree, see below ... ],
+//   ];
+// A node is one of:
+//   ['type'=>'box',  'direction'=>'row'|'column', 'justify'=>.., 'align'=>..,
+//    'gap'=>int, 'padding'=>[t,r,b,l]|int, 'width'=>'auto'|'fill'|'NN%'|int,
+//    'height'=>same, 'background'=>['type'=>'solid','color'=>'#hex'] or
+//    ['type'=>'gradient','angle'=>'vertical'|'horizontal'|'diagonal','from'=>'#hex','to'=>'#hex'],
+//    'radius'=>int, 'border'=>['width'=>int,'color'=>'#hex'],
+//    'shadow'=>['x'=>int,'y'=>int,'blur'=>int,'color'=>'#hex','opacity'=>0..1],
+//    'opacity'=>0..1, 'children'=>[ ...nodes... ]]
+//   ['type'=>'text', 'content'=>'{{heading}}', 'font'=>'regular'|'bold',
+//    'size'=>int, 'color'=>'#hex', 'align'=>'left'|'center'|'right',
+//    'valign'=>'top'|'middle'|'bottom', 'lineHeight'=>float, 'maxLines'=>int,
+//    'transform'=>'none'|'uppercase', 'width'=>.., 'height'=>..]
+//   ['type'=>'icon', 'icon'=>'star', 'size'=>int, 'color'=>'#hex']
+// `content` and any 'color' value may use {{placeholder}} tokens resolved
+// from the same fields every other category uses: heading, subheading,
+// description, badge, footer, website, author, date, username, role,
+// category_label, icon, bg_color, fg_color, accent_color, watermark.
+// ════════════════════════════════════════════════════════════════════════════
+
+$CUSTOM_SPECS = [
+    // Paste your exported templates here. This one ships as a live example so
+    // you can see the shape of a real entry and try the "custom" category
+    // immediately — feel free to delete it once you've added your own.
+    'sample_card' => [
+        'name' => 'Sample Rich Card',
+        'default_w' => 1200,
+        'default_h' => 630,
+        'root' => [
+            'type' => 'box', 'direction' => 'column', 'justify' => 'center', 'align' => 'stretch',
+            'padding' => 64, 'gap' => 20,
+            'background' => ['type' => 'gradient', 'angle' => 'diagonal', 'from' => '#0f172a', 'to' => '#1e293b'],
+            'children' => [
+                [
+                    'type' => 'box', 'direction' => 'row', 'align' => 'center', 'gap' => 12,
+                    'width' => 'auto', 'height' => 'auto',
+                    'children' => [
+                        [
+                            'type' => 'box', 'width' => 56, 'height' => 56, 'radius' => 16, 'align' => 'center', 'justify' => 'center',
+                            'background' => ['type' => 'gradient', 'angle' => 'diagonal', 'from' => '{{accent_color}}', 'to' => '#60a5fa'],
+                            'shadow' => ['x' => 0, 'y' => 6, 'blur' => 16, 'color' => '#000000', 'opacity' => 0.35],
+                            'children' => [['type' => 'icon', 'icon' => '{{icon}}', 'size' => 28, 'color' => '#ffffff']],
+                        ],
+                        ['type' => 'text', 'content' => '{{badge}}', 'size' => 18, 'color' => '{{accent_color}}', 'font' => 'bold', 'valign' => 'middle', 'height' => 56],
+                    ],
+                ],
+                ['type' => 'text', 'content' => '{{heading}}', 'size' => 56, 'font' => 'bold', 'color' => '#f8fafc', 'maxLines' => 2, 'lineHeight' => 1.15],
+                ['type' => 'text', 'content' => '{{description}}', 'size' => 24, 'color' => '#94a3b8', 'maxLines' => 2, 'lineHeight' => 1.4],
+                [
+                    'type' => 'box', 'direction' => 'row', 'justify' => 'between', 'align' => 'center', 'height' => 'fill',
+                    'children' => [
+                        ['type' => 'spacer'],
+                        ['type' => 'text', 'content' => '{{website}}', 'size' => 20, 'color' => '#64748b', 'align' => 'right', 'valign' => 'bottom'],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+// ════════════════════════════════════════════════════════════════════════════
 // CATEGORY REGISTRY — the single list that drives the sidebar (index.php),
 // the template picker (previewer.js, via $PT_REGISTRY as JSON), and template
 // validation (render.php). Add a new category by adding one entry here (see
@@ -433,6 +515,20 @@ $CATEGORIES = [
     ['id'=>'id_card',       'icon'=>'id-card-alt',        'label'=>'ID Cards',          'templates'=>array_keys($IDCARD_SPECS),     'default_w'=>600, 'default_h'=>900],
     ['id'=>'invitation',    'icon'=>'envelope-open-text', 'label'=>'Invitations',       'templates'=>array_keys($INVITATION_SPECS), 'default_w'=>1200,'default_h'=>800],
 ];
+
+// Custom Templates only shows up once you've added at least one — an empty
+// category would just be a dead end in the sidebar.
+if (!empty($CUSTOM_SPECS)) {
+    // Every custom template can have its own canvas size, so default_w/h here
+    // is just what a brand-new pick defaults to (the first one's size).
+    $firstCustom = reset($CUSTOM_SPECS);
+    $CATEGORIES[] = [
+        'id' => 'custom', 'icon' => 'wand-magic-sparkles', 'label' => 'Custom Templates',
+        'templates' => array_keys($CUSTOM_SPECS),
+        'default_w' => $firstCustom['default_w'] ?? 1200,
+        'default_h' => $firstCustom['default_h'] ?? 630,
+    ];
+}
 
 // $PT_REGISTRY — same shape render.php has always used for template
 // validation/dispatch: category id => ['templates' => [...], 'default_w' =>

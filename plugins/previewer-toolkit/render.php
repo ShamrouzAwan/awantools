@@ -381,6 +381,282 @@ function pt_shadow_rect(GdImage $im, int $x, int $y, int $w, int $h, int $r, str
     }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// CUSTOM TEMPLATE LAYOUT ENGINE — a small flexbox-like renderer for node
+// trees authored via tools/custom-template-builder.html and stored in
+// templates.php's $CUSTOM_SPECS. See templates.php for the node-tree schema.
+// This is intentionally simple (no wrapping, one flex line, no true clipping)
+// but covers rich boxes/gradients/shadows/text/icons without hand-written GD.
+// ════════════════════════════════════════════════════════════════════════════
+
+function pt_layout_text(string $text, array $p): string {
+    return preg_replace_callback('/\{\{\s*([a-z0-9_]+)\s*\}\}/i', function ($m) use ($p) {
+        $v = $p[$m[1]] ?? '';
+        return is_string($v) ? $v : (string)$v;
+    }, $text);
+}
+
+function pt_layout_size_axis($val, int $avail, int $intrinsic): int {
+    // Resolves a width/height style value against the available space.
+    if ($val === 'fill' || $val === 'stretch') return $avail;
+    if ($val === 'auto' || $val === null) return min($intrinsic, $avail > 0 ? max($intrinsic, $avail) : $intrinsic);
+    if (is_string($val) && str_ends_with($val, '%')) {
+        return (int)round($avail * ((float)rtrim($val, '%') / 100));
+    }
+    if (is_numeric($val)) return (int)$val;
+    return $intrinsic;
+}
+
+function pt_layout_padding($pad): array {
+    if (is_array($pad)) {
+        return [
+            (int)($pad[0] ?? 0), (int)($pad[1] ?? $pad[0] ?? 0),
+            (int)($pad[2] ?? $pad[0] ?? 0), (int)($pad[3] ?? $pad[1] ?? $pad[0] ?? 0),
+        ];
+    }
+    $v = (int)($pad ?? 0);
+    return [$v, $v, $v, $v];
+}
+
+function pt_layout_font(array $node): string {
+    return ($node['font'] ?? 'regular') === 'bold' ? PT_FONT_BOLD : PT_FONT_REG;
+}
+
+// Measures a node's natural (content) size within the given available space.
+// Used both to size 'auto' boxes and to know each flex child's contribution
+// before the parent distributes leftover space.
+function pt_layout_measure(array $node, array $p, int $availW, int $availH): array {
+    $type = $node['type'] ?? 'box';
+    if ($type === 'text') {
+        $font = pt_layout_font($node);
+        $size = (float)($node['size'] ?? 24);
+        $text = pt_layout_text($node['content'] ?? '', $p);
+        if (($node['transform'] ?? '') === 'uppercase') $text = mb_strtoupper($text);
+        $maxW = is_numeric($node['width'] ?? null) ? (int)$node['width'] : $availW;
+        $lines = $maxW > 0 ? pt_wrap_text($font, $size, $text, $maxW) : [$text];
+        $maxLines = (int)($node['maxLines'] ?? 0);
+        if ($maxLines > 0) $lines = array_slice($lines, 0, $maxLines);
+        $lineH = $size * (float)($node['lineHeight'] ?? 1.3);
+        $w = 0;
+        foreach ($lines as $l) $w = max($w, pt_text_width($font, $size, $l));
+        return [min($w, $maxW ?: $w), (int)ceil($lineH * max(1, count($lines)))];
+    }
+    if ($type === 'icon') {
+        $size = (int)($node['size'] ?? 32);
+        return [$size, $size];
+    }
+    if ($type === 'spacer') {
+        return [(int)($node['width'] ?? 0), (int)($node['height'] ?? 0)];
+    }
+    // box
+    [$pt_, $pr, $pb, $pl] = pt_layout_padding($node['padding'] ?? 0);
+    $dir = ($node['direction'] ?? 'column') === 'row' ? 'row' : 'column';
+    $gap = (int)($node['gap'] ?? 0);
+    $innerW = max(0, $availW - $pl - $pr);
+    $innerH = max(0, $availH - $pt_ - $pb);
+    $children = $node['children'] ?? [];
+    $mainTotal = 0; $crossMax = 0; $n = count($children);
+    foreach ($children as $child) {
+        [$cw, $ch] = pt_layout_measure($child, $p, $innerW, $innerH);
+        if ($dir === 'row') { $mainTotal += $cw; $crossMax = max($crossMax, $ch); }
+        else { $mainTotal += $ch; $crossMax = max($crossMax, $cw); }
+    }
+    if ($n > 1) $mainTotal += $gap * ($n - 1);
+    if ($dir === 'row') return [$mainTotal + $pl + $pr, $crossMax + $pt_ + $pb];
+    return [$crossMax + $pl + $pr, $mainTotal + $pt_ + $pb];
+}
+
+// Draws a node into the exact box (x, y, w, h) already resolved by the parent.
+function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, int $w, int $h): void {
+    $type = $node['type'] ?? 'box';
+    $w = max(0, $w); $h = max(0, $h);
+    if ($w <= 0 || $h <= 0) return;
+
+    if ($type === 'text') {
+        $font = pt_layout_font($node);
+        $size = (float)($node['size'] ?? 24);
+        $text = pt_layout_text($node['content'] ?? '', $p);
+        if (($node['transform'] ?? '') === 'uppercase') $text = mb_strtoupper($text);
+        $color = pt_layout_text($node['color'] ?? '#ffffff', $p);
+        $align = $node['align'] ?? 'left';
+        $lineH = $size * (float)($node['lineHeight'] ?? 1.3);
+        $maxLines = (int)($node['maxLines'] ?? 0);
+        $lines = pt_wrap_text($font, $size, $text, $w);
+        if ($maxLines > 0 && count($lines) > $maxLines) {
+            $lines = array_slice($lines, 0, $maxLines);
+            $last = &$lines[$maxLines - 1];
+            while (strlen($last) > 3 && pt_text_width($font, $size, $last . '…') > $w) $last = rtrim(substr($last, 0, -1));
+            $last .= '…';
+            unset($last);
+        }
+        $textH = (int)ceil($lineH * max(1, count($lines)));
+        $valign = $node['valign'] ?? 'top';
+        $startY = $y;
+        if ($valign === 'middle') $startY = $y + (int)(($h - $textH) / 2);
+        elseif ($valign === 'bottom') $startY = $y + $h - $textH;
+        pt_text_block($im, $font, $size, $x, $startY, $color, implode("\n", $lines), $w, $lineH, $align, 0);
+        return;
+    }
+
+    if ($type === 'icon') {
+        $size = (int)($node['size'] ?? 32);
+        $color = pt_layout_text($node['color'] ?? '#ffffff', $p);
+        $ix = $x + (int)(($w - $size) / 2);
+        $iy = $y + (int)(($h - $size) / 2);
+        pt_icon($im, $node['icon'] ?? 'star', $ix, $iy, $size, $color);
+        return;
+    }
+
+    if ($type === 'spacer') return;
+
+    // box
+    $opacity = (float)($node['opacity'] ?? 1);
+    if ($opacity <= 0) return;
+
+    $radius = (int)($node['radius'] ?? 0);
+    if (!empty($node['shadow'])) {
+        $sh = $node['shadow'];
+        $sColor = pt_layout_text($sh['color'] ?? '#000000', $p);
+        $sBlur = (int)($sh['blur'] ?? 12);
+        $sOx = (int)($sh['x'] ?? 0); $sOy = (int)($sh['y'] ?? 6);
+        $sOpacity = (float)($sh['opacity'] ?? 0.35);
+        [$sr,$sg,$sb] = pt_hex2rgb($sColor);
+        for ($i = $sBlur; $i >= 1; $i--) {
+            $alpha = (int)(127 * $sOpacity * ($i / ($sBlur + 1)));
+            $c = imagecolorallocatealpha($im, $sr, $sg, $sb, min(127, max(0, $alpha)));
+            pt_rounded_rect($im, $x + $sOx + $i, $y + $sOy + $i, $w, $h, $radius, $c);
+        }
+    }
+
+    $bg = $node['background'] ?? null;
+    if ($bg) {
+        $bgType = $bg['type'] ?? 'solid';
+        if ($bgType === 'gradient') {
+            $from = pt_layout_text($bg['from'] ?? '#000000', $p);
+            $to = pt_layout_text($bg['to'] ?? '#333333', $p);
+            $angle = $bg['angle'] ?? 'vertical';
+            if ($radius > 0) {
+                // Render gradient onto a temp canvas, then stamp it through a
+                // rounded-rect mask so corners stay clean.
+                $tmp = imagecreatetruecolor($w, $h);
+                imagesavealpha($tmp, true);
+                imagealphablending($tmp, true);
+                imagefill($tmp, 0, 0, imagecolorallocatealpha($tmp, 0, 0, 0, 127));
+                if ($angle === 'horizontal') pt_gradient_h($tmp, 0, 0, $w, $h, $from, $to);
+                elseif ($angle === 'diagonal') pt_gradient_diag($tmp, 0, 0, $w, $h, $from, $to);
+                else pt_gradient_v($tmp, 0, 0, $w, $h, $from, $to);
+                $mask = imagecreatetruecolor($w, $h);
+                imagealphablending($mask, false);
+                imagesavealpha($mask, true);
+                $transparent = imagecolorallocatealpha($mask, 0, 0, 0, 127);
+                imagefill($mask, 0, 0, $transparent);
+                pt_rounded_rect($mask, 0, 0, $w, $h, $radius, imagecolorallocatealpha($mask, 0, 0, 0, 0));
+                imagealphablending($tmp, false);
+                for ($py = 0; $py < $h; $py++) {
+                    for ($px = 0; $px < $w; $px++) {
+                        $maskPixel = imagecolorat($mask, $px, $py);
+                        $maskAlpha = ($maskPixel >> 24) & 0x7F;
+                        if ($maskAlpha === 127) imagesetpixel($tmp, $px, $py, imagecolorallocatealpha($tmp, 0, 0, 0, 127));
+                    }
+                }
+                imagealphablending($im, true);
+                imagecopy($im, $tmp, $x, $y, 0, 0, $w, $h);
+                imagedestroy($tmp);
+                imagedestroy($mask);
+            } else {
+                if ($angle === 'horizontal') pt_gradient_h($im, $x, $y, $w, $h, $from, $to);
+                elseif ($angle === 'diagonal') pt_gradient_diag($im, $x, $y, $w, $h, $from, $to);
+                else pt_gradient_v($im, $x, $y, $w, $h, $from, $to);
+            }
+        } else {
+            $color = pt_color($im, pt_layout_text($bg['color'] ?? '#000000', $p));
+            pt_rounded_rect($im, $x, $y, $w, $h, $radius, $color);
+        }
+    }
+
+    if (!empty($node['border'])) {
+        $bWidth = (int)($node['border']['width'] ?? 1);
+        $bColor = pt_color($im, pt_layout_text($node['border']['color'] ?? '#ffffff', $p));
+        pt_rounded_rect_border($im, $x, $y, $w, $h, $radius, $bColor, max(1, $bWidth));
+    }
+
+    [$pt_, $pr, $pb, $pl] = pt_layout_padding($node['padding'] ?? 0);
+    $cx = $x + $pl; $cy = $y + $pt_;
+    $cw = max(0, $w - $pl - $pr); $ch = max(0, $h - $pt_ - $pb);
+    $children = $node['children'] ?? [];
+    if (empty($children)) return;
+
+    $dir = ($node['direction'] ?? 'column') === 'row' ? 'row' : 'column';
+    $justify = $node['justify'] ?? 'start';
+    $align = $node['align'] ?? 'start';
+    $gap = (int)($node['gap'] ?? 0);
+    $mainAvail = $dir === 'row' ? $cw : $ch;
+    $crossAvail = $dir === 'row' ? $ch : $cw;
+    $n = count($children);
+
+    // Pass 1: resolve each child's main-axis size; 'fill' children share
+    // whatever space is left after fixed/auto-sized siblings and gaps.
+    $sizes = []; $fixedTotal = 0; $fillCount = 0;
+    foreach ($children as $i => $child) {
+        $mainKey = $dir === 'row' ? 'width' : 'height';
+        $val = $child[$mainKey] ?? 'auto';
+        if ($val === 'fill' || $val === 'stretch') { $sizes[$i] = null; $fillCount++; continue; }
+        [$mw, $mh] = pt_layout_measure($child, $p, $cw, $ch);
+        $intrinsic = $dir === 'row' ? $mw : $mh;
+        $sizes[$i] = pt_layout_size_axis($val, $mainAvail, $intrinsic);
+        $fixedTotal += $sizes[$i];
+    }
+    if ($n > 1) $fixedTotal += $gap * ($n - 1);
+    $remaining = max(0, $mainAvail - $fixedTotal);
+    $fillSize = $fillCount > 0 ? (int)floor($remaining / $fillCount) : 0;
+    foreach ($sizes as $i => $s) if ($s === null) $sizes[$i] = $fillSize;
+
+    $usedMain = array_sum($sizes) + ($n > 1 ? $gap * ($n - 1) : 0);
+    $leftover = max(0, $mainAvail - $usedMain);
+    $cursor = 0; $extraGap = 0;
+    switch ($justify) {
+        case 'center': $cursor = (int)($leftover / 2); break;
+        case 'end': $cursor = $leftover; break;
+        case 'between': $extraGap = $n > 1 ? $leftover / ($n - 1) : 0; break;
+        case 'around': $cursor = $leftover / ($n + 1); $extraGap = $leftover / ($n + 1); break;
+    }
+
+    foreach ($children as $i => $child) {
+        $mainKey = $dir === 'row' ? 'width' : 'height';
+        $crossKey = $dir === 'row' ? 'height' : 'width';
+        $mainSize = $sizes[$i];
+        $crossVal = $child[$crossKey] ?? 'auto';
+        if ($crossVal === 'fill' || $crossVal === 'stretch' || $align === 'stretch') {
+            $crossSize = $crossAvail;
+        } else {
+            [$mw, $mh] = pt_layout_measure($child, $p, $cw, $ch);
+            $intrinsicCross = $dir === 'row' ? $mh : $mw;
+            $crossSize = pt_layout_size_axis($crossVal, $crossAvail, $intrinsicCross);
+        }
+        $crossOffset = 0;
+        if ($crossVal !== 'fill' && $crossVal !== 'stretch' && $align !== 'stretch') {
+            if ($align === 'center') $crossOffset = (int)(($crossAvail - $crossSize) / 2);
+            elseif ($align === 'end') $crossOffset = $crossAvail - $crossSize;
+        }
+        if ($dir === 'row') {
+            $childX = $cx + (int)round($cursor);
+            $childY = $cy + $crossOffset;
+            pt_layout_render($im, $child, $p, $childX, $childY, $mainSize, $crossSize);
+        } else {
+            $childX = $cx + $crossOffset;
+            $childY = $cy + (int)round($cursor);
+            pt_layout_render($im, $child, $p, $childX, $childY, $crossSize, $mainSize);
+        }
+        $cursor += $mainSize + $gap + $extraGap;
+    }
+}
+
+function pt_render_custom(GdImage $im, array $p, array $entry, int $W, int $H): void {
+    $root = $entry['root'] ?? null;
+    if (!$root) return;
+    pt_layout_render($im, $root, $p, 0, 0, $W, $H);
+}
+
 function pt_fallback_image(string $format = 'png'): never {
     ob_end_clean();
     $im = imagecreatetruecolor(400, 200);
@@ -1970,6 +2246,10 @@ try {
         case 'github':
             $spec = $GITHUB_SPECS[$tpl] ?? $GITHUB_SPECS['repo'];
             pt_render_github($im, $p, $spec);
+            break;
+        case 'custom':
+            $entry = $CUSTOM_SPECS[$tpl] ?? null;
+            if ($entry) pt_render_custom($im, $p, $entry, $W, $H);
             break;
     }
 
