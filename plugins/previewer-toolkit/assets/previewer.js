@@ -18,8 +18,12 @@ const PT = (() => {
   // Do NOT redeclare it here — that would shadow the absolute path with 'render',
   // breaking image URLs when the page is served without a trailing slash.
 
-  // ── Template registry (mirrors PHP) ───────────────────────────
-  const REGISTRY = {
+  // ── Template registry ──────────────────────────────────────────
+  // Server-authoritative copy is injected by index.php as window.PT_REGISTRY,
+  // generated from plugins/previewer-toolkit/templates.php (the single source
+  // of truth also used by render.php). The literal object below is only a
+  // fallback for resilience if that injection is ever missing.
+  const REGISTRY = window.PT_REGISTRY || {
     og:            { templates: ['github_dark','github_light','glass_modern','minimal_clean','gradient_pro','corporate','neon_dark','startup','retro_sunset','ocean','aurora','newspaper','blueprint','dark_amber','cyberpunk','forest','indie','mono','candy','steel','ocean_wave'], defaultW:1200, defaultH:630 },
     social:        { templates: ['twitter','linkedin','discord','telegram','announcement','product_launch','feature_highlight','blog_post','youtube','instagram','facebook','reddit','hackernews','product_hunt','dribbble','newsletter','event','job_post'], defaultW:1200, defaultH:630 },
     placeholder:   { templates: ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], defaultW:800, defaultH:600 },

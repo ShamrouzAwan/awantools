@@ -15,6 +15,12 @@ $renderBase    = '/plugins/previewer-toolkit/render';
 $renderBaseAbs = siteUrl('/plugins/previewer-toolkit/render'); // used for og_image only
 $metaBase      = '/plugins/previewer-toolkit/meta';
 
+// Template/category registry — single source of truth, see templates.php.
+// Drives the sidebar category list below and the client-side template picker
+// (injected as window.PT_REGISTRY near the bottom of this file).
+require_once __DIR__ . '/templates.php';
+$ptTotalTemplates = array_sum(array_map(fn($c) => count($c['templates']), $CATEGORIES));
+
 ob_start();
 ?>
 <link rel="stylesheet" href="/plugins/previewer-toolkit/assets/previewer.css">
@@ -113,7 +119,7 @@ ob_start();
       </button>
     </div>
     <div class="pt-topbar-right">
-      <span class="pt-topbar-badge">52 Templates</span>
+      <span class="pt-topbar-badge"><?= $ptTotalTemplates ?> Templates</span>
       <a href="/plugins" class="btn btn-ghost btn-sm">← All Tools</a>
     </div>
   </div>
@@ -126,31 +132,14 @@ ob_start();
       <aside class="pt-sidebar">
         <div class="pt-sidebar-header">Category</div>
         <nav class="pt-cat-nav" id="ptCatNav">
-          <?php
-          $categories = [
-            ['og',            'image',              'OG Images',          '21 templates'],
-            ['social',        'share-nodes',        'Social Cards',       '19 templates'],
-            ['placeholder',   'fill',               'Placeholders',       '18 templates'],
-            ['browser',       'globe',              'Browser Mockups',    '15 templates'],
-            ['terminal',      'terminal',           'Terminal Previews',  '15 templates'],
-            ['profile',       'id-card',            'Profile Cards',      '15 templates'],
-            ['code',          'file-code',          'Code Snippets',      '15 templates'],
-            ['dashboard',     'chart-bar',          'Dashboards',         '15 templates'],
-            ['docs',          'book',               'Docs Previews',      '15 templates'],
-            ['github',        'code-branch',        'GitHub Cards',       '15 templates'],
-            ['business_card', 'credit-card',        'Business Cards',     '6 templates'],
-            ['id_card',       'id-card-alt',        'ID Cards',           '6 templates'],
-            ['invitation',    'envelope-open-text', 'Invitations',        '6 templates'],
-          ];
-          foreach ($categories as [$catId, $icon, $label, $count]):
-          ?>
-          <button class="pt-cat-btn <?= $catId === 'og' ? 'pt-cat-active' : '' ?>"
-                  data-cat="<?= $catId ?>"
-                  onclick="PT.selectCategory('<?= $catId ?>', this)">
-            <span class="pt-cat-icon"><i class="fa-solid fa-<?= $icon ?>"></i></span>
+          <?php foreach ($CATEGORIES as $c): $tplCount = count($c['templates']); ?>
+          <button class="pt-cat-btn <?= $c['id'] === 'og' ? 'pt-cat-active' : '' ?>"
+                  data-cat="<?= $c['id'] ?>"
+                  onclick="PT.selectCategory('<?= $c['id'] ?>', this)">
+            <span class="pt-cat-icon"><i class="fa-solid fa-<?= $c['icon'] ?>"></i></span>
             <span class="pt-cat-info">
-              <span class="pt-cat-name"><?= $label ?></span>
-              <span class="pt-cat-count"><?= $count ?></span>
+              <span class="pt-cat-name"><?= $c['label'] ?></span>
+              <span class="pt-cat-count"><?= $tplCount ?> template<?= $tplCount === 1 ? '' : 's' ?></span>
             </span>
           </button>
           <?php endforeach; ?>
@@ -432,6 +421,13 @@ ob_start();
 <script>
 const PT_RENDER_BASE = <?= json_encode($renderBase) ?>;
 const PT_META_BASE   = <?= json_encode($metaBase) ?>;
+// Category/template registry, generated from templates.php — keeps the
+// client-side template picker in sync with the server automatically.
+window.PT_REGISTRY = <?= json_encode(array_map(fn($c) => [
+    'templates' => $c['templates'],
+    'defaultW'  => $c['default_w'],
+    'defaultH'  => $c['default_h'],
+], $PT_REGISTRY)) ?>;
 </script>
 <script src="/plugins/previewer-toolkit/assets/previewer.js"></script>
 <?php
@@ -439,5 +435,5 @@ $content = ob_get_clean();
 
 plugin_render('Previewer Toolkit', $content, [
     'description' => 'Generate professional OG images, Twitter cards, social previews and more. Plus inspect any URL\'s metadata and social tags.',
-    'og_image'    => $renderBaseAbs . '?category=og&template=github_dark&heading=Previewer+Toolkit&description=52+templates+%C2%B7+OG+images+%C2%B7+Social+cards+%C2%B7+Metadata+inspector&icon=image&badge=Free+Tool&website=awantools.site&format=webp',
+    'og_image'    => $renderBaseAbs . '?category=og&template=github_dark&heading=Previewer+Toolkit&description=' . rawurlencode("{$ptTotalTemplates} templates · OG images · Social cards · Metadata inspector") . '&icon=image&badge=Free+Tool&website=awantools.site&format=webp',
 ]);
