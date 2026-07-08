@@ -18,16 +18,19 @@ const PT = (() => {
 
   // ── Template registry (mirrors PHP) ───────────────────────────
   const REGISTRY = {
-    og:          { templates: ['github_dark','github_light','glass_modern','minimal_clean','gradient_pro','corporate','neon_dark','startup','retro_sunset','ocean','aurora','newspaper','blueprint','dark_amber','cyberpunk','forest','indie','mono','candy','steel'], defaultW:1200, defaultH:630 },
-    social:      { templates: ['twitter','linkedin','discord','telegram','announcement','product_launch','feature_highlight','blog_post','youtube','instagram','facebook','reddit','hackernews','product_hunt','dribbble','newsletter','event','job_post'], defaultW:1200, defaultH:630 },
-    placeholder: { templates: ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], defaultW:800, defaultH:600 },
-    browser:     { templates: ['chrome','firefox','safari','edge','arc','generic','brave','opera','vivaldi','dark_mode','minimal_browser','retro_browser','high_contrast','material','warm_light'], defaultW:1200, defaultH:800 },
-    terminal:    { templates: ['linux','modern','hacker','vscode','minimal','powerline','fish_shell','windows_cmd','powershell','ubuntu_term','matrix','amber','iterm2','p10k','dracula_term'], defaultW:900, defaultH:600 },
-    profile:     { templates: ['team_member','author','developer','business','creator','speaker','minimal_white','dark_glass','gradient_card','resume_clean','podcast_card','athlete','musician','freelancer','noir'], defaultW:900, defaultH:500 },
-    code:        { templates: ['vscode','github','monokai','nord','dracula','minimal','one_dark','synthwave','gruvbox','solarized','tokyo_night','catppuccin','atom_light','sublime','jetbrains'], defaultW:1000, defaultH:600 },
-    dashboard:   { templates: ['analytics','saas','stats','kpi','revenue','admin','marketing','crypto','fitness','ecommerce','social_dash','devops','project_dash','finance','monitoring'], defaultW:1200, defaultH:630 },
-    docs:        { templates: ['api','readme','changelog','product','developer','knowledge','tutorial','component_doc','library_pkg','cli_doc','guide_doc','reference_doc','faq_doc','notes_doc','quickstart'], defaultW:1200, defaultH:630 },
-    github:      { templates: ['repo','package','release','open_source','org','project','stars_showcase','npm_card','contribution_card','profile_readme','docker_card','pr_card','issue_card','workflow_card','monorepo'], defaultW:1200, defaultH:630 },
+    og:            { templates: ['github_dark','github_light','glass_modern','minimal_clean','gradient_pro','corporate','neon_dark','startup','retro_sunset','ocean','aurora','newspaper','blueprint','dark_amber','cyberpunk','forest','indie','mono','candy','steel','ocean_wave'], defaultW:1200, defaultH:630 },
+    social:        { templates: ['twitter','linkedin','discord','telegram','announcement','product_launch','feature_highlight','blog_post','youtube','instagram','facebook','reddit','hackernews','product_hunt','dribbble','newsletter','event','job_post'], defaultW:1200, defaultH:630 },
+    placeholder:   { templates: ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], defaultW:800, defaultH:600 },
+    browser:       { templates: ['chrome','firefox','safari','edge','arc','generic','brave','opera','vivaldi','dark_mode','minimal_browser','retro_browser','high_contrast','material','warm_light'], defaultW:1200, defaultH:800 },
+    terminal:      { templates: ['linux','modern','hacker','vscode','minimal','powerline','fish_shell','windows_cmd','powershell','ubuntu_term','matrix','amber','iterm2','p10k','dracula_term'], defaultW:900, defaultH:600 },
+    profile:       { templates: ['team_member','author','developer','business','creator','speaker','minimal_white','dark_glass','gradient_card','resume_clean','podcast_card','athlete','musician','freelancer','noir'], defaultW:900, defaultH:500 },
+    code:          { templates: ['vscode','github','monokai','nord','dracula','minimal','one_dark','synthwave','gruvbox','solarized','tokyo_night','catppuccin','atom_light','sublime','jetbrains'], defaultW:1000, defaultH:600 },
+    dashboard:     { templates: ['analytics','saas','stats','kpi','revenue','admin','marketing','crypto','fitness','ecommerce','social_dash','devops','project_dash','finance','monitoring'], defaultW:1200, defaultH:630 },
+    docs:          { templates: ['api','readme','changelog','product','developer','knowledge','tutorial','component_doc','library_pkg','cli_doc','guide_doc','reference_doc','faq_doc','notes_doc','quickstart'], defaultW:1200, defaultH:630 },
+    github:        { templates: ['repo','package','release','open_source','org','project','stars_showcase','npm_card','contribution_card','profile_readme','docker_card','pr_card','issue_card','workflow_card','monorepo'], defaultW:1200, defaultH:630 },
+    business_card: { templates: ['wave_dark','corporate_stripe','minimal_biz','creative_split','tech_grid','luxury_foil'], defaultW:1050, defaultH:600 },
+    id_card:       { templates: ['corporate_dark','corporate_red','student_teal','minimal_badge','access_badge','gov_blue'], defaultW:600, defaultH:900 },
+    invitation:    { templates: ['vintage_cream','luxury_dark','birthday_fun','wedding_elegant','corporate_event','garden_party'], defaultW:1200, defaultH:800 },
   };
 
   // ── Template labels ────────────────────────────────────────────
@@ -38,7 +41,7 @@ const PT = (() => {
     neon_dark:'Neon Dark', startup:'Startup', retro_sunset:'Retro Sunset', ocean:'Ocean Wave',
     aurora:'Aurora', newspaper:'Newspaper', blueprint:'Blueprint', dark_amber:'Dark Amber',
     cyberpunk:'Cyberpunk', forest:'Forest Dark', indie:'Indie', mono:'Monochrome',
-    candy:'Candy', steel:'Steel',
+    candy:'Candy', steel:'Steel', ocean_wave:'Ocean Wave',
     // Social
     twitter:'Twitter / X', linkedin:'LinkedIn', discord:'Discord', telegram:'Telegram',
     announcement:'Announcement', product_launch:'Product Launch',
@@ -68,6 +71,15 @@ const PT = (() => {
     minimal_white:'Minimal White', dark_glass:'Dark Glass', gradient_card:'Gradient Card',
     resume_clean:'Resume', podcast_card:'Podcast', athlete:'Athlete',
     musician:'Musician', freelancer:'Freelancer', noir:'Noir',
+    // Business Card
+    wave_dark:'Wave Dark', corporate_stripe:'Corporate Stripe', minimal_biz:'Minimal',
+    creative_split:'Creative Split', tech_grid:'Tech Grid', luxury_foil:'Luxury Foil',
+    // ID Card
+    corporate_dark:'Corporate Dark', corporate_red:'Corporate Red', student_teal:'Student Teal',
+    minimal_badge:'Minimal Badge', access_badge:'Access Badge', gov_blue:'Gov Blue',
+    // Invitation
+    vintage_cream:'Vintage Cream', luxury_dark:'Luxury Dark', birthday_fun:'Birthday Fun',
+    wedding_elegant:'Wedding Elegant', corporate_event:'Corporate Event', garden_party:'Garden Party',
     // Code
     monokai:'Monokai', nord:'Nord', dracula:'Dracula',
     one_dark:'One Dark', synthwave:'Synthwave 84', gruvbox:'Gruvbox',
@@ -96,16 +108,19 @@ const PT = (() => {
   // ── Content field groups per category ──────────────────────────
   // Which static groups to show in the Content section
   const CAT_GROUPS = {
-    og:          ['base','badge','icon','author','extra'],
-    social:      ['base','badge','icon','author','extra'],
-    placeholder: ['base','badge','icon'],
-    browser:     ['base'],
-    terminal:    [],
-    profile:     ['base','badge','author'],
-    code:        ['badge'],
-    dashboard:   ['base'],
-    docs:        ['base','badge','icon'],
-    github:      ['base','badge'],
+    og:            ['base','badge','icon','author','extra'],
+    social:        ['base','badge','icon','author','extra'],
+    placeholder:   ['base','badge','icon'],
+    browser:       ['base'],
+    terminal:      [],
+    profile:       ['base','badge','author'],
+    code:          ['badge'],
+    dashboard:     ['base'],
+    docs:          ['base','badge','icon'],
+    github:        ['base','badge'],
+    business_card: ['base','badge','author','extra'],
+    id_card:       ['base','author'],
+    invitation:    ['base','badge','author','extra'],
   };
 
   // ── Extra (dynamic) field definitions per category ─────────────
@@ -155,6 +170,14 @@ const PT = (() => {
       { id:'p_version',        label:'Version badge', type:'text', placeholder:'v2.0.0' },
       { id:'p_category_label', label:'Section label', type:'text', placeholder:'Getting Started' },
     ],
+    business_card: [
+      { id:'p_username', label:'Address / Extra',   type:'text', placeholder:'City, State' },
+    ],
+    id_card: [
+      { id:'p_role',     label:'Department / Role', type:'text', placeholder:'Computer Science' },
+      { id:'p_username', label:'ID Number',         type:'text', placeholder:'ID-123-456-7890' },
+      { id:'p_date',     label:'Date (DOB / Issue)', type:'text', placeholder:'01 January 2000' },
+    ],
   };
 
   // ── Thumbnail default content per category ─────────────────────
@@ -168,7 +191,10 @@ const PT = (() => {
     code:        'filename=index.ts&lang=typescript',
     dashboard:   'heading=Dashboard&metric1=24%2C891&metric1_label=Users&metric2=%2B12.4%25&metric2_label=Growth&metric3=%248%2C240&metric3_label=Revenue&description=Monthly+Overview',
     docs:        'heading=Documentation&description=API+Reference+%26+Guides&version=v2.0.0&category_label=Getting+Started',
-    github:      'heading=my-project&description=An+awesome+open-source+project&username=octocat&stars=1.2k&forks=234&lang=TypeScript&version=v1.0.0',
+    github:        'heading=my-project&description=An+awesome+open-source+project&username=octocat&stars=1.2k&forks=234&lang=TypeScript&version=v1.0.0',
+    business_card: 'heading=Jane+Smith&description=Creative+Director&author=Acme+Corp&website=jane.design&footer=%2B1+555+000+0000&badge=hello%40jane.design',
+    id_card:       'heading=Daniel+Garcia&author=Borcelle+Inc.&role=Marketing+Director&username=ID-123-456-7890',
+    invitation:    'heading=Birthday+Gala&description=An+elegant+evening+celebration&author=Olivia+Wilson&website=The+Grand+Hotel&footer=20+August+%C2%B7+7+PM&badge=Black+Tie',
   };
 
   // ── Thumbnail URL builder ──────────────────────────────────────
@@ -375,6 +401,8 @@ const PT = (() => {
       'p_stat3_label','p_stat3_value',
       // github/docs
       'p_stars','p_forks','p_version','p_category_label',
+      // id_card
+      'p_date',
       // dashboard
       'p_metric1','p_metric1_label',
       'p_metric2','p_metric2_label',

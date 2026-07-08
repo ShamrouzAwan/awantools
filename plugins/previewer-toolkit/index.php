@@ -128,16 +128,19 @@ ob_start();
         <nav class="pt-cat-nav" id="ptCatNav">
           <?php
           $categories = [
-            ['og',          'image',         'OG Images',         '8 templates'],
-            ['social',      'share-nodes',   'Social Cards',      '8 templates'],
-            ['placeholder', 'fill',          'Placeholders',      '8 templates'],
-            ['browser',     'globe',         'Browser Mockups',   '6 templates'],
-            ['terminal',    'terminal',      'Terminal Previews', '5 templates'],
-            ['profile',     'id-card',       'Profile Cards',     '6 templates'],
-            ['code',        'file-code',     'Code Snippets',     '6 templates'],
-            ['dashboard',   'chart-bar',     'Dashboards',        '6 templates'],
-            ['docs',        'book',          'Docs Previews',     '6 templates'],
-            ['github',      'code-branch',   'GitHub Cards',      '6 templates'],
+            ['og',            'image',              'OG Images',          '21 templates'],
+            ['social',        'share-nodes',        'Social Cards',       '19 templates'],
+            ['placeholder',   'fill',               'Placeholders',       '18 templates'],
+            ['browser',       'globe',              'Browser Mockups',    '15 templates'],
+            ['terminal',      'terminal',           'Terminal Previews',  '15 templates'],
+            ['profile',       'id-card',            'Profile Cards',      '15 templates'],
+            ['code',          'file-code',          'Code Snippets',      '15 templates'],
+            ['dashboard',     'chart-bar',          'Dashboards',         '15 templates'],
+            ['docs',          'book',               'Docs Previews',      '15 templates'],
+            ['github',        'code-branch',        'GitHub Cards',       '15 templates'],
+            ['business_card', 'credit-card',        'Business Cards',     '6 templates'],
+            ['id_card',       'id-card-alt',        'ID Cards',           '6 templates'],
+            ['invitation',    'envelope-open-text', 'Invitations',        '6 templates'],
           ];
           foreach ($categories as [$catId, $icon, $label, $count]):
           ?>

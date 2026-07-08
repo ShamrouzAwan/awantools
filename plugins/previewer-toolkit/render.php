@@ -410,285 +410,269 @@ function pt_output(GdImage $im, string $format, int $w, int $h): void {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// OG IMAGE TEMPLATES (spec-based)
+// OG IMAGE TEMPLATES — 6 distinct layout types
+// Layouts: stack | editorial | hero | split | floating | diagonal
 // ════════════════════════════════════════════════════════════════════════════
 
 $OG_SPECS = [
-    'github_dark' => [
-        'bg'=>'0d1117','bg2'=>null,'pattern'=>'dots',
-        'card_bg'=>'161b22','card_alpha'=>0,'card_border'=>'30363d',
-        'heading_color'=>'e6edf3','desc_color'=>'8b949e',
-        'badge_bg'=>'21262d','badge_color'=>'3fb950',
-        'accent_color'=>'3fb950','accent_pos'=>'left',
-        'icon_bg'=>'21262d','icon_color'=>'3fb950',
-        'footer_color'=>'484f58','radius'=>8,
-    ],
-    'github_light' => [
-        'bg'=>'ffffff','bg2'=>null,'pattern'=>'none',
-        'card_bg'=>'f6f8fa','card_alpha'=>0,'card_border'=>'d0d7de',
-        'heading_color'=>'1f2328','desc_color'=>'656d76',
-        'badge_bg'=>'ddf4ff','badge_color'=>'0969da',
-        'accent_color'=>'0969da','accent_pos'=>'left',
-        'icon_bg'=>'ddf4ff','icon_color'=>'0969da',
-        'footer_color'=>'6e7781','radius'=>6,
-    ],
-    'glass_modern' => [
-        'bg'=>'1a0533','bg2'=>'0a1628','pattern'=>'gradient',
-        'card_bg'=>'ffffff','card_alpha'=>20,'card_border'=>'ffffff',
-        'heading_color'=>'ffffff','desc_color'=>'c4b5fd',
-        'badge_bg'=>'6d28d9','badge_color'=>'ddd6fe',
-        'accent_color'=>'a855f7','accent_pos'=>'bottom',
-        'icon_bg'=>'4c1d95','icon_color'=>'a855f7',
-        'footer_color'=>'7c3aed','radius'=>20,
-    ],
-    'minimal_clean' => [
-        'bg'=>'ffffff','bg2'=>null,'pattern'=>'dots',
-        'card_bg'=>null,'card_alpha'=>0,'card_border'=>null,
-        'heading_color'=>'111827','desc_color'=>'6b7280',
-        'badge_bg'=>'f3f4f6','badge_color'=>'374151',
-        'accent_color'=>'3b82f6','accent_pos'=>'none',
-        'icon_bg'=>'eff6ff','icon_color'=>'3b82f6',
-        'footer_color'=>'9ca3af','radius'=>0,
-    ],
-    'gradient_pro' => [
-        'bg'=>'0f0c29','bg2'=>'302b63','pattern'=>'gradient',
-        'card_bg'=>null,'card_alpha'=>0,'card_border'=>null,
-        'heading_color'=>'ffffff','desc_color'=>'94a3b8',
-        'badge_bg'=>'3b82f6','badge_color'=>'ffffff',
-        'accent_color'=>'60a5fa','accent_pos'=>'none',
-        'icon_bg'=>'1d4ed8','icon_color'=>'93c5fd',
-        'footer_color'=>'64748b','radius'=>16,
-    ],
-    'corporate' => [
-        'bg'=>'0f2744','bg2'=>'1a3a5c','pattern'=>'none',
-        'card_bg'=>'162c47','card_alpha'=>0,'card_border'=>'1e3f63',
-        'heading_color'=>'ffffff','desc_color'=>'90a4b9',
-        'badge_bg'=>'c8a04a','badge_color'=>'0f2744',
-        'accent_color'=>'c8a04a','accent_pos'=>'left',
-        'icon_bg'=>'1a3a5c','icon_color'=>'c8a04a',
-        'footer_color'=>'4a6a85','radius'=>4,
-    ],
-    'neon_dark' => [
-        'bg'=>'030308','bg2'=>'060614','pattern'=>'noise',
-        'card_bg'=>'0d0d1a','card_alpha'=>0,'card_border'=>'1a1a3a',
-        'heading_color'=>'ffffff','desc_color'=>'a0a8c0',
-        'badge_bg'=>'001a0d','badge_color'=>'00ff88',
-        'accent_color'=>'00ff88','accent_pos'=>'left',
-        'icon_bg'=>'001a0d','icon_color'=>'00ff88',
-        'footer_color'=>'333355','radius'=>4,
-    ],
-    'startup' => [
-        'bg'=>'f72585','bg2'=>'7209b7','pattern'=>'gradient',
-        'card_bg'=>null,'card_alpha'=>0,'card_border'=>null,
-        'heading_color'=>'ffffff','desc_color'=>'fecdd3',
-        'badge_bg'=>'ffffff','badge_color'=>'be185d',
-        'accent_color'=>'fbbf24','accent_pos'=>'none',
-        'icon_bg'=>'ffffff','icon_color'=>'be185d',
-        'footer_color'=>'fbcfe8','radius'=>16,
-    ],
-    // ── 12 new OG templates ──────────────────────────────────────
-    'retro_sunset'  => ['bg'=>'2d1b69','bg2'=>'c43b00','pattern'=>'gradient','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffd6c0','badge_bg'=>'c43b00','badge_color'=>'ffffff','accent_color'=>'ffd700','accent_pos'=>'none','icon_bg'=>'ffffff','icon_color'=>'2d1b69','footer_color'=>'ffd6c0','radius'=>0],
-    'ocean'         => ['bg'=>'0c1b33','bg2'=>'023e8a','pattern'=>'gradient','card_bg'=>'0077b6','card_alpha'=>30,'card_border'=>'48cae4','heading_color'=>'caf0f8','desc_color'=>'90e0ef','badge_bg'=>'00b4d8','badge_color'=>'ffffff','accent_color'=>'48cae4','accent_pos'=>'bottom','icon_bg'=>'00b4d8','icon_color'=>'caf0f8','footer_color'=>'90e0ef','radius'=>16],
-    'aurora'        => ['bg'=>'0a0f0d','bg2'=>'0d2b1a','pattern'=>'noise','card_bg'=>'0d1f15','card_alpha'=>0,'card_border'=>'1a4a2e','heading_color'=>'ecfdf5','desc_color'=>'6ee7b7','badge_bg'=>'064e3b','badge_color'=>'34d399','accent_color'=>'10b981','accent_pos'=>'left','icon_bg'=>'064e3b','icon_color'=>'34d399','footer_color'=>'34d399','radius'=>8],
-    'newspaper'     => ['bg'=>'fef9ef','bg2'=>null,'pattern'=>'none','card_bg'=>'fef9ef','card_alpha'=>0,'card_border'=>'1a1a1a','heading_color'=>'1a1a1a','desc_color'=>'333333','badge_bg'=>'1a1a1a','badge_color'=>'fef9ef','accent_color'=>'1a1a1a','accent_pos'=>'top','icon_bg'=>'e8e0d0','icon_color'=>'1a1a1a','footer_color'=>'777777','radius'=>0],
-    'blueprint'     => ['bg'=>'003580','bg2'=>'012a6b','pattern'=>'dots','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'a8c4f0','badge_bg'=>'ffffff','badge_color'=>'003580','accent_color'=>'4fc3f7','accent_pos'=>'left','icon_bg'=>'ffffff','icon_color'=>'003580','footer_color'=>'a8c4f0','radius'=>0],
-    'dark_amber'    => ['bg'=>'120e09','bg2'=>null,'pattern'=>'noise','card_bg'=>'1c1610','card_alpha'=>0,'card_border'=>'3d2f12','heading_color'=>'fef3c7','desc_color'=>'d97706','badge_bg'=>'3d2f12','badge_color'=>'f59e0b','accent_color'=>'f59e0b','accent_pos'=>'left','icon_bg'=>'3d2f12','icon_color'=>'f59e0b','footer_color'=>'78716c','radius'=>4],
-    'cyberpunk'     => ['bg'=>'0a0a0a','bg2'=>null,'pattern'=>'noise','card_bg'=>'111111','card_alpha'=>0,'card_border'=>'ffff00','heading_color'=>'ffffff','desc_color'=>'ff00ff','badge_bg'=>'ffff00','badge_color'=>'0a0a0a','accent_color'=>'00ffff','accent_pos'=>'left','icon_bg'=>'1a1a00','icon_color'=>'ffff00','footer_color'=>'ff00ff','radius'=>0],
-    'forest'        => ['bg'=>'14231b','bg2'=>'1a3a28','pattern'=>'none','card_bg'=>'1e3d2b','card_alpha'=>0,'card_border'=>'2d5a40','heading_color'=>'ecfdf5','desc_color'=>'86efac','badge_bg'=>'2d5a40','badge_color'=>'bbf7d0','accent_color'=>'22c55e','accent_pos'=>'left','icon_bg'=>'2d5a40','icon_color'=>'22c55e','footer_color'=>'4ade80','radius'=>4],
-    'indie'         => ['bg'=>'fef6ee','bg2'=>null,'pattern'=>'dots','card_bg'=>'ffffff','card_alpha'=>0,'card_border'=>'e8d5c0','heading_color'=>'1c0a00','desc_color'=>'7c4a1e','badge_bg'=>'c4600a','badge_color'=>'ffffff','accent_color'=>'c4600a','accent_pos'=>'none','icon_bg'=>'fde8d0','icon_color'=>'c4600a','footer_color'=>'a0816b','radius'=>12],
-    'mono'          => ['bg'=>'000000','bg2'=>null,'pattern'=>'none','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'999999','badge_bg'=>'ffffff','badge_color'=>'000000','accent_color'=>'ffffff','accent_pos'=>'none','icon_bg'=>'222222','icon_color'=>'ffffff','footer_color'=>'666666','radius'=>0],
-    'candy'         => ['bg'=>'fce4ec','bg2'=>'e8d5f0','pattern'=>'gradient','card_bg'=>null,'card_alpha'=>0,'card_border'=>null,'heading_color'=>'880e4f','desc_color'=>'ad1457','badge_bg'=>'ad1457','badge_color'=>'ffffff','accent_color'=>'e91e63','accent_pos'=>'none','icon_bg'=>'f8bbd0','icon_color'=>'ad1457','footer_color'=>'c2185b','radius'=>24],
-    'steel'         => ['bg'=>'1c2128','bg2'=>null,'pattern'=>'none','card_bg'=>'22272e','card_alpha'=>0,'card_border'=>'444c56','heading_color'=>'cdd9e5','desc_color'=>'768390','badge_bg'=>'316dca','badge_color'=>'ffffff','accent_color'=>'316dca','accent_pos'=>'left','icon_bg'=>'1f3051','icon_color'=>'4493f8','footer_color'=>'444c56','radius'=>6],
+    // ── STACK: icon top-left, badges, title, desc, footer ────────────────
+    'github_dark'   => ['layout'=>'stack','bg'=>'0d1117','bg2'=>null,'pattern'=>'dots','card_bg'=>'161b22','card_border'=>'30363d','heading_color'=>'e6edf3','desc_color'=>'8b949e','badge_bg'=>'21262d','badge_color'=>'3fb950','accent_color'=>'3fb950','icon_bg'=>'21262d','icon_color'=>'3fb950','footer_color'=>'484f58','radius'=>8],
+    'aurora'        => ['layout'=>'stack','bg'=>'0a0f0d','bg2'=>'0d2b1a','pattern'=>'noise','card_bg'=>'0d1f15','card_border'=>'1a4a2e','heading_color'=>'ecfdf5','desc_color'=>'6ee7b7','badge_bg'=>'064e3b','badge_color'=>'34d399','accent_color'=>'10b981','icon_bg'=>'064e3b','icon_color'=>'34d399','footer_color'=>'34d399','radius'=>8],
+    'forest'        => ['layout'=>'stack','bg'=>'14231b','bg2'=>'1a3a28','pattern'=>'none','card_bg'=>'1e3d2b','card_border'=>'2d5a40','heading_color'=>'ecfdf5','desc_color'=>'86efac','badge_bg'=>'2d5a40','badge_color'=>'bbf7d0','accent_color'=>'22c55e','icon_bg'=>'2d5a40','icon_color'=>'22c55e','footer_color'=>'4ade80','radius'=>4],
+    'dark_amber'    => ['layout'=>'stack','bg'=>'120e09','bg2'=>null,'pattern'=>'noise','card_bg'=>'1c1610','card_border'=>'3d2f12','heading_color'=>'fef3c7','desc_color'=>'d97706','badge_bg'=>'3d2f12','badge_color'=>'f59e0b','accent_color'=>'f59e0b','icon_bg'=>'3d2f12','icon_color'=>'f59e0b','footer_color'=>'78716c','radius'=>4],
+    // ── EDITORIAL: large headline across full width, top + bottom rule ─────
+    'github_light'  => ['layout'=>'editorial','bg'=>'ffffff','bg2'=>null,'pattern'=>'none','heading_color'=>'1f2328','desc_color'=>'656d76','badge_bg'=>'ddf4ff','badge_color'=>'0969da','accent_color'=>'0969da','footer_color'=>'6e7781','radius'=>6],
+    'newspaper'     => ['layout'=>'editorial','bg'=>'f7f2e8','bg2'=>null,'pattern'=>'none','heading_color'=>'1a1207','desc_color'=>'44392a','badge_bg'=>'1a1207','badge_color'=>'f7f2e8','accent_color'=>'b5441b','footer_color'=>'8a7360','radius'=>0],
+    'neon_dark'     => ['layout'=>'editorial','bg'=>'030308','bg2'=>null,'pattern'=>'noise','heading_color'=>'ffffff','desc_color'=>'a0a8c0','badge_bg'=>'001a0d','badge_color'=>'00ff88','accent_color'=>'00ff88','footer_color'=>'333355','radius'=>0],
+    'mono'          => ['layout'=>'editorial','bg'=>'0a0a0a','bg2'=>null,'pattern'=>'none','heading_color'=>'ffffff','desc_color'=>'777777','badge_bg'=>'ffffff','badge_color'=>'0a0a0a','accent_color'=>'ffffff','footer_color'=>'444444','radius'=>0],
+    // ── HERO: large centered icon circle, centered title + desc ───────────
+    'glass_modern'  => ['layout'=>'hero','bg'=>'1a0533','bg2'=>'0a1628','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'c4b5fd','badge_bg'=>'6d28d9','badge_color'=>'ddd6fe','accent_color'=>'a855f7','icon_bg'=>'4c1d95','icon_color'=>'a855f7','footer_color'=>'7c3aed','radius'=>24],
+    'gradient_pro'  => ['layout'=>'hero','bg'=>'0f0c29','bg2'=>'302b63','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'94a3b8','badge_bg'=>'3b82f6','badge_color'=>'ffffff','accent_color'=>'60a5fa','icon_bg'=>'1d4ed8','icon_color'=>'93c5fd','footer_color'=>'64748b','radius'=>20],
+    'indie'         => ['layout'=>'hero','bg'=>'fef6ee','bg2'=>null,'pattern'=>'dots','heading_color'=>'1c0a00','desc_color'=>'7c4a1e','badge_bg'=>'c4600a','badge_color'=>'ffffff','accent_color'=>'c4600a','icon_bg'=>'fde8d0','icon_color'=>'c4600a','footer_color'=>'a0816b','radius'=>16],
+    'candy'         => ['layout'=>'hero','bg'=>'fce4ec','bg2'=>'e8d5f0','pattern'=>'gradient','heading_color'=>'4a0027','desc_color'=>'ad1457','badge_bg'=>'ad1457','badge_color'=>'ffffff','accent_color'=>'e91e63','icon_bg'=>'f8bbd0','icon_color'=>'ad1457','footer_color'=>'c2185b','radius'=>28],
+    // ── SPLIT: left icon panel | right content panel ──────────────────────
+    'corporate'     => ['layout'=>'split','bg'=>'fafbfc','bg2'=>null,'pattern'=>'none','heading_color'=>'0f2744','desc_color'=>'4a6a85','badge_bg'=>'0f2744','badge_color'=>'c8a04a','accent_color'=>'c8a04a','icon_bg'=>'0f2744','icon_color'=>'c8a04a','footer_color'=>'7a9ab5','split_bg'=>'0f2744','radius'=>0],
+    'blueprint'     => ['layout'=>'split','bg'=>'f0f4ff','bg2'=>null,'pattern'=>'dots','heading_color'=>'003580','desc_color'=>'1a4a9e','badge_bg'=>'003580','badge_color'=>'4fc3f7','accent_color'=>'4fc3f7','icon_bg'=>'003580','icon_color'=>'ffffff','footer_color'=>'7090c8','split_bg'=>'003580','radius'=>0],
+    'retro_sunset'  => ['layout'=>'split','bg'=>'fdf0e8','bg2'=>null,'pattern'=>'none','heading_color'=>'2d1b69','desc_color'=>'9a6a4a','badge_bg'=>'2d1b69','badge_color'=>'ffd700','accent_color'=>'c43b00','icon_bg'=>'2d1b69','icon_color'=>'ffd700','footer_color'=>'c0856a','split_bg'=>'2d1b69','radius'=>0],
+    // ── FLOATING: dark background + elevated card with drop shadow ─────────
+    'ocean'         => ['layout'=>'floating','bg'=>'0c1b33','bg2'=>'023e8a','pattern'=>'gradient','card_bg'=>'0a2a55','card_border'=>'48cae4','heading_color'=>'caf0f8','desc_color'=>'90e0ef','badge_bg'=>'005f86','badge_color'=>'caf0f8','accent_color'=>'48cae4','icon_bg'=>'00b4d8','icon_color'=>'caf0f8','footer_color'=>'90e0ef','radius'=>16],
+    'steel'         => ['layout'=>'floating','bg'=>'111318','bg2'=>null,'pattern'=>'none','card_bg'=>'1c2128','card_border'=>'30363d','heading_color'=>'cdd9e5','desc_color'=>'768390','badge_bg'=>'316dca','badge_color'=>'ffffff','accent_color'=>'316dca','icon_bg'=>'1f3051','icon_color'=>'4493f8','footer_color'=>'444c56','radius'=>8],
+    'startup'       => ['layout'=>'floating','bg'=>'f72585','bg2'=>'7209b7','pattern'=>'gradient','card_bg'=>'ffffff','card_border'=>'f0e0ff','heading_color'=>'2d0058','desc_color'=>'6b21a8','badge_bg'=>'7c3aed','badge_color'=>'ffffff','accent_color'=>'7c3aed','icon_bg'=>'ede9fe','icon_color'=>'7c3aed','footer_color'=>'9333ea','radius'=>20],
+    // ── DIAGONAL: two-tone angled split ───────────────────────────────────
+    'minimal_clean' => ['layout'=>'diagonal','bg'=>'ffffff','bg2'=>'eef2ff','pattern'=>'none','heading_color'=>'111827','desc_color'=>'6b7280','badge_bg'=>'eff6ff','badge_color'=>'3b82f6','accent_color'=>'3b82f6','icon_bg'=>'dbeafe','icon_color'=>'2563eb','footer_color'=>'9ca3af','radius'=>0],
+    'cyberpunk'     => ['layout'=>'diagonal','bg'=>'0a0a0a','bg2'=>'1a0020','pattern'=>'noise','heading_color'=>'ffffff','desc_color'=>'ff00ff','badge_bg'=>'ffff00','badge_color'=>'0a0a0a','accent_color'=>'00ffff','icon_bg'=>'1a1a00','icon_color'=>'ffff00','footer_color'=>'ff00ff','radius'=>0],
+    'ocean_wave'    => ['layout'=>'diagonal','bg'=>'e0f7ff','bg2'=>'b3e5fc','pattern'=>'none','heading_color'=>'01579b','desc_color'=>'0277bd','badge_bg'=>'01579b','badge_color'=>'ffffff','accent_color'=>'039be5','icon_bg'=>'01579b','icon_color'=>'ffffff','footer_color'=>'4fc3f7','radius'=>0],
 ];
 
-function pt_render_og(GdImage $im, array $p, array $s): void {
-    $W = imagesx($im); $H = imagesy($im);
-    $pad = $p['padding'];
-    $r = max(0, $s['radius'] ?? 12);
-
-    // Background
+// ── OG Background helper ──────────────────────────────────────────────────────
+function pt_og_bg(GdImage $im, int $W, int $H, array $s): void {
     if (!empty($s['bg2'])) {
-        if ($s['pattern'] === 'gradient') {
-            pt_gradient_diag($im, 0, 0, $W, $H, $s['bg'], $s['bg2']);
-        } else {
-            pt_gradient_v($im, 0, 0, $W, $H, $s['bg'], $s['bg2']);
-        }
+        ($s['pattern'] ?? '') === 'gradient'
+            ? pt_gradient_diag($im, 0, 0, $W, $H, $s['bg'], $s['bg2'])
+            : pt_gradient_v($im, 0, 0, $W, $H, $s['bg'], $s['bg2']);
     } else {
         imagefill($im, 0, 0, pt_color($im, $s['bg']));
     }
+    if (($s['pattern'] ?? '') === 'dots')  pt_dot_grid($im, 0, 0, $W, $H, '888888', 0.05);
+    if (($s['pattern'] ?? '') === 'noise') pt_noise($im, 0, 0, $W, $H, 'ffffff', 0.012);
+}
 
-    if ($s['pattern'] === 'dots') {
-        pt_dot_grid($im, 0, 0, $W, $H, '888888', 0.05);
-    } elseif ($s['pattern'] === 'noise') {
-        pt_noise($im, 0, 0, $W, $H, 'ffffff', 0.012);
-    }
-
-    // Card
-    $cx = $pad; $cy = $pad; $cw = $W - $pad*2; $ch = $H - $pad*2;
-    if (!empty($s['card_bg'])) {
-        if ($s['card_alpha'] > 0) {
-            imagesavealpha($im, true);
-            $cardC = pt_color($im, $s['card_bg'], $s['card_alpha']);
-            pt_rounded_rect($im, $cx, $cy, $cw, $ch, $r, $cardC);
-        } else {
-            pt_rounded_rect($im, $cx, $cy, $cw, $ch, $r, pt_color($im, $s['card_bg']));
-        }
-        if (!empty($s['card_border'])) {
-            pt_rounded_rect_border($im, $cx, $cy, $cw, $ch, $r, pt_color($im, $s['card_border']), 1);
-        }
-    }
-
-    // Accent line
-    $ix = $cx; $iy = $cy; $iw = $cw; $ih = $ch;
-    if ($s['accent_pos'] === 'left') {
-        imagefilledrectangle($im, $ix+16, $iy+16, $ix+20, $iy+$ih-16, pt_color($im, $s['accent_color']));
-        $ix += 36; $iw -= 36;
-    } elseif ($s['accent_pos'] === 'top') {
-        imagefilledrectangle($im, $ix, $iy, $ix+$iw, $iy+4, pt_color($im, $s['accent_color']));
-        $iy += 16; $ih -= 16;
-    } elseif ($s['accent_pos'] === 'bottom') {
-        imagefilledrectangle($im, $ix, $iy+$ih-4, $ix+$iw, $iy+$ih, pt_color($im, $s['accent_color']));
-    }
-
-    // Inner padding
-    $ip = 40;
-    $ox = $ix + $ip; $oy = $iy + $ip; $ow = $iw - $ip*2;
-
-    // Icon box
-    $iconBoxSize = (int)($H * 0.11);
-    $iconSize    = (int)($iconBoxSize * 0.6);
-    pt_rounded_rect($im, $ox, $oy, $iconBoxSize, $iconBoxSize, (int)($iconBoxSize * 0.22), pt_color($im, $s['icon_bg']));
-    pt_icon($im, $p['icon'], $ox + (int)(($iconBoxSize - $iconSize)/2), $oy + (int)(($iconBoxSize - $iconSize)/2), $iconSize, $s['icon_color']);
-
-    $curY = $oy + $iconBoxSize + (int)($H * 0.04);
-
-    // Badges (comma-separated support)
-    $badgeStr = $p['badge'] ?: $p['category_label'];
-    if ($badgeStr) {
-        $badges   = array_filter(array_map('trim', explode(',', $badgeStr)));
-        $badgeFsz = (int)($H * 0.022);
-        $badgeX   = $ox;
-        foreach (array_slice($badges, 0, 5) as $bg_label) {
-            $bw = pt_badge_width(PT_FONT_REG, strtoupper($bg_label), $badgeFsz);
-            if ($badgeX + $bw > $ox + $ow) break;
-            pt_badge($im, PT_FONT_REG, strtoupper($bg_label), $badgeX, $curY, $s['badge_bg'], $s['badge_color'], 100, $badgeFsz);
-            $badgeX += $bw + 8;
-        }
-        $curY += (int)($H * 0.06);
-    }
-
-    // Heading
-    $headingSize = min((int)($H * 0.082), max(22, $p['font_size']));
-    $curY = pt_text_block($im, PT_FONT_BOLD, $headingSize, $ox, $curY, $s['heading_color'], $p['heading'] ?: 'Heading', $ow, $headingSize * 1.25, 'left', 2);
-    $curY += (int)($H * 0.02);
-
-    // Description
-    if ($p['description']) {
-        $descSize = (int)($H * 0.036);
-        $curY = pt_text_block($im, PT_FONT_REG, $descSize, $ox, $curY, $s['desc_color'], $p['description'], $ow, $descSize * 1.5, 'left', 3);
-    }
-
-    // Footer
+// ── OG Footer helper ──────────────────────────────────────────────────────────
+function pt_og_footer(GdImage $im, array $p, array $s, int $ox, int $fy, int $ow, int $H): void {
     $footerText = trim(implode('  ·  ', array_filter([$p['website'], $p['footer'], $p['author']])));
     if ($footerText) {
-        $fy = $iy + $ih - (int)($H * 0.08);
-        if (!empty($s['card_bg'])) {
-            imagefilledrectangle($im, $ox, $fy - 12, $ox + $ow, $fy - 11, pt_color($im, $s['card_border'] ?? $s['footer_color']));
-        }
-        $fsz = (int)($H * 0.026);
+        $fsz = (int)($H * 0.027);
         pt_text_block($im, PT_FONT_REG, $fsz, $ox, $fy, $s['footer_color'], $footerText, $ow, $fsz*1.4, 'left', 1);
     }
+}
 
-    // Watermark
-    if ($p['watermark']) {
-        $wsz = (int)($H * 0.022);
-        $wc = pt_color($im, $s['footer_color']);
-        $wbbox = imagettfbbox($wsz, 0, PT_FONT_REG, $p['watermark']);
-        $ww = abs($wbbox[2]-$wbbox[0]);
-        imagettftext($im, $wsz, 0, $W - $pad - $ww, $H - $pad/2, $wc, PT_FONT_REG, $p['watermark']);
+// ── OG Badge row helper ───────────────────────────────────────────────────────
+function pt_og_badges(GdImage $im, array $p, array $s, int $ox, int $oy, int $ow, int $H): int {
+    if (!$p['badge']) return $oy;
+    $bfsz = (int)($H * 0.024); $bx = $ox;
+    foreach (array_slice(array_filter(array_map('trim', explode(',', $p['badge']))), 0, 4) as $bl) {
+        $bw = pt_badge_width(PT_FONT_REG, strtoupper($bl), $bfsz);
+        if ($bx + $bw > $ox + $ow) break;
+        pt_badge($im, PT_FONT_REG, strtoupper($bl), $bx, $oy, $s['badge_bg'], $s['badge_color'], 100, $bfsz);
+        $bx += $bw + 8;
+    }
+    return $oy + (int)($H * 0.068);
+}
+
+// ── Layout: STACK ─────────────────────────────────────────────────────────────
+function pt_og_stack(GdImage $im, array $p, array $s, int $W, int $H): void {
+    pt_og_bg($im, $W, $H, $s);
+    $pad = max(36, (int)($W * 0.05)); $r = $s['radius'] ?? 12;
+    if (!empty($s['card_bg'])) {
+        pt_rounded_rect($im, $pad, $pad, $W-$pad*2, $H-$pad*2, $r, pt_color($im, $s['card_bg']));
+        if (!empty($s['card_border'])) pt_rounded_rect_border($im, $pad, $pad, $W-$pad*2, $H-$pad*2, $r, pt_color($im, $s['card_border']));
+    }
+    $ip = (int)($W * 0.045); $ox = $pad + $ip; $oy = $pad + $ip; $ow = ($W-$pad*2)-$ip*2;
+    // Icon box
+    $ibs = (int)($H * 0.135); $iconsz = (int)($ibs * 0.55);
+    pt_rounded_rect($im, $ox, $oy, $ibs, $ibs, (int)($ibs*0.24), pt_color($im, $s['icon_bg']));
+    pt_icon($im, $p['icon'], $ox+(int)(($ibs-$iconsz)/2), $oy+(int)(($ibs-$iconsz)/2), $iconsz, $s['icon_color']);
+    $curY = $oy + $ibs + (int)($H * 0.04);
+    $curY = pt_og_badges($im, $p, $s, $ox, $curY, $ow, $H);
+    $hsz = min((int)($H * 0.09), max(24, $p['font_size']));
+    $curY = pt_text_block($im, PT_FONT_BOLD, $hsz, $ox, $curY, $s['heading_color'], $p['heading'] ?: 'Heading', $ow, $hsz*1.2, 'left', 2);
+    $curY += (int)($H * 0.02);
+    if ($p['description']) pt_text_block($im, PT_FONT_REG, (int)($H*0.036), $ox, $curY, $s['desc_color'], $p['description'], $ow, (int)($H*0.036)*1.5, 'left', 3);
+    $fy = $pad + ($H-$pad*2) - $ip - (int)($H*0.065);
+    imagefilledrectangle($im, $ox, $fy-9, $ox+$ow, $fy-8, pt_color($im, $s['footer_color'] . '44'));
+    pt_og_footer($im, $p, $s, $ox, $fy, $ow, $H);
+}
+
+// ── Layout: EDITORIAL ─────────────────────────────────────────────────────────
+function pt_og_editorial(GdImage $im, array $p, array $s, int $W, int $H): void {
+    pt_og_bg($im, $W, $H, $s);
+    imagefilledrectangle($im, 0, 0, $W, 6, pt_color($im, $s['accent_color']));
+    $pad = (int)($W * 0.07); $ow = $W - $pad * 2; $oy = (int)($H * 0.14);
+    if ($p['badge']) {
+        pt_badge($im, PT_FONT_REG, strtoupper($p['badge']), $pad, $oy, $s['badge_bg'], $s['badge_color'], 0, (int)($H*0.022));
+        $oy += (int)($H * 0.075);
+    }
+    $hsz = min((int)($H * 0.12), max(30, $p['font_size'] + 12));
+    $oy = pt_text_block($im, PT_FONT_BOLD, $hsz, $pad, $oy, $s['heading_color'], $p['heading'] ?: 'Headline', $ow, $hsz*1.15, 'left', 2);
+    $oy += (int)($H * 0.03);
+    imagefilledrectangle($im, $pad, $oy, $pad+(int)($ow*0.4), $oy+2, pt_color($im, $s['accent_color']));
+    $oy += (int)($H * 0.045);
+    if ($p['description']) pt_text_block($im, PT_FONT_REG, (int)($H*0.038), $pad, $oy, $s['desc_color'], $p['description'], (int)($ow*0.75), (int)($H*0.038)*1.5, 'left', 2);
+    pt_og_footer($im, $p, $s, $pad, $H-(int)($H*0.14), (int)($ow*0.6), $H);
+    imagefilledrectangle($im, 0, $H-5, $W, $H, pt_color($im, $s['accent_color']));
+}
+
+// ── Layout: HERO ──────────────────────────────────────────────────────────────
+function pt_og_hero(GdImage $im, array $p, array $s, int $W, int $H): void {
+    pt_og_bg($im, $W, $H, $s);
+    $cx = (int)($W/2); $pad = (int)($W*0.07); $ow = $W-$pad*2;
+    $circR = (int)($H * 0.145); $circCY = (int)($H * 0.3);
+    [$ar,$ag,$ab] = pt_hex2rgb($s['accent_color']);
+    for ($g=3; $g>=1; $g--) { $gc=imagecolorallocatealpha($im,$ar,$ag,$ab,(int)(80*(1-$g/4))); imagefilledellipse($im,$cx,$circCY,($circR+$g*6)*2,($circR+$g*6)*2,$gc); }
+    imagefilledellipse($im, $cx, $circCY, $circR*2, $circR*2, pt_color($im, $s['icon_bg']));
+    pt_icon($im, $p['icon'], $cx-(int)($circR*0.55), $circCY-(int)($circR*0.55), (int)($circR*1.1), $s['icon_color']);
+    $curY = $circCY + $circR + (int)($H*0.045);
+    if ($p['badge']) {
+        $bfsz=(int)($H*0.023);
+        $badges=array_slice(array_filter(array_map('trim',explode(',',$p['badge']))),0,3);
+        $totalBW=array_sum(array_map(fn($b)=>pt_badge_width(PT_FONT_REG,strtoupper($b),$bfsz)+8,$badges));
+        $bx=$cx-(int)($totalBW/2);
+        foreach($badges as $bl){$bw=pt_badge_width(PT_FONT_REG,strtoupper($bl),$bfsz);pt_badge($im,PT_FONT_REG,strtoupper($bl),$bx,$curY,$s['badge_bg'],$s['badge_color'],100,$bfsz);$bx+=$bw+8;}
+        $curY+=(int)($H*0.065);
+    }
+    $hsz=min((int)($H*0.086),max(24,$p['font_size']));
+    $curY=pt_text_block($im,PT_FONT_BOLD,$hsz,$pad,$curY,$s['heading_color'],$p['heading']?:'Heading',$ow,$hsz*1.2,'center',2);
+    $curY+=(int)($H*0.018);
+    if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.034),$pad,$curY,$s['desc_color'],$p['description'],$ow,(int)($H*0.034)*1.5,'center',2);
+    pt_og_footer($im,$p,$s,$pad,$H-(int)($H*0.1),$ow,$H);
+}
+
+// ── Layout: SPLIT ─────────────────────────────────────────────────────────────
+function pt_og_split(GdImage $im, array $p, array $s, int $W, int $H): void {
+    $splitX=(int)($W*0.33);
+    $leftBg=$s['split_bg']??$s['bg'];
+    imagefilledrectangle($im,0,0,$splitX,$H,pt_color($im,$leftBg));
+    imagefilledrectangle($im,$splitX,0,$W,$H,pt_color($im,$s['bg']));
+    if(($s['pattern']??'')==='dots') pt_dot_grid($im,$splitX,0,$W-$splitX,$H,'888888',0.04);
+    // Left panel: centered icon circle
+    $ibs=(int)($H*0.2); $iconsz=(int)($ibs*0.55);
+    $icX=(int)(($splitX-$ibs)/2); $icY=(int)(($H-$ibs)/2)-(int)($H*0.06);
+    imagefilledellipse($im,$icX+(int)($ibs/2),$icY+(int)($ibs/2),$ibs,$ibs,pt_color($im,$s['icon_bg']));
+    pt_icon($im,$p['icon'],$icX+(int)(($ibs-$iconsz)/2),$icY+(int)(($ibs-$iconsz)/2),$iconsz,$s['icon_color']);
+    if($p['website']) pt_text_block($im,PT_FONT_REG,(int)($H*0.025),0,$icY+$ibs+(int)($H*0.04),$s['footer_color'],$p['website'],$splitX,(int)($H*0.025)*1.4,'center',1);
+    imagefilledrectangle($im,0,$H-4,$splitX,$H,pt_color($im,$s['accent_color']));
+    imagefilledrectangle($im,$splitX,0,$splitX+1,$H,pt_color($im,$s['accent_color'].'55'));
+    // Right panel content
+    $rpad=(int)($W*0.045); $rx=$splitX+$rpad; $ry=(int)($H*0.13); $rw=$W-$splitX-$rpad*2;
+    if($p['badge']){
+        $bfsz=(int)($H*0.023);$bx=$rx;
+        foreach(array_slice(array_filter(array_map('trim',explode(',',$p['badge']))),0,3) as $bl){$bw=pt_badge_width(PT_FONT_REG,strtoupper($bl),$bfsz);if($bx+$bw>$rx+$rw)break;pt_badge($im,PT_FONT_REG,strtoupper($bl),$bx,$ry,$s['badge_bg'],$s['badge_color'],100,$bfsz);$bx+=$bw+8;}
+        $ry+=(int)($H*0.07);
+    } else { $ry+=(int)($H*0.04); }
+    $hsz=min((int)($H*0.09),max(24,$p['font_size']));
+    $ry=pt_text_block($im,PT_FONT_BOLD,$hsz,$rx,$ry,$s['heading_color'],$p['heading']?:'Heading',$rw,$hsz*1.2,'left',2);
+    $ry+=(int)($H*0.025);
+    if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$rx,$ry,$s['desc_color'],$p['description'],$rw,(int)($H*0.036)*1.5,'left',3);
+    $fy=$H-(int)($H*0.13);
+    imagefilledrectangle($im,$rx,$fy-8,$rx+$rw,$fy-7,pt_color($im,$s['footer_color'].'44'));
+    $footerText=trim(implode('  ·  ',array_filter([$p['footer'],$p['author']])));
+    if($footerText) pt_text_block($im,PT_FONT_REG,(int)($H*0.027),$rx,$fy,$s['footer_color'],$footerText,$rw,(int)($H*0.027)*1.4,'left',1);
+}
+
+// ── Layout: FLOATING ──────────────────────────────────────────────────────────
+function pt_og_floating(GdImage $im, array $p, array $s, int $W, int $H): void {
+    pt_og_bg($im,$W,$H,$s);
+    $padX=(int)($W*0.07); $padY=(int)($H*0.11);
+    $cw=$W-$padX*2; $ch=$H-$padY*2; $r=$s['radius']??12;
+    for($i=8;$i>=1;$i--){$sc=imagecolorallocatealpha($im,0,0,0,(int)(90*$i/9));pt_rounded_rect($im,$padX+$i,$padY+$i*2,$cw,$ch,$r,$sc);}
+    pt_rounded_rect($im,$padX,$padY,$cw,$ch,$r,pt_color($im,$s['card_bg']??$s['bg']));
+    if(!empty($s['card_border'])) pt_rounded_rect_border($im,$padX,$padY,$cw,$ch,$r,pt_color($im,$s['card_border']));
+    imagefilledrectangle($im,$padX,$padY,$padX+$cw,$padY+5,pt_color($im,$s['accent_color']));
+    $cpad=(int)($W*0.045); $ox=$padX+$cpad; $oy=$padY+$cpad+8; $ow=$cw-$cpad*2;
+    $ibs=(int)($H*0.14); $iconsz=(int)($ibs*0.56);
+    pt_rounded_rect($im,$ox,$oy,$ibs,$ibs,(int)($ibs*0.22),pt_color($im,$s['icon_bg']));
+    pt_icon($im,$p['icon'],$ox+(int)(($ibs-$iconsz)/2),$oy+(int)(($ibs-$iconsz)/2),$iconsz,$s['icon_color']);
+    $curY=$oy+$ibs+(int)($H*0.03);
+    $curY=pt_og_badges($im,$p,$s,$ox,$curY,$ow,$H);
+    $hsz=min((int)($H*0.088),max(22,$p['font_size']));
+    $curY=pt_text_block($im,PT_FONT_BOLD,$hsz,$ox,$curY,$s['heading_color'],$p['heading']?:'Heading',$ow,$hsz*1.2,'left',2);
+    $curY+=(int)($H*0.02);
+    if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.035),$ox,$curY,$s['desc_color'],$p['description'],$ow,(int)($H*0.035)*1.5,'left',3);
+    $fy=$padY+$ch-$cpad-(int)($H*0.065);
+    imagefilledrectangle($im,$ox,$fy-8,$ox+$ow,$fy-7,pt_color($im,($s['card_border']??$s['footer_color']).'44'));
+    pt_og_footer($im,$p,$s,$ox,$fy,$ow,$H);
+}
+
+// ── Layout: DIAGONAL ──────────────────────────────────────────────────────────
+function pt_og_diagonal(GdImage $im, array $p, array $s, int $W, int $H): void {
+    if(!empty($s['bg2'])) pt_gradient_diag($im,0,0,$W,$H,$s['bg'],$s['bg2']);
+    else imagefill($im,0,0,pt_color($im,$s['bg']));
+    if(($s['pattern']??'')==='noise') pt_noise($im,0,0,$W,$H,'ffffff',0.015);
+    [$ar,$ag,$ab]=pt_hex2rgb($s['bg2']??$s['bg']); $lt=($ar+$ag+$ab)/3>180;
+    $diagColor=$lt?imagecolorallocatealpha($im,0,0,0,115):imagecolorallocatealpha($im,255,255,255,110);
+    imagefilledpolygon($im,[(int)($W*0.42),0,$W,0,$W,$H,(int)($W*0.18),$H],$diagColor);
+    $pad=(int)($W*0.06); $ow=(int)($W*0.52); $oy=(int)($H*0.12);
+    $ibs=(int)($H*0.15); $iconsz=(int)($ibs*0.56);
+    pt_rounded_rect($im,$pad,$oy,$ibs,$ibs,(int)($ibs*0.22),pt_color($im,$s['icon_bg']));
+    pt_icon($im,$p['icon'],$pad+(int)(($ibs-$iconsz)/2),$oy+(int)(($ibs-$iconsz)/2),$iconsz,$s['icon_color']);
+    $oy+=$ibs+(int)($H*0.04);
+    $oy=pt_og_badges($im,$p,$s,$pad,$oy,$ow,$H);
+    $hsz=min((int)($H*0.09),max(24,$p['font_size']));
+    $oy=pt_text_block($im,PT_FONT_BOLD,$hsz,$pad,$oy,$s['heading_color'],$p['heading']?:'Heading',$ow,$hsz*1.2,'left',2);
+    $oy+=(int)($H*0.02);
+    if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['desc_color'],$p['description'],$ow,(int)($H*0.036)*1.5,'left',2);
+    pt_og_footer($im,$p,$s,$pad,$H-(int)($H*0.13),$ow,$H);
+}
+
+function pt_render_og(GdImage $im, array $p, array $s): void {
+    $W=imagesx($im); $H=imagesy($im);
+    switch($s['layout']??'stack'){
+        case 'editorial': pt_og_editorial($im,$p,$s,$W,$H); break;
+        case 'hero':      pt_og_hero($im,$p,$s,$W,$H); break;
+        case 'split':     pt_og_split($im,$p,$s,$W,$H); break;
+        case 'floating':  pt_og_floating($im,$p,$s,$W,$H); break;
+        case 'diagonal':  pt_og_diagonal($im,$p,$s,$W,$H); break;
+        default:          pt_og_stack($im,$p,$s,$W,$H); break;
+    }
+    if($p['watermark']){
+        $wsz=(int)($H*0.022); $wbbox=imagettfbbox($wsz,0,PT_FONT_REG,$p['watermark']);
+        imagettftext($im,$wsz,0,$W-40-abs($wbbox[2]-$wbbox[0]),$H-20,pt_color($im,'888888'),PT_FONT_REG,$p['watermark']);
     }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// SOCIAL CARD TEMPLATES
+// SOCIAL CARD TEMPLATES — same layout engine as OG
 // ════════════════════════════════════════════════════════════════════════════
 
 $SOCIAL_SPECS = [
-    'twitter' => [
-        'bg'=>'000000','bg2'=>null,
-        'card_bg'=>'0f0f0f','card_border'=>'2f3336',
-        'heading_color'=>'e7e9ea','desc_color'=>'8b98a5',
-        'accent'=>'1d9bf0','badge_bg'=>'1d9bf0','badge_color'=>'ffffff',
-        'icon_bg'=>'1d3a4f','icon_color'=>'1d9bf0','footer_color'=>'536471','radius'=>16,
-    ],
-    'linkedin' => [
-        'bg'=>'f3f2ef','bg2'=>null,
-        'card_bg'=>'ffffff','card_border'=>'e0dfdc',
-        'heading_color'=>'000000','desc_color'=>'666666',
-        'accent'=>'0a66c2','badge_bg'=>'0a66c2','badge_color'=>'ffffff',
-        'icon_bg'=>'cce5ff','icon_color'=>'0a66c2','footer_color'=>'666666','radius'=>8,
-    ],
-    'discord' => [
-        'bg'=>'313338','bg2'=>null,
-        'card_bg'=>'2b2d31','card_border'=>'1e1f22',
-        'heading_color'=>'f2f3f5','desc_color'=>'b5bac1',
-        'accent'=>'5865f2','badge_bg'=>'5865f2','badge_color'=>'ffffff',
-        'icon_bg'=>'3c45a5','icon_color'=>'ffffff','footer_color'=>'4e5058','radius'=>4,
-    ],
-    'telegram' => [
-        'bg'=>'212121','bg2'=>null,
-        'card_bg'=>'2c2c2c','card_border'=>'383838',
-        'heading_color'=>'ffffff','desc_color'=>'aaaaaa',
-        'accent'=>'2aabee','badge_bg'=>'2aabee','badge_color'=>'ffffff',
-        'icon_bg'=>'005691','icon_color'=>'2aabee','footer_color'=>'777777','radius'=>12,
-    ],
-    'announcement' => [
-        'bg'=>'020817','bg2'=>'1e1b4b',
-        'card_bg'=>'0f172a','card_border'=>'334155',
-        'heading_color'=>'f8fafc','desc_color'=>'94a3b8',
-        'accent'=>'f59e0b','badge_bg'=>'f59e0b','badge_color'=>'000000',
-        'icon_bg'=>'451a03','icon_color'=>'f59e0b','footer_color'=>'475569','radius'=>12,
-    ],
-    'product_launch' => [
-        'bg'=>'06b6d4','bg2'=>'0ea5e9',
-        'card_bg'=>null,'card_border'=>null,
-        'heading_color'=>'ffffff','desc_color'=>'e0f7fa',
-        'accent'=>'ffffff','badge_bg'=>'ffffff','badge_color'=>'0891b2',
-        'icon_bg'=>'ffffff','icon_color'=>'0891b2','footer_color'=>'b2ebf2','radius'=>16,
-    ],
-    'feature_highlight' => [
-        'bg'=>'1a1a2e','bg2'=>'16213e',
-        'card_bg'=>'0f3460','card_border'=>'e94560',
-        'heading_color'=>'ffffff','desc_color'=>'a8b2d8',
-        'accent'=>'e94560','badge_bg'=>'e94560','badge_color'=>'ffffff',
-        'icon_bg'=>'e94560','icon_color'=>'ffffff','footer_color'=>'627b9a','radius'=>12,
-    ],
-    'blog_post' => [
-        'bg'=>'fafafa','bg2'=>null,
-        'card_bg'=>'ffffff','card_border'=>'e4e4e7',
-        'heading_color'=>'09090b','desc_color'=>'71717a',
-        'accent'=>'ef4444','badge_bg'=>'fef2f2','badge_color'=>'ef4444',
-        'icon_bg'=>'fef2f2','icon_color'=>'ef4444','footer_color'=>'a1a1aa','radius'=>8,
-    ],
-    // ── 10 new social templates ──────────────────────────────────
-    'youtube'       => ['bg'=>'0f0f0f','bg2'=>null,'card_bg'=>'212121','card_border'=>'3d3d3d','heading_color'=>'ffffff','desc_color'=>'aaaaaa','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff0000','badge_color'=>'ffffff','icon_bg'=>'330000','icon_color'=>'ff0000','footer_color'=>'717171','radius'=>4],
-    'instagram'     => ['bg'=>'833ab4','bg2'=>'fd1d1d','pattern'=>'gradient','card_bg'=>null,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffecd2','accent_color'=>'fcb045','accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'833ab4','icon_bg'=>'ffffff','icon_color'=>'fd1d1d','footer_color'=>'ffecd2','radius'=>20],
-    'facebook'      => ['bg'=>'1877f2','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'dde3ee','heading_color'=>'1c1e21','desc_color'=>'65676b','accent_color'=>'1877f2','accent_pos'=>'none','badge_bg'=>'1877f2','badge_color'=>'ffffff','icon_bg'=>'e7f3ff','icon_color'=>'1877f2','footer_color'=>'8a8d91','radius'=>8],
-    'reddit'        => ['bg'=>'1a1a1b','bg2'=>null,'card_bg'=>'272729','card_border'=>'343536','heading_color'=>'d7dadc','desc_color'=>'818384','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff4500','badge_color'=>'ffffff','icon_bg'=>'331400','icon_color'=>'ff4500','footer_color'=>'818384','radius'=>4],
-    'hackernews'    => ['bg'=>'f6f6ef','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e5e5e5','heading_color'=>'000000','desc_color'=>'828282','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ff6600','badge_color'=>'ffffff','icon_bg'=>'fff0e6','icon_color'=>'ff6600','footer_color'=>'828282','radius'=>0],
-    'product_hunt'  => ['bg'=>'da552f','bg2'=>'c0392b','pattern'=>'gradient','card_bg'=>null,'card_border'=>null,'heading_color'=>'ffffff','desc_color'=>'ffd0c0','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'da552f','icon_bg'=>'ffffff','icon_color'=>'da552f','footer_color'=>'ffd0c0','radius'=>16],
-    'dribbble'      => ['bg'=>'ea4c89','bg2'=>null,'card_bg'=>'f6478c','card_border'=>'f8a9c9','heading_color'=>'ffffff','desc_color'=>'fce4ef','accent_color'=>null,'accent_pos'=>'none','badge_bg'=>'ffffff','badge_color'=>'ea4c89','icon_bg'=>'ffffff','icon_color'=>'ea4c89','footer_color'=>'fce4ef','radius'=>16],
-    'newsletter'    => ['bg'=>'faf7f2','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e8ddd0','heading_color'=>'1a1208','desc_color'=>'6b5a45','accent_color'=>'c17817','accent_pos'=>'none','badge_bg'=>'fef3e2','badge_color'=>'c17817','icon_bg'=>'fef3e2','icon_color'=>'c17817','footer_color'=>'9b8b78','radius'=>8],
-    'event'         => ['bg'=>'13001f','bg2'=>'2d0050','pattern'=>'gradient','card_bg'=>'1a0030','card_border'=>'c89600','heading_color'=>'ffffff','desc_color'=>'e2c8ff','accent_color'=>'c89600','accent_pos'=>'left','badge_bg'=>'c89600','badge_color'=>'000000','icon_bg'=>'c89600','icon_color'=>'13001f','footer_color'=>'9370db','radius'=>4],
-    'job_post'      => ['bg'=>'f0fdf4','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'bbf7d0','heading_color'=>'052e16','desc_color'=>'166534','accent_color'=>'16a34a','accent_pos'=>'none','badge_bg'=>'dcfce7','badge_color'=>'15803d','icon_bg'=>'dcfce7','icon_color'=>'16a34a','footer_color'=>'4ade80','radius'=>12],
+    // ── STACK ───────────────────────────────────────────────────────────────
+    'twitter'          => ['layout'=>'stack','bg'=>'000000','bg2'=>null,'pattern'=>'none','card_bg'=>'0f0f0f','card_border'=>'2f3336','heading_color'=>'e7e9ea','desc_color'=>'8b98a5','badge_bg'=>'1d9bf0','badge_color'=>'ffffff','accent_color'=>'1d9bf0','icon_bg'=>'1d3a4f','icon_color'=>'1d9bf0','footer_color'=>'536471','radius'=>16],
+    'discord'          => ['layout'=>'stack','bg'=>'313338','bg2'=>null,'pattern'=>'none','card_bg'=>'2b2d31','card_border'=>'1e1f22','heading_color'=>'f2f3f5','desc_color'=>'b5bac1','badge_bg'=>'5865f2','badge_color'=>'ffffff','accent_color'=>'5865f2','icon_bg'=>'3c45a5','icon_color'=>'ffffff','footer_color'=>'4e5058','radius'=>4],
+    'announcement'     => ['layout'=>'stack','bg'=>'020817','bg2'=>'1e1b4b','pattern'=>'gradient','card_bg'=>'0f172a','card_border'=>'334155','heading_color'=>'f8fafc','desc_color'=>'94a3b8','badge_bg'=>'f59e0b','badge_color'=>'000000','accent_color'=>'f59e0b','icon_bg'=>'451a03','icon_color'=>'f59e0b','footer_color'=>'475569','radius'=>12],
+    'feature_highlight'=> ['layout'=>'stack','bg'=>'1a1a2e','bg2'=>'16213e','pattern'=>'none','card_bg'=>'0f3460','card_border'=>'e94560','heading_color'=>'ffffff','desc_color'=>'a8b2d8','badge_bg'=>'e94560','badge_color'=>'ffffff','accent_color'=>'e94560','icon_bg'=>'e94560','icon_color'=>'ffffff','footer_color'=>'627b9a','radius'=>12],
+    'reddit'           => ['layout'=>'stack','bg'=>'1a1a1b','bg2'=>null,'pattern'=>'none','card_bg'=>'272729','card_border'=>'343536','heading_color'=>'d7dadc','desc_color'=>'818384','badge_bg'=>'ff4500','badge_color'=>'ffffff','accent_color'=>'ff4500','icon_bg'=>'331400','icon_color'=>'ff4500','footer_color'=>'818384','radius'=>4],
+    // ── EDITORIAL ────────────────────────────────────────────────────────────
+    'linkedin'         => ['layout'=>'editorial','bg'=>'f3f2ef','bg2'=>null,'pattern'=>'none','heading_color'=>'000000','desc_color'=>'666666','badge_bg'=>'0a66c2','badge_color'=>'ffffff','accent_color'=>'0a66c2','icon_bg'=>'cce5ff','icon_color'=>'0a66c2','footer_color'=>'666666','radius'=>8],
+    'hackernews'       => ['layout'=>'editorial','bg'=>'f6f6ef','bg2'=>null,'pattern'=>'none','heading_color'=>'000000','desc_color'=>'828282','badge_bg'=>'ff6600','badge_color'=>'ffffff','accent_color'=>'ff6600','icon_bg'=>'fff0e6','icon_color'=>'ff6600','footer_color'=>'828282','radius'=>0],
+    'blog_post'        => ['layout'=>'editorial','bg'=>'fafafa','bg2'=>null,'pattern'=>'none','heading_color'=>'09090b','desc_color'=>'71717a','badge_bg'=>'fef2f2','badge_color'=>'ef4444','accent_color'=>'ef4444','icon_bg'=>'fef2f2','icon_color'=>'ef4444','footer_color'=>'a1a1aa','radius'=>8],
+    'newsletter'       => ['layout'=>'editorial','bg'=>'faf7f2','bg2'=>null,'pattern'=>'none','heading_color'=>'1a1208','desc_color'=>'6b5a45','badge_bg'=>'fef3e2','badge_color'=>'c17817','accent_color'=>'c17817','icon_bg'=>'fef3e2','icon_color'=>'c17817','footer_color'=>'9b8b78','radius'=>8],
+    // ── HERO ─────────────────────────────────────────────────────────────────
+    'instagram'        => ['layout'=>'hero','bg'=>'833ab4','bg2'=>'fd1d1d','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'ffecd2','badge_bg'=>'ffffff','badge_color'=>'833ab4','accent_color'=>'fcb045','icon_bg'=>'ffffff','icon_color'=>'fd1d1d','footer_color'=>'ffecd2','radius'=>20],
+    'product_hunt'     => ['layout'=>'hero','bg'=>'da552f','bg2'=>'c0392b','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'ffd0c0','badge_bg'=>'ffffff','badge_color'=>'da552f','accent_color'=>'da552f','icon_bg'=>'ffffff','icon_color'=>'da552f','footer_color'=>'ffd0c0','radius'=>16],
+    'dribbble'         => ['layout'=>'hero','bg'=>'ea4c89','bg2'=>'f06292','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'fce4ef','badge_bg'=>'ffffff','badge_color'=>'ea4c89','accent_color'=>'ea4c89','icon_bg'=>'ffffff','icon_color'=>'ea4c89','footer_color'=>'fce4ef','radius'=>20],
+    'event'            => ['layout'=>'hero','bg'=>'13001f','bg2'=>'2d0050','pattern'=>'gradient','heading_color'=>'ffffff','desc_color'=>'e2c8ff','badge_bg'=>'c89600','badge_color'=>'000000','accent_color'=>'c89600','icon_bg'=>'c89600','icon_color'=>'13001f','footer_color'=>'9370db','radius'=>4],
+    // ── SPLIT ────────────────────────────────────────────────────────────────
+    'telegram'         => ['layout'=>'split','bg'=>'ffffff','bg2'=>null,'pattern'=>'none','heading_color'=>'1a1a1a','desc_color'=>'555555','badge_bg'=>'2aabee','badge_color'=>'ffffff','accent_color'=>'2aabee','icon_bg'=>'2aabee','icon_color'=>'ffffff','footer_color'=>'888888','split_bg'=>'2aabee','radius'=>12],
+    'youtube'          => ['layout'=>'split','bg'=>'f9f9f9','bg2'=>null,'pattern'=>'none','heading_color'=>'0f0f0f','desc_color'=>'717171','badge_bg'=>'ff0000','badge_color'=>'ffffff','accent_color'=>'ff0000','icon_bg'=>'ff0000','icon_color'=>'ffffff','footer_color'=>'aaaaaa','split_bg'=>'0f0f0f','radius'=>0],
+    'facebook'         => ['layout'=>'split','bg'=>'f0f2f5','bg2'=>null,'pattern'=>'none','heading_color'=>'1c1e21','desc_color'=>'65676b','badge_bg'=>'1877f2','badge_color'=>'ffffff','accent_color'=>'1877f2','icon_bg'=>'1877f2','icon_color'=>'ffffff','footer_color'=>'8a8d91','split_bg'=>'1877f2','radius'=>8],
+    'job_post'         => ['layout'=>'split','bg'=>'f0fdf4','bg2'=>null,'pattern'=>'none','heading_color'=>'052e16','desc_color'=>'166534','badge_bg'=>'dcfce7','badge_color'=>'15803d','accent_color'=>'16a34a','icon_bg'=>'16a34a','icon_color'=>'ffffff','footer_color'=>'4ade80','split_bg'=>'052e16','radius'=>12],
+    // ── FLOATING ─────────────────────────────────────────────────────────────
+    'product_launch'   => ['layout'=>'floating','bg'=>'0c3547','bg2'=>'06b6d4','pattern'=>'gradient','card_bg'=>'ffffff','card_border'=>'e0f7fa','heading_color'=>'0c3547','desc_color'=>'0277bd','badge_bg'=>'0891b2','badge_color'=>'ffffff','accent_color'=>'06b6d4','icon_bg'=>'e0f7fa','icon_color'=>'0891b2','footer_color'=>'90cae0','radius'=>16],
 ];
 
-// Social cards use the same renderer as OG but with different default dimensions
 function pt_render_social(GdImage $im, array $p, array $s): void {
     pt_render_og($im, $p, $s);
 }
-
-// ════════════════════════════════════════════════════════════════════════════
 // PLACEHOLDER TEMPLATES
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -1102,118 +1086,573 @@ function pt_render_terminal(GdImage $im, array $p, string $template): void {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// PROFILE CARD TEMPLATES
+// PROFILE CARD TEMPLATES — 5 distinct layouts
+// Layouts: horizontal | vertical | split | glass | minimal
 // ════════════════════════════════════════════════════════════════════════════
 
 $PROFILE_SPECS = [
-    'team_member'   => ['bg'=>'ffffff','bg2'=>null,'card_bg'=>'f9fafb','card_border'=>'e5e7eb','name_color'=>'111827','role_color'=>'6b7280','accent'=>'4f46e5','stat_color'=>'111827','stat_label_color'=>'9ca3af','radius'=>16],
-    'author'        => ['bg'=>'fafaf9','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e7e5e4','name_color'=>'1c1917','role_color'=>'78716c','accent'=>'ea580c','stat_color'=>'1c1917','stat_label_color'=>'a8a29e','radius'=>12],
-    'developer'     => ['bg'=>'0d1117','bg2'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','name_color'=>'e6edf3','role_color'=>'8b949e','accent'=>'3fb950','stat_color'=>'e6edf3','stat_label_color'=>'6e7781','radius'=>8],
-    'business'      => ['bg'=>'f8fafc','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'e2e8f0','name_color'=>'0f172a','role_color'=>'64748b','accent'=>'0ea5e9','stat_color'=>'0f172a','stat_label_color'=>'94a3b8','radius'=>8],
-    'creator'     => ['bg'=>'fdf2f8','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'fce7f3','name_color'=>'831843','role_color'=>'9d174d','accent'=>'db2777','stat_color'=>'831843','stat_label_color'=>'be185d','radius'=>20],
-    'speaker'      => ['bg'=>'1e1b4b','bg2'=>'312e81','card_bg'=>'1e1b4b','card_border'=>'4338ca','name_color'=>'e0e7ff','role_color'=>'a5b4fc','accent'=>'818cf8','stat_color'=>'e0e7ff','stat_label_color'=>'6366f1','radius'=>16],
-    // ── 9 new profile templates ──────────────────────────────────
-    'minimal_white' => ['bg'=>'ffffff','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'f0f0f0','name_color'=>'000000','role_color'=>'666666','accent'=>'000000','stat_color'=>'000000','stat_label_color'=>'999999','radius'=>0],
-    'dark_glass'    => ['bg'=>'0d1117','bg2'=>'161b22','card_bg'=>'161b22','card_border'=>'30363d','name_color'=>'ffffff','role_color'=>'8b949e','accent'=>'58a6ff','stat_color'=>'e6edf3','stat_label_color'=>'8b949e','radius'=>16],
-    'gradient_card' => ['bg'=>'667eea','bg2'=>'764ba2','card_bg'=>'ffffff','card_border'=>'ffffff','name_color'=>'1a202c','role_color'=>'4a5568','accent'=>'667eea','stat_color'=>'1a202c','stat_label_color'=>'718096','radius'=>20],
-    'resume_clean'  => ['bg'=>'f8f9fa','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'dee2e6','name_color'=>'212529','role_color'=>'495057','accent'=>'0d6efd','stat_color'=>'212529','stat_label_color'=>'6c757d','radius'=>4],
-    'podcast_card'  => ['bg'=>'1a1a2e','bg2'=>null,'card_bg'=>'16213e','card_border'=>'e94560','name_color'=>'ffffff','role_color'=>'a8b2d8','accent'=>'e94560','stat_color'=>'ffffff','stat_label_color'=>'627b9a','radius'=>12],
-    'athlete'       => ['bg'=>'0a0a0a','bg2'=>null,'card_bg'=>'1a1a1a','card_border'=>'ff4500','name_color'=>'ffffff','role_color'=>'ff8c42','accent'=>'ff4500','stat_color'=>'ffffff','stat_label_color'=>'999999','radius'=>0],
-    'musician'      => ['bg'=>'0d0208','bg2'=>null,'card_bg'=>'140310','card_border'=>'ff006e','name_color'=>'ffffff','role_color'=>'ff8fb1','accent'=>'ff006e','stat_color'=>'ffffff','stat_label_color'=>'cc6699','radius'=>12],
-    'freelancer'    => ['bg'=>'fff8f0','bg2'=>null,'card_bg'=>'ffffff','card_border'=>'f0d8c0','name_color'=>'2d1b00','role_color'=>'7a5c3a','accent'=>'d97706','stat_color'=>'2d1b00','stat_label_color'=>'a0856b','radius'=>12],
-    'noir'          => ['bg'=>'0a0a0a','bg2'=>null,'card_bg'=>'1a1a1a','card_border'=>'333333','name_color'=>'ffffff','role_color'=>'aaaaaa','accent'=>'ffffff','stat_color'=>'ffffff','stat_label_color'=>'777777','radius'=>0],
+    // ── HORIZONTAL: avatar left, content right ────────────────────────────
+    'team_member'   => ['layout'=>'horizontal','bg'=>'eef2ff','card_bg'=>'ffffff','card_border'=>'c7d2fe','accent'=>'4f46e5','name_color'=>'1e1b4b','role_color'=>'4338ca','stat_color'=>'4f46e5','stat_label_color'=>'818cf8','radius'=>16],
+    'business'      => ['layout'=>'horizontal','bg'=>'0f2744','card_bg'=>'162c47','card_border'=>'c8a04a','accent'=>'c8a04a','name_color'=>'ffffff','role_color'=>'90a4b9','stat_color'=>'c8a04a','stat_label_color'=>'4a6a85','radius'=>4],
+    'speaker'       => ['layout'=>'horizontal','bg'=>'1e1b4b','card_bg'=>'1e1b4b','card_border'=>'4338ca','accent'=>'818cf8','name_color'=>'e0e7ff','role_color'=>'a5b4fc','stat_color'=>'c7d2fe','stat_label_color'=>'6366f1','radius'=>16],
+    // ── VERTICAL: avatar centered top, content centered below ─────────────
+    'author'        => ['layout'=>'vertical','bg'=>'faf8f5','card_bg'=>'ffffff','card_border'=>'e8ddd0','accent'=>'c4600a','name_color'=>'1c0a00','role_color'=>'7c4a1e','stat_color'=>'c4600a','stat_label_color'=>'a0816b','radius'=>12],
+    'creator'       => ['layout'=>'vertical','bg'=>'0f0f1a','card_bg'=>'1a1a2e','card_border'=>'2d2d4e','accent'=>'06b6d4','name_color'=>'ffffff','role_color'=>'94a3b8','stat_color'=>'06b6d4','stat_label_color'=>'475569','radius'=>12],
+    'podcast_card'  => ['layout'=>'vertical','bg'=>'fde8d8','card_bg'=>'ffffff','card_border'=>'f9c299','accent'=>'ea580c','name_color'=>'431407','role_color'=>'92400e','stat_color'=>'ea580c','stat_label_color'=>'9a3412','radius'=>12],
+    // ── SPLIT PANEL: left accent panel with avatar, content right ─────────
+    'developer'     => ['layout'=>'split','bg'=>'0d1117','card_bg'=>'0d1117','card_border'=>'30363d','accent'=>'3fb950','name_color'=>'e6edf3','role_color'=>'8b949e','stat_color'=>'3fb950','stat_label_color'=>'484f58','panel_bg'=>'161b22','radius'=>6],
+    'freelancer'    => ['layout'=>'split','bg'=>'fff7ed','card_bg'=>'ffffff','card_border'=>'fed7aa','accent'=>'f97316','name_color'=>'1c0a00','role_color'=>'78350f','stat_color'=>'f97316','stat_label_color'=>'a16207','panel_bg'=>'f97316','radius'=>8],
+    'musician'      => ['layout'=>'split','bg'=>'0a0014','card_bg'=>'0a0014','card_border'=>'3d0071','accent'=>'a855f7','name_color'=>'ffffff','role_color'=>'c4b5fd','stat_color'=>'d8b4fe','stat_label_color'=>'7c3aed','panel_bg'=>'1e0033','radius'=>8],
+    // ── GLASS: dark bg + glass card, centered avatar ──────────────────────
+    'dark_glass'    => ['layout'=>'glass','bg'=>'030711','card_bg'=>'0f172a','card_border'=>'1e293b','accent'=>'38bdf8','name_color'=>'f0f9ff','role_color'=>'94a3b8','stat_color'=>'38bdf8','stat_label_color'=>'475569','radius'=>24],
+    'noir'          => ['layout'=>'glass','bg'=>'000000','card_bg'=>'111111','card_border'=>'222222','accent'=>'ffffff','name_color'=>'ffffff','role_color'=>'888888','stat_color'=>'ffffff','stat_label_color'=>'444444','radius'=>0],
+    'athlete'       => ['layout'=>'glass','bg'=>'0a1628','card_bg'=>'0f1f3d','card_border'=>'ef4444','accent'=>'ef4444','name_color'=>'ffffff','role_color'=>'93c5fd','stat_color'=>'ef4444','stat_label_color'=>'3b82f6','radius'=>8],
+    // ── MINIMAL: clean flat card, bold left accent bar ────────────────────
+    'minimal_white' => ['layout'=>'minimal','bg'=>'f0f2f5','card_bg'=>'ffffff','card_border'=>'e2e8f0','accent'=>'6366f1','name_color'=>'0f172a','role_color'=>'475569','stat_color'=>'6366f1','stat_label_color'=>'94a3b8','radius'=>8],
+    'resume_clean'  => ['layout'=>'minimal','bg'=>'f1f5f9','card_bg'=>'ffffff','card_border'=>'cbd5e1','accent'=>'0284c7','name_color'=>'0c1a28','role_color'=>'334155','stat_color'=>'0284c7','stat_label_color'=>'64748b','radius'=>4],
+    'gradient_card' => ['layout'=>'minimal','bg'=>'f0fdf4','card_bg'=>'ffffff','card_border'=>'bbf7d0','accent'=>'16a34a','name_color'=>'052e16','role_color'=>'166534','stat_color'=>'16a34a','stat_label_color'=>'4ade80','radius'=>12],
 ];
+
+// ── Profile shared stats helper ───────────────────────────────────────────────
+function pt_profile_stats(GdImage $im, array $p, array $s, int $ox, int $sY, int $ow): void {
+    $stats = [[$p['stat1_value'],$p['stat1_label']],[$p['stat2_value'],$p['stat2_label']],[$p['stat3_value'],$p['stat3_label']]];
+    $H = imagesy($im); $sW = (int)($ow/3);
+    foreach ($stats as $i => [$val,$lbl]) {
+        if (!$val) continue;
+        $sx = $ox + $i*$sW;
+        pt_text_block($im, PT_FONT_BOLD, (int)($H*0.048), $sx, $sY, $s['stat_color'], $val, $sW, (int)($H*0.048)*1.3, 'center', 1);
+        pt_text_block($im, PT_FONT_REG, (int)($H*0.024), $sx, $sY+(int)($H*0.055), $s['stat_label_color'], $lbl, $sW, (int)($H*0.024)*1.4, 'center', 1);
+    }
+}
+
+// ── Profile initials helper ───────────────────────────────────────────────────
+function pt_profile_initials(string $name): string {
+    $init = '';
+    foreach (explode(' ', trim($name)) as $w) if ($w) $init .= strtoupper($w[0]);
+    return substr($init, 0, 2) ?: 'U';
+}
 
 function pt_render_profile(GdImage $im, array $p, array $s): void {
     $W = imagesx($im); $H = imagesy($im);
+    $layout   = $s['layout'] ?? 'horizontal';
+    $name     = $p['heading'] ?: $p['author'] ?: 'Your Name';
+    $role     = $p['role'] ?: $p['subheading'] ?: 'Developer';
+    $initials = pt_profile_initials($name);
+    $pad      = (int)($W * 0.055); $r = $s['radius'];
+    $cw       = $W - $pad*2; $ch = $H - $pad*2;
+    $ip       = (int)($W * 0.045);
+    $ox       = $pad + $ip; $ow = $cw - $ip*2;
+    $sY       = $pad + $ch - $ip - (int)($H * 0.145);
 
-    if (!empty($s['bg2'])) {
-        pt_gradient_v($im, 0, 0, $W, $H, $s['bg'], $s['bg2']);
-    } else {
+    // Shared avatar circle draw
+    $drawAvatar = function(int $cx, int $cy, int $avR) use ($im, $s, $initials, $W, $H): void {
+        imagefilledellipse($im, $cx, $cy, $avR*2+8, $avR*2+8, pt_color($im, $s['accent'].'44'));
+        imagefilledellipse($im, $cx, $cy, $avR*2, $avR*2, pt_color($im, $s['accent']));
+        $isz = (int)($avR*0.72);
+        $ibbox = imagettfbbox($isz, 0, PT_FONT_BOLD, $initials);
+        imagettftext($im, $isz, 0, $cx-(int)(abs($ibbox[2]-$ibbox[0])/2), $cy+(int)(abs($ibbox[5]-$ibbox[1])/2), pt_color($im,'ffffff'), PT_FONT_BOLD, $initials);
+    };
+
+    if ($layout === 'horizontal') {
         imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        pt_rounded_rect($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_bg']));
+        pt_rounded_rect_border($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_border']));
+        $avR = (int)($H * 0.175); $avCX = $ox + $avR; $avCY = $pad + (int)($ch/2) - (int)($H*0.04);
+        $drawAvatar($avCX, $avCY, $avR);
+        $tx = $ox + $avR*2 + (int)($W*0.035); $ty = $pad + (int)($ch*0.08); $tw = $ow - $avR*2 - (int)($W*0.035);
+        if ($p['badge']) { pt_badge($im, PT_FONT_REG, $p['badge'], $tx, $ty, $s['accent'], 'ffffff', 100, (int)($H*0.024)); $ty+=(int)($H*0.068); } else { $ty+=(int)($H*0.02); }
+        $nsz = (int)($H * 0.075); $ty = pt_text_block($im, PT_FONT_BOLD, $nsz, $tx, $ty, $s['name_color'], $name, $tw, $nsz*1.2, 'left', 2);
+        $ty += (int)($H*0.01);
+        $ty = pt_text_block($im, PT_FONT_REG, (int)($H*0.038), $tx, $ty, $s['role_color'], $role, $tw, (int)($H*0.038)*1.5, 'left', 1);
+        if ($p['description']) pt_text_block($im, PT_FONT_REG, (int)($H*0.029), $tx, $ty+(int)($H*0.02), $s['role_color'], $p['description'], $tw, (int)($H*0.029)*1.55, 'left', 2);
+        imagefilledrectangle($im, $ox, $sY-10, $ox+$ow, $sY-9, pt_color($im, $s['card_border']));
+        pt_profile_stats($im, $p, $s, $ox, $sY, $ow);
+        if ($p['username']) pt_text_block($im, PT_FONT_REG, (int)($H*0.026), $ox, $pad+$ch-$ip/2-(int)($H*0.028), $s['role_color'], $p['username'], (int)($ow/2), (int)($H*0.026)*1.4, 'left', 1);
+        if ($p['website'])  pt_text_block($im, PT_FONT_REG, (int)($H*0.026), $ox+(int)($ow/2), $pad+$ch-$ip/2-(int)($H*0.028), $s['accent'], $p['website'], (int)($ow/2), (int)($H*0.026)*1.4, 'right', 1);
+
+    } elseif ($layout === 'vertical') {
+        imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        pt_rounded_rect($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_bg']));
+        pt_rounded_rect_border($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_border']));
+        $cx2 = (int)($W/2); $avR = (int)($H * 0.155); $avCY = $pad + $ip + $avR + (int)($H*0.02);
+        $drawAvatar($cx2, $avCY, $avR);
+        $curY = $avCY + $avR + (int)($H*0.04);
+        if ($p['badge']) { $bfsz=(int)($H*0.024); $bw=pt_badge_width(PT_FONT_REG,$p['badge'],$bfsz); pt_badge($im,PT_FONT_REG,$p['badge'],$cx2-(int)($bw/2),$curY,$s['accent'],'ffffff',100,$bfsz); $curY+=(int)($H*0.065); }
+        $nsz=(int)($H*0.072); $curY=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad+$ip,$curY,$s['name_color'],$name,$ow,$nsz*1.2,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad+$ip,$curY+(int)($H*0.01),$s['role_color'],$role,$ow,(int)($H*0.036)*1.5,'center',1);
+        imagefilledrectangle($im,$pad+$ip,$sY-10,$W-$pad-$ip,$sY-9,pt_color($im,$s['card_border']));
+        pt_profile_stats($im, $p, $s, $pad+$ip, $sY, $ow);
+
+    } elseif ($layout === 'split') {
+        imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        pt_rounded_rect($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_bg']));
+        pt_rounded_rect_border($im, $pad, $pad, $cw, $ch, $r, pt_color($im, $s['card_border']));
+        $panelW = (int)($cw * 0.3);
+        $panelC = pt_color($im, $s['panel_bg'] ?? $s['accent']);
+        pt_rounded_rect($im, $pad, $pad, $panelW, $ch, $r, $panelC);
+        imagefilledrectangle($im, $pad+$panelW-$r, $pad, $pad+$panelW, $pad+$ch, $panelC);
+        $avR=(int)($H*0.14); $avCX=$pad+(int)($panelW/2); $avCY=$pad+(int)($ch*0.34);
+        imagefilledellipse($im,$avCX,$avCY,$avR*2+6,$avR*2+6,pt_color($im,'ffffff33'));
+        imagefilledellipse($im,$avCX,$avCY,$avR*2,$avR*2,pt_color($im,$s['accent'].'cc'));
+        $isz=(int)($avR*0.72); $ibbox=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$avCX-(int)(abs($ibbox[2]-$ibbox[0])/2),$avCY+(int)(abs($ibbox[5]-$ibbox[1])/2),pt_color($im,'ffffff'),PT_FONT_BOLD,$initials);
+        if($p['website']) pt_text_block($im,PT_FONT_REG,(int)($H*0.024),$pad+8,$avCY+$avR+(int)($H*0.04),'ffffffaa',$p['website'],$panelW-16,(int)($H*0.024)*1.4,'center',1);
+        $rx=$pad+$panelW+(int)($cw*0.04); $ry=$pad+(int)($ch*0.1); $rw=$cw-$panelW-(int)($cw*0.08);
+        if($p['badge']){pt_badge($im,PT_FONT_REG,$p['badge'],$rx,$ry,$s['accent'],'ffffff',100,(int)($H*0.024));$ry+=(int)($H*0.068);}else{$ry+=(int)($H*0.03);}
+        $nsz=(int)($H*0.073); $ry=pt_text_block($im,PT_FONT_BOLD,$nsz,$rx,$ry,$s['name_color'],$name,$rw,$nsz*1.2,'left',2);
+        $ry=pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$rx,$ry+(int)($H*0.01),$s['role_color'],$role,$rw,(int)($H*0.036)*1.5,'left',1);
+        if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.028),$rx,$ry+(int)($H*0.025),$s['role_color'],$p['description'],$rw,(int)($H*0.028)*1.55,'left',2);
+        $rsY=$pad+$ch-(int)($ch*0.22); imagefilledrectangle($im,$rx,$rsY-10,$rx+$rw,$rsY-9,pt_color($im,$s['card_border'])); pt_profile_stats($im,$p,$s,$rx,$rsY,$rw);
+
+    } elseif ($layout === 'glass') {
+        pt_gradient_v($im, 0, 0, $W, $H, $s['bg'], $s['card_bg']);
+        pt_noise($im, 0, 0, $W, $H, 'ffffff', 0.008);
+        $decR=(int)($W*0.22); [$ar,$ag,$ab]=pt_hex2rgb($s['accent']); $glow=imagecolorallocatealpha($im,$ar,$ag,$ab,110);
+        imagefilledellipse($im,(int)($W*0.25),(int)($H*0.38),$decR*2,$decR*2,$glow);
+        $cardC=imagecolorallocatealpha($im,255,255,255,110); $borderC=imagecolorallocatealpha($im,255,255,255,90);
+        pt_rounded_rect($im,$pad,$pad,$cw,$ch,$r,$cardC); pt_rounded_rect_border($im,$pad,$pad,$cw,$ch,$r,$borderC);
+        $cx2=(int)($W/2); $avR=(int)($H*0.165); $avCY=$pad+$ip+$avR+(int)($H*0.02);
+        imagefilledellipse($im,$cx2,$avCY,$avR*2+10,$avR*2+10,pt_color($im,$s['accent'].'55'));
+        imagefilledellipse($im,$cx2,$avCY,$avR*2,$avR*2,pt_color($im,$s['accent']));
+        $isz=(int)($avR*0.72); $ibbox=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$cx2-(int)(abs($ibbox[2]-$ibbox[0])/2),$avCY+(int)(abs($ibbox[5]-$ibbox[1])/2),pt_color($im,'ffffff'),PT_FONT_BOLD,$initials);
+        $curY=$avCY+$avR+(int)($H*0.04);
+        if($p['badge']){$bfsz=(int)($H*0.024);$bw=pt_badge_width(PT_FONT_REG,$p['badge'],$bfsz);pt_badge($im,PT_FONT_REG,$p['badge'],$cx2-(int)($bw/2),$curY,$s['accent'],'ffffff',100,$bfsz);$curY+=(int)($H*0.065);}
+        $nsz=(int)($H*0.072); $curY=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad+$ip,$curY,$s['name_color'],$name,$ow,$nsz*1.2,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.035),$pad+$ip,$curY+(int)($H*0.01),$s['role_color'],$role,$ow,(int)($H*0.035)*1.5,'center',1);
+        imagefilledrectangle($im,$pad+$ip,$sY-10,$W-$pad-$ip,$sY-9,pt_color($im,$s['card_border']));
+        pt_profile_stats($im,$p,$s,$pad+$ip,$sY,$ow);
+
+    } else { // minimal
+        imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        pt_rounded_rect($im,$pad,$pad,$cw,$ch,$r,pt_color($im,$s['card_bg']));
+        pt_rounded_rect_border($im,$pad,$pad,$cw,$ch,$r,pt_color($im,$s['card_border']));
+        imagefilledrectangle($im,$pad,$pad,$pad+5,$pad+$ch,pt_color($im,$s['accent']));
+        $ox2=$pad+$ip+12; $oy2=$pad+$ip; $ow2=$ow-12;
+        $ibs=(int)($H*0.16);
+        pt_rounded_rect($im,$ox2,$oy2,$ibs,$ibs,(int)($ibs*0.18),pt_color($im,$s['accent'].'22'));
+        $isz=(int)($ibs*0.42); $ibbox=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$ox2+(int)(($ibs-abs($ibbox[2]-$ibbox[0]))/2),$oy2+(int)(($ibs+abs($ibbox[5]-$ibbox[1]))/2),pt_color($im,$s['accent']),PT_FONT_BOLD,$initials);
+        $tx=$ox2+$ibs+(int)($W*0.03); $ty=$oy2+(int)($H*0.02); $tw=$ow2-$ibs-(int)($W*0.03);
+        if($p['badge']){pt_badge($im,PT_FONT_REG,$p['badge'],$tx,$ty,$s['accent'].'22',$s['accent'],0,(int)($H*0.022));$ty+=(int)($H*0.065);}else{$ty+=(int)($H*0.02);}
+        $nsz=(int)($H*0.073); $ty=pt_text_block($im,PT_FONT_BOLD,$nsz,$tx,$ty,$s['name_color'],$name,$tw,$nsz*1.2,'left',2);
+        $ty=pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$tx,$ty+(int)($H*0.01),$s['role_color'],$role,$tw,(int)($H*0.036)*1.5,'left',1);
+        if($p['description']) pt_text_block($im,PT_FONT_REG,(int)($H*0.028),$tx,$ty+(int)($H*0.025),$s['role_color'],$p['description'],$tw,(int)($H*0.028)*1.55,'left',2);
+        imagefilledrectangle($im,$ox2,$sY-10,$ox2+$ow2,$sY-9,pt_color($im,$s['card_border']));
+        pt_profile_stats($im,$p,$s,$ox2,$sY,$ow2);
+        if($p['username']) pt_text_block($im,PT_FONT_REG,(int)($H*0.026),$ox2,$pad+$ch-$ip/2-(int)($H*0.028),$s['role_color'],$p['username'],(int)($ow2/2),(int)($H*0.026)*1.4,'left',1);
+        if($p['website'])  pt_text_block($im,PT_FONT_REG,(int)($H*0.026),$ox2+(int)($ow2/2),$pad+$ch-$ip/2-(int)($H*0.028),$s['accent'],$p['website'],(int)($ow2/2),(int)($H*0.026)*1.4,'right',1);
     }
+}
 
-    $pad = (int)($W * 0.06);
-    $cw = $W - $pad*2; $ch = $H - $pad*2;
-    pt_rounded_rect($im, $pad, $pad, $cw, $ch, $s['radius'], pt_color($im, $s['card_bg']));
-    pt_rounded_rect_border($im, $pad, $pad, $cw, $ch, $s['radius'], pt_color($im, $s['card_border']), 1);
+// ════════════════════════════════════════════════════════════════════════════
+// BUSINESS CARD TEMPLATES  (landscape 1050 × 600)
+// ════════════════════════════════════════════════════════════════════════════
 
-    $ip = (int)($W * 0.05);
-    $ox = $pad + $ip; $oy = $pad + $ip; $ow = $cw - $ip*2;
+$BIZCARD_SPECS = [
+    'wave_dark'        => ['layout'=>'wave',     'bg'=>'1e2235','panel_bg'=>'e8eaf0','accent'=>'c8a04a','name_color'=>'ffffff','title_color'=>'8b98b5','contact_color'=>'c0c8da'],
+    'corporate_stripe' => ['layout'=>'stripe',   'bg'=>'ffffff','panel_bg'=>'0f2744','accent'=>'c8a04a','name_color'=>'0f2744','title_color'=>'4a6a85','contact_color'=>'555555'],
+    'minimal_biz'      => ['layout'=>'minimal',  'bg'=>'f8f9fa','panel_bg'=>'343a40','accent'=>'343a40','name_color'=>'212529','title_color'=>'495057','contact_color'=>'6c757d'],
+    'creative_split'   => ['layout'=>'creative', 'bg'=>'6366f1','panel_bg'=>'ffffff','accent'=>'6366f1','name_color'=>'4338ca','title_color'=>'5b21b6','contact_color'=>'4b5563'],
+    'tech_grid'        => ['layout'=>'tech',     'bg'=>'0a0e1a','panel_bg'=>'101520','accent'=>'00d4ff','name_color'=>'ffffff','title_color'=>'7aa5cc','contact_color'=>'5a8a9e'],
+    'luxury_foil'      => ['layout'=>'luxury',   'bg'=>'0a0a0a','panel_bg'=>'111111','accent'=>'c9a84c','name_color'=>'ffffff','title_color'=>'c9a84c','contact_color'=>'888888'],
+];
 
-    // Avatar placeholder
-    $avSize = (int)($H * 0.28);
-    $avX = $ox; $avY = $oy;
-    pt_rounded_rect($im, $avX, $avY, $avSize, $avSize, (int)($avSize/2), pt_color($im, $s['accent']));
-    // Initials
-    $initials = '';
-    $name = $p['heading'] ?: $p['author'];
-    foreach (explode(' ', trim($name)) as $word) {
-        if ($word) $initials .= strtoupper($word[0]);
+function pt_render_bizcard(GdImage $im, array $p, array $s): void {
+    $W = imagesx($im); $H = imagesy($im);
+    $name    = $p['heading']     ?: 'Full Name';
+    $title   = $p['description'] ?: 'Professional Title';
+    $company = $p['author']      ?: '';
+    $website = $p['website']     ?: '';
+    $phone   = $p['footer']      ?: '';
+    $email   = $p['badge']       ?: '';
+    $addr     = $p['username']   ?: '';
+    $contacts = array_filter([$phone, $email, $website, $addr]);
+    $initials = pt_profile_initials($name);
+    $layout  = $s['layout'];
+
+    if ($layout === 'wave') {
+        imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        $waveC = pt_color($im, $s['panel_bg']);
+        $baseX = (int)($W * 0.52);
+        imagefilledrectangle($im, $baseX, 0, $W, $H, $waveC);
+        imagefilledellipse($im, $baseX-(int)($H*0.6), (int)($H/2), (int)($H*1.35), (int)($H*2.3), $waveC);
+        $pad=(int)($H*0.15); $lw=(int)($W*0.5);
+        $nsz=min((int)($H*0.12),max(18,$p['font_size']));
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$pad,$s['name_color'],strtoupper($name),$lw-$pad*2,$nsz*1.2,'left',2);
+        $ny+=(int)($H*0.04);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.055),$pad,$ny,$s['title_color'],$title,$lw-$pad*2,(int)($H*0.055)*1.4,'left',2);
+        $cy=(int)($H*0.55); $csz=(int)($H*0.05);
+        foreach($contacts as $ci){
+            if($cy+$csz>$H-$pad) break;
+            imagefilledellipse($im,$pad+(int)($csz*0.35),$cy+(int)($csz*0.55),(int)($csz*0.38),(int)($csz*0.38),pt_color($im,$s['accent']));
+            imagettftext($im,$csz,0,$pad+(int)($csz*0.8),$cy+$csz,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);
+            $cy+=$csz+(int)($H*0.04);
+        }
+
+    } elseif ($layout === 'stripe') {
+        imagefill($im, 0, 0, pt_color($im, $s['bg']));
+        $sw=(int)($W*0.07);
+        imagefilledrectangle($im,0,0,$sw,$H,pt_color($im,$s['panel_bg']));
+        imagefilledrectangle($im,$sw,0,$sw+4,$H,pt_color($im,$s['accent']));
+        $pad=(int)($H*0.15); $lx=$sw+(int)($H*0.12); $ow=$W-$lx-$pad;
+        $nsz=min((int)($H*0.11),max(16,$p['font_size']));
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$lx,$pad,$s['name_color'],$name,$ow,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.052),$lx,$ny+(int)($H*0.025),$s['title_color'],$title,$ow,(int)($H*0.052)*1.4,'left',1);
+        if($company) imagettftext($im,(int)($H*0.045),0,$lx,$ny+(int)($H*0.115),pt_color($im,$s['accent']),PT_FONT_BOLD,$company);
+        $ry=(int)($H*0.52); imagefilledrectangle($im,$lx,$ry,$lx+(int)($ow*0.5),$ry+2,pt_color($im,$s['accent']));
+        $cy=$ry+(int)($H*0.08); $csz=(int)($H*0.048);
+        foreach($contacts as $ci){imagettftext($im,$csz,0,$lx,$cy,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);$cy+=$csz+(int)($H*0.04);}
+
+    } elseif ($layout === 'creative') {
+        imagefilledrectangle($im,0,0,(int)($W*0.42),$H,pt_color($im,$s['bg']));
+        imagefilledrectangle($im,(int)($W*0.42),0,$W,$H,pt_color($im,$s['panel_bg']));
+        $avR=(int)($H*0.2); $avCX=(int)($W*0.21); $avCY=(int)($H*0.38);
+        imagefilledellipse($im,$avCX,$avCY,$avR*2,$avR*2,pt_color($im,'ffffff33'));
+        $isz=(int)($avR*0.72); $ibbox=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$avCX-(int)(abs($ibbox[2]-$ibbox[0])/2),$avCY+(int)(abs($ibbox[5]-$ibbox[1])/2),pt_color($im,'ffffff'),PT_FONT_BOLD,$initials);
+        if($company) pt_text_block($im,PT_FONT_REG,(int)($H*0.05),0,$avCY+$avR+(int)($H*0.06),'ffffffbb',$company,(int)($W*0.42),(int)($H*0.05)*1.4,'center',1);
+        $rx=(int)($W*0.42)+(int)($H*0.1); $ry=(int)($H*0.15); $rw=$W-$rx-(int)($H*0.08);
+        $nsz=min((int)($H*0.11),max(16,$p['font_size']));
+        $ry=pt_text_block($im,PT_FONT_BOLD,$nsz,$rx,$ry,$s['name_color'],$name,$rw,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.05),$rx,$ry+(int)($H*0.025),$s['title_color'],$title,$rw,(int)($H*0.05)*1.4,'left',1);
+        imagefilledrectangle($im,$rx,(int)($H*0.5),$rx+(int)($rw*0.4),(int)($H*0.5)+2,pt_color($im,$s['accent']));
+        $cy=(int)($H*0.56); $csz=(int)($H*0.048);
+        foreach($contacts as $ci){imagettftext($im,$csz,0,$rx,$cy,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);$cy+=$csz+(int)($H*0.04);}
+
+    } elseif ($layout === 'tech') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $gc=imagecolorallocatealpha($im,...[...pt_hex2rgb($s['accent']),115]); $gsp=(int)($H*0.18);
+        for($x=0;$x<$W;$x+=$gsp) imageline($im,$x,0,$x,$H,$gc);
+        for($y=0;$y<$H;$y+=$gsp) imageline($im,0,$y,$W,$y,$gc);
+        $brsz=(int)($H*0.15); $bm=(int)($H*0.07);
+        imagefilledrectangle($im,$bm,$bm,$bm+$brsz,$bm+3,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$bm,$bm,$bm+3,$bm+$brsz,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$W-$bm-$brsz,$H-$bm-3,$W-$bm,$H-$bm,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$W-$bm-3,$H-$bm-$brsz,$W-$bm,$H-$bm,pt_color($im,$s['accent']));
+        $pad=(int)($H*0.17); $ow=$W-$pad*2;
+        $nsz=min((int)($H*0.11),max(16,$p['font_size']));
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$pad,$s['name_color'],$name,$ow,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.05),$pad,$ny+(int)($H*0.03),$s['title_color'],$title,$ow,(int)($H*0.05)*1.4,'left',1);
+        $cy=(int)($H*0.55); $csz=(int)($H*0.048);
+        foreach($contacts as $ci){
+            imagefilledrectangle($im,$pad,$cy+(int)($csz*0.4),$pad+(int)($csz*0.28),$cy+(int)($csz*0.62),pt_color($im,$s['accent']));
+            imagettftext($im,$csz,0,$pad+(int)($csz*0.6),$cy+$csz,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);
+            $cy+=$csz+(int)($H*0.04);
+        }
+
+    } elseif ($layout === 'luxury') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $fb=(int)($H*0.05);
+        imagefilledrectangle($im,$fb,$fb,$W-$fb,$fb+2,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$fb,$H-$fb-2,$W-$fb,$H-$fb,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$fb,$fb,$fb+2,$H-$fb,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$W-$fb-2,$fb,$W-$fb,$H-$fb,pt_color($im,$s['accent']));
+        $co=(int)($H*0.06);
+        imagefilledrectangle($im,$fb,$fb,$fb+$co,$fb+2,pt_color($im,$s['accent']));
+        imagefilledrectangle($im,$fb,$fb,$fb+2,$fb+$co,pt_color($im,$s['accent']));
+        $pad=(int)($H*0.18); $ow=$W-$pad*2;
+        $nsz=min((int)($H*0.11),max(16,$p['font_size']));
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$pad,$s['name_color'],$name,$ow,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.05),$pad,$ny+(int)($H*0.02),$s['title_color'],$title,$ow,(int)($H*0.05)*1.4,'left',1);
+        if($company) imagettftext($im,(int)($H*0.046),0,$pad,$ny+(int)($H*0.1),pt_color($im,$s['accent']),PT_FONT_BOLD,$company);
+        imagefilledrectangle($im,$pad,(int)($H*0.52),$pad+(int)($ow*0.35),(int)($H*0.52)+1,pt_color($im,$s['accent']));
+        $cy=(int)($H*0.57); $csz=(int)($H*0.046);
+        foreach($contacts as $ci){imagettftext($im,$csz,0,$pad,$cy,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);$cy+=$csz+(int)($H*0.04);}
+
+    } else { // minimal
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        imagefilledrectangle($im,0,$H-(int)($H*0.08),$W,$H,pt_color($im,$s['panel_bg']));
+        $pad=(int)($H*0.15); $ow=$W-$pad*2;
+        $nsz=min((int)($H*0.11),max(16,$p['font_size']));
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$pad,$s['name_color'],$name,$ow,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.052),$pad,$ny+(int)($H*0.025),$s['title_color'],$title,$ow,(int)($H*0.052)*1.4,'left',1);
+        if($company) imagettftext($im,(int)($H*0.045),0,$pad,$ny+(int)($H*0.12),pt_color($im,$s['name_color']),PT_FONT_BOLD,$company);
+        imagefilledrectangle($im,$pad,(int)($H*0.5),$pad+(int)($ow*0.4),(int)($H*0.5)+2,pt_color($im,$s['accent']));
+        $cy=(int)($H*0.56); $csz=(int)($H*0.047);
+        foreach($contacts as $ci){imagettftext($im,$csz,0,$pad,$cy,pt_color($im,$s['contact_color']),PT_FONT_REG,$ci);$cy+=$csz+(int)($H*0.038);}
     }
-    $initials = substr($initials, 0, 2);
-    if (!$initials) $initials = 'U';
-    $isz = (int)($avSize * 0.38);
-    $ibbox = imagettfbbox($isz, 0, PT_FONT_BOLD, $initials);
-    $itw = abs($ibbox[2]-$ibbox[0]); $ith = abs($ibbox[5]-$ibbox[1]);
-    imagettftext($im, $isz, 0, $avX+(int)(($avSize-$itw)/2), $avY+(int)(($avSize+$ith)/2), pt_color($im, 'ffffff'), PT_FONT_BOLD, $initials);
+}
 
-    // Name and role (to the right of avatar)
-    $tx = $avX + $avSize + (int)($W*0.04);
-    $ty = $avY;
-    $tw = $ow - $avSize - (int)($W*0.04);
+// ════════════════════════════════════════════════════════════════════════════
+// ID CARD TEMPLATES  (portrait 600 × 900)
+// ════════════════════════════════════════════════════════════════════════════
 
-    // Badge
-    if ($p['badge'] || $p['category_label']) {
-        $btext = $p['badge'] ?: $p['category_label'];
-        pt_badge($im, PT_FONT_REG, $btext, $tx, $ty, $s['accent'], 'ffffff', 100, (int)($H*0.025));
-        $ty += (int)($H * 0.07);
-    } else {
-        $ty += (int)($H * 0.02);
+$IDCARD_SPECS = [
+    'corporate_dark' => ['layout'=>'dark_id',   'bg'=>'1a1f2e','accent'=>'38bdf8','name_color'=>'ffffff','role_color'=>'94a3b8','company_color'=>'38bdf8','barcode_color'=>'38bdf8'],
+    'corporate_red'  => ['layout'=>'red_side',  'bg'=>'ffffff','accent'=>'ef4444','name_color'=>'1a1a1a','role_color'=>'4b5563','company_color'=>'ef4444','barcode_color'=>'111111'],
+    'student_teal'   => ['layout'=>'student',   'bg'=>'ffffff','accent'=>'0d9488','name_color'=>'1a1a1a','role_color'=>'374151','company_color'=>'ffffff','barcode_color'=>'000000','deco_color'=>'0e7490'],
+    'minimal_badge'  => ['layout'=>'minimal',   'bg'=>'f8fafc','accent'=>'6366f1','name_color'=>'1e1b4b','role_color'=>'4338ca','company_color'=>'6366f1','barcode_color'=>'1e1b4b'],
+    'access_badge'   => ['layout'=>'access',    'bg'=>'0f172a','accent'=>'f59e0b','name_color'=>'ffffff','role_color'=>'fbbf24','company_color'=>'f59e0b','barcode_color'=>'f59e0b'],
+    'gov_blue'       => ['layout'=>'gov',       'bg'=>'0a2463','accent'=>'ffd700','name_color'=>'ffffff','role_color'=>'bfd3fe','company_color'=>'ffd700','barcode_color'=>'ffd700'],
+];
+
+function pt_idcard_barcode(GdImage $im, int $bx, int $by, int $bw, int $bh, int $color): void {
+    $bars=[3,1,2,1,3,2,1,2,1,3,1,2,3,1,2,1,3,2,1,2,3,1,2,1,3,2];
+    $total=array_sum($bars); $xp=$bx;
+    foreach($bars as $i=>$bww){$sc=(int)($bw*$bww/$total);if($i%2===0)imagefilledrectangle($im,$xp,$by,$xp+$sc-1,$by+$bh,$color);$xp+=$sc;}
+}
+
+function pt_render_idcard(GdImage $im, array $p, array $s): void {
+    $W=imagesx($im); $H=imagesy($im);
+    $name    = $p['heading'] ?: 'Full Name';
+    $role    = $p['role']    ?: $p['description'] ?: 'Member';
+    $company = $p['author']  ?: 'Organization';
+    $idnum   = $p['username']?: 'ID-000-000-000';
+    $initials= pt_profile_initials($name);
+    $pad=(int)($W*0.07); $cx=(int)($W/2);
+
+    if ($s['layout']==='dark_id') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        pt_dot_grid($im,0,0,$W,$H,$s['accent'],0.07);
+        $csz=(int)($W*0.045); pt_text_block($im,PT_FONT_BOLD,$csz,$pad,(int)($H*0.05),$s['company_color'],strtoupper($company),$W-$pad*2,$csz*1.2,'center',1);
+        $avR=(int)($W*0.2); $avCY=(int)($H*0.32);
+        imagefilledellipse($im,$cx,$avCY,$avR*2+8,$avR*2+8,pt_color($im,$s['accent'].'33'));
+        imagefilledellipse($im,$cx,$avCY,$avR*2,$avR*2,pt_color($im,'2a3a4a'));
+        $isz=(int)($avR*0.65); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$cx-(int)(abs($ib[2]-$ib[0])/2),$avCY+(int)(abs($ib[5]-$ib[1])/2),pt_color($im,'cccccc'),PT_FONT_BOLD,$initials);
+        $nsz=(int)($W*0.065); $ny=$avCY+$avR+(int)($H*0.04);
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$ny,$s['name_color'],strtoupper($name),$W-$pad*2,$nsz*1.2,'center',2);
+        $rfsz=(int)($W*0.038); $rbw=pt_badge_width(PT_FONT_REG,$role,$rfsz);
+        pt_rounded_rect($im,(int)(($W-$rbw)/2),$ny+(int)($H*0.02),$rbw,(int)($rfsz*1.7),max(4,(int)($rfsz*0.8)),pt_color($im,$s['accent'].'33'));
+        pt_text_block($im,PT_FONT_REG,$rfsz,0,$ny+(int)($H*0.02)+4,$s['role_color'],$role,$W,(int)($rfsz*1.7),'center',1);
+        $bcy=$H-(int)($H*0.16); pt_idcard_barcode($im,(int)(($W-$W*0.65)/2),$bcy,(int)($W*0.65),(int)($H*0.07),pt_color($im,$s['barcode_color']));
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.028),$pad,$bcy+(int)($H*0.08),$s['role_color'],$idnum,$W-$pad*2,(int)($W*0.028)*1.4,'center',1);
+
+    } elseif ($s['layout']==='red_side') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $sw=(int)($W*0.22); imagefilledrectangle($im,$W-$sw,0,$W,$H,pt_color($im,$s['accent']));
+        $csz=(int)($W*0.04); imagettftext($im,$csz,0,$pad,(int)($H*0.07),pt_color($im,$s['accent']),PT_FONT_BOLD,$company);
+        $avW=(int)($W*0.34); $avH=(int)($avW*1.18); $avX=$pad; $avY=(int)($H*0.14);
+        pt_rounded_rect($im,$avX,$avY,$avW,$avH,4,pt_color($im,'e8e8e8'));
+        $isz=(int)($avW*0.4); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$avX+(int)(($avW-abs($ib[2]-$ib[0]))/2),$avY+(int)(($avH+abs($ib[5]-$ib[1]))/2),pt_color($im,'aaaaaa'),PT_FONT_BOLD,$initials);
+        $rx=$avX+$avW+(int)($W*0.04); $ry=$avY; $rw=($W-$sw)-$rx-(int)($W*0.02);
+        $nsz=(int)($W*0.05); $ry=pt_text_block($im,PT_FONT_BOLD,$nsz,$rx,$ry,$s['name_color'],$name,$rw,$nsz*1.2,'left',2);
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.035),$rx,$ry+(int)($H*0.015),$s['role_color'],$role,$rw,(int)($W*0.035)*1.4,'left',1);
+        $iy=$avY+$avH+(int)($H*0.04); $isz2=(int)($W*0.033);
+        foreach([['ID No.',$idnum],['Phone',$p['footer']?:'']] as [$lbl,$val]){
+            if(!$val) continue;
+            imagettftext($im,$isz2*0.85,0,$pad,$iy,pt_color($im,'888888'),PT_FONT_REG,$lbl.':');
+            imagettftext($im,$isz2,0,$pad+(int)($W*0.16),$iy,pt_color($im,$s['name_color']),PT_FONT_REG,$val);
+            $iy+=$isz2+(int)($H*0.028);
+        }
+        $bcy=$H-(int)($H*0.14); pt_idcard_barcode($im,$pad,$bcy,(int)(($W-$sw)*0.7),(int)($H*0.06),pt_color($im,$s['barcode_color']));
+        $rtxt=strtoupper($role);
+        imagettftext($im,(int)($W*0.036),90,$W-(int)($sw*0.43),$H-(int)($H*0.12),pt_color($im,'ffffff'),PT_FONT_BOLD,$rtxt);
+
+    } elseif ($s['layout']==='student') {
+        $hdrH=(int)($H*0.42);
+        pt_gradient_h($im,0,0,$W,$hdrH,$s['accent'],$s['deco_color']??'0d9488');
+        imagefilledrectangle($im,0,$hdrH,$W,$H,pt_color($im,$s['bg']));
+        $csz=(int)($W*0.04); pt_text_block($im,PT_FONT_BOLD,$csz,$pad,(int)($H*0.04),'ffffff',$company,(int)($W*0.5),$csz*1.3,'left',2);
+        $tsz=(int)($W*0.055); pt_text_block($im,PT_FONT_BOLD,$tsz,(int)($W*0.5),(int)($H*0.1),'ffffff',"STUDENT\nID CARD",(int)($W*0.46),$tsz*1.25,'right',2);
+        $avR=(int)($W*0.18); $avCX=(int)($W*0.22); $avCY=$hdrH;
+        imagefilledellipse($im,$avCX,$avCY,$avR*2+8,$avR*2+8,pt_color($im,$s['accent']));
+        imagefilledellipse($im,$avCX,$avCY,$avR*2,$avR*2,pt_color($im,'cce8e8'));
+        $isz=(int)($avR*0.65); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$avCX-(int)(abs($ib[2]-$ib[0])/2),$avCY+(int)(abs($ib[5]-$ib[1])/2),pt_color($im,'ffffff'),PT_FONT_BOLD,$initials);
+        $ixL=$avCX+$avR+(int)($W*0.04); $iy=$hdrH+(int)($H*0.06); $fsz=(int)($W*0.033); $rw=$W-$ixL-$pad;
+        foreach([['Name',$name],['Student ID',$idnum],['Programme',$role],['Date',$p['date']?:date('d M Y')]] as [$lbl,$val]){
+            imagettftext($im,$fsz*0.85,0,$ixL,$iy,pt_color($im,'777777'),PT_FONT_REG,$lbl);
+            pt_text_block($im,PT_FONT_REG,$fsz,$ixL+(int)($rw*0.46),$iy,$s['name_color'],': '.$val,(int)($rw*0.54),$fsz*1.3,'left',1);
+            $iy+=$fsz+(int)($H*0.03);
+        }
+        pt_idcard_barcode($im,$pad,$H-(int)($H*0.13),(int)($W*0.55),(int)($H*0.065),pt_color($im,$s['barcode_color']));
+
+    } elseif ($s['layout']==='access') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        imagefilledrectangle($im,0,0,$W,(int)($H*0.085),pt_color($im,$s['accent']));
+        $clipW=(int)($W*0.2); imagefilledellipse($im,$cx,(int)($H*0.085)-(int)($H*0.03),$clipW,(int)($H*0.06),pt_color($im,$s['bg']));
+        $avR=(int)($W*0.2); $avCY=(int)($H*0.3);
+        imagefilledellipse($im,$cx,$avCY,$avR*2+6,$avR*2+6,pt_color($im,$s['accent'].'44'));
+        imagefilledellipse($im,$cx,$avCY,$avR*2,$avR*2,pt_color($im,'1e293b'));
+        $isz=(int)($avR*0.68); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$cx-(int)(abs($ib[2]-$ib[0])/2),$avCY+(int)(abs($ib[5]-$ib[1])/2),pt_color($im,'cccccc'),PT_FONT_BOLD,$initials);
+        $nsz=(int)($W*0.06); $ny=$avCY+$avR+(int)($H*0.04);
+        $ny=pt_text_block($im,PT_FONT_BOLD,$nsz,$pad,$ny,$s['name_color'],$name,$W-$pad*2,$nsz*1.2,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.038),$pad,$ny+(int)($H*0.015),$s['role_color'],$role,$W-$pad*2,(int)($W*0.038)*1.4,'center',1);
+        imagefilledrectangle($im,0,$H-(int)($H*0.18),$W,$H-(int)($H*0.165),pt_color($im,$s['accent']));
+        $bcW=(int)($W*0.65); pt_idcard_barcode($im,(int)(($W-$bcW)/2),$H-(int)($H*0.15),$bcW,(int)($H*0.065),pt_color($im,$s['barcode_color']));
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.03),$pad,$H-(int)($H*0.065),$s['role_color'],$idnum,$W-$pad*2,(int)($W*0.03)*1.4,'center',1);
+
+    } elseif ($s['layout']==='gov') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $hdrH=(int)($H*0.16); imagefilledrectangle($im,0,$hdrH,$W,$hdrH+3,pt_color($im,$s['accent']));
+        pt_text_block($im,PT_FONT_BOLD,(int)($W*0.048),$pad,(int)($H*0.04),$s['company_color'],strtoupper($company),$W-$pad*2,(int)($W*0.048)*1.3,'center',2);
+        $avR=(int)($W*0.2); $avCY=(int)($H*0.42);
+        imagefilledellipse($im,$cx,$avCY,$avR*2+6,$avR*2+6,pt_color($im,$s['accent'].'55'));
+        imagefilledellipse($im,$cx,$avCY,$avR*2,$avR*2,pt_color($im,'1a2a45'));
+        $isz=(int)($avR*0.68); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$cx-(int)(abs($ib[2]-$ib[0])/2),$avCY+(int)(abs($ib[5]-$ib[1])/2),pt_color($im,'aaaaaa'),PT_FONT_BOLD,$initials);
+        $ny=$avCY+$avR+(int)($H*0.04);
+        $ny=pt_text_block($im,PT_FONT_BOLD,(int)($W*0.055),$pad,$ny,$s['name_color'],$name,$W-$pad*2,(int)($W*0.055)*1.2,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.036),$pad,$ny+(int)($H*0.015),$s['role_color'],$role,$W-$pad*2,(int)($W*0.036)*1.4,'center',1);
+        imagefilledrectangle($im,0,$H-(int)($H*0.205),$W,$H-(int)($H*0.2),pt_color($im,$s['accent']));
+        $bcW=(int)($W*0.65); pt_idcard_barcode($im,(int)(($W-$bcW)/2),$H-(int)($H*0.18),$bcW,(int)($H*0.065),pt_color($im,$s['barcode_color']));
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.03),$pad,$H-(int)($H*0.075),$s['role_color'],$idnum,$W-$pad*2,(int)($W*0.03)*1.4,'center',1);
+
+    } else { // minimal
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        imagefilledrectangle($im,0,0,$W,(int)($H*0.1),pt_color($im,$s['accent']));
+        $avR=(int)($W*0.18); $avCY=(int)($H*0.27);
+        imagefilledellipse($im,$cx,$avCY,$avR*2,$avR*2,pt_color($im,$s['accent'].'33'));
+        imagefilledellipse($im,$cx,$avCY,$avR*2-4,$avR*2-4,pt_color($im,'e8eaf0'));
+        $isz=(int)($avR*0.65); $ib=imagettfbbox($isz,0,PT_FONT_BOLD,$initials);
+        imagettftext($im,$isz,0,$cx-(int)(abs($ib[2]-$ib[0])/2),$avCY+(int)(abs($ib[5]-$ib[1])/2),pt_color($im,$s['accent']),PT_FONT_BOLD,$initials);
+        $ny=$avCY+$avR+(int)($H*0.04);
+        $ny=pt_text_block($im,PT_FONT_BOLD,(int)($W*0.055),$pad,$ny,$s['name_color'],$name,$W-$pad*2,(int)($W*0.055)*1.2,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.035),$pad,$ny+(int)($H*0.015),$s['role_color'],$role,$W-$pad*2,(int)($W*0.035)*1.4,'center',1);
+        $bcW=(int)($W*0.65); pt_idcard_barcode($im,(int)(($W-$bcW)/2),$H-(int)($H*0.17),$bcW,(int)($H*0.065),pt_color($im,$s['barcode_color']));
+        pt_text_block($im,PT_FONT_REG,(int)($W*0.03),$pad,$H-(int)($H*0.073),$s['role_color'],$idnum,$W-$pad*2,(int)($W*0.03)*1.4,'center',1);
     }
+}
 
-    // Name
-    $nsz = (int)($H * 0.07);
-    $ty = pt_text_block($im, PT_FONT_BOLD, $nsz, $tx, $ty, $s['name_color'], $name ?: 'Your Name', $tw, $nsz*1.3, 'left', 2);
-    $ty += (int)($H * 0.01);
+// ════════════════════════════════════════════════════════════════════════════
+// INVITATION TEMPLATES  (landscape 1200 × 800)
+// ════════════════════════════════════════════════════════════════════════════
 
-    // Role/title
-    $rsz = (int)($H * 0.038);
-    $ty = pt_text_block($im, PT_FONT_REG, $rsz, $tx, $ty, $s['role_color'], $p['role'] ?: $p['subheading'] ?: 'Developer', $tw, $rsz*1.5, 'left', 2);
-    $ty += (int)($H * 0.03);
+$INVITATION_SPECS = [
+    'vintage_cream'   => ['layout'=>'vintage',   'bg'=>'e8e0d0','accent'=>'3d7a6a','title_color'=>'1e3d38','subtitle_color'=>'3d7a6a','body_color'=>'2a4040'],
+    'luxury_dark'     => ['layout'=>'luxury',    'bg'=>'0a0a0a','accent'=>'c9a84c','title_color'=>'c9a84c','subtitle_color'=>'ffffff','body_color'=>'aaaaaa'],
+    'birthday_fun'    => ['layout'=>'festive',   'bg'=>'fff8e1','accent'=>'f97316','title_color'=>'1c0a00','subtitle_color'=>'ea580c','body_color'=>'78350f'],
+    'wedding_elegant' => ['layout'=>'elegant',   'bg'=>'fefefe','accent'=>'a3875a','title_color'=>'1c1917','subtitle_color'=>'44403c','body_color'=>'78716c'],
+    'corporate_event' => ['layout'=>'corporate', 'bg'=>'0f2744','accent'=>'60a5fa','title_color'=>'ffffff','subtitle_color'=>'93c5fd','body_color'=>'64748b'],
+    'garden_party'    => ['layout'=>'garden',    'bg'=>'f0fdf4','accent'=>'22c55e','title_color'=>'052e16','subtitle_color'=>'166534','body_color'=>'374151'],
+];
 
-    // Description
-    if ($p['description']) {
-        $dsz = (int)($H * 0.03);
-        pt_text_block($im, PT_FONT_REG, $dsz, $tx, $ty, $s['role_color'], $p['description'], $tw, $dsz*1.6, 'left', 3);
-    }
+function pt_render_invitation(GdImage $im, array $p, array $s): void {
+    $W=imagesx($im); $H=imagesy($im);
+    $title    = $p['heading']     ?: 'Event Name';
+    $dateTime = $p['description'] ?: 'Date & Time';
+    $venue    = $p['website']     ?: 'Venue Address';
+    $host     = $p['author']      ?: 'Host Name';
+    $dress    = $p['badge']       ?: '';
+    $note     = $p['footer']      ?: '';
+    $pad=(int)($H*0.1); $cx=(int)($W/2);
+    $acC=pt_color($im,$s['accent']);
 
-    // Stats row
-    $stats = [
-        [$p['stat1_value'], $p['stat1_label']],
-        [$p['stat2_value'], $p['stat2_label']],
-        [$p['stat3_value'], $p['stat3_label']],
-    ];
-    $statsY = $pad + $ch - $ip - (int)($H * 0.12);
-    imagefilledrectangle($im, $ox, $statsY - 12, $ox+$ow, $statsY - 11, pt_color($im, $s['card_border']));
-    $statW = (int)($ow / 3);
-    foreach ($stats as $i => [$val, $label]) {
-        if (!$val) continue;
-        $sx = $ox + $i * $statW;
-        $vsz = (int)($H * 0.05);
-        $lsz = (int)($H * 0.025);
-        pt_text_block($im, PT_FONT_BOLD, $vsz, $sx, $statsY, $s['stat_color'], $val, $statW, $vsz*1.3, 'center', 1);
-        pt_text_block($im, PT_FONT_REG, $lsz, $sx, $statsY + $vsz + 4, $s['stat_label_color'], $label, $statW, $lsz*1.4, 'center', 1);
-    }
+    if ($s['layout']==='vintage') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $bp=(int)($H*0.055);
+        // Wavy decorative border
+        for($x=$bp;$x<$W-$bp;$x+=14){
+            $wy=$bp+(int)(sin($x*0.12)*5);
+            imagefilledrectangle($im,$x,$wy,$x+8,$wy+2,$acC);
+            $wy2=($H-$bp)+(int)(sin($x*0.12)*5);
+            imagefilledrectangle($im,$x,$wy2,$x+8,$wy2+2,$acC);
+        }
+        for($y=$bp;$y<$H-$bp;$y+=14){
+            $wx=$bp+(int)(sin($y*0.12)*5);
+            imagefilledrectangle($im,$wx,$y,$wx+2,$y+8,$acC);
+            $wx2=($W-$bp)+(int)(sin($y*0.12)*5);
+            imagefilledrectangle($im,$wx2,$y,$wx2+2,$y+8,$acC);
+        }
+        foreach([$bp,$W-$bp] as $bx) foreach([$bp,$H-$bp] as $by){imagefilledellipse($im,$bx,$by,12,12,$acC);imageline($im,$bx-20,$by,$bx+20,$by,$acC);imageline($im,$bx,$by-20,$bx,$by+20,$acC);}
+        $lw=(int)($W*0.5); $oy=$pad;
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.04),$pad,$oy,$s['subtitle_color'],'You are invited!',$lw-$pad,(int)($H*0.04)*1.4,'left',1);
+        $oy+=(int)($H*0.07);
+        $tsz=min((int)($H*0.105),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$lw-$pad,$tsz*1.2,'left',3);
+        $oy+=(int)($H*0.04);
+        if($dateTime){imagettftext($im,(int)($H*0.065),0,$pad,$oy+(int)($H*0.065),pt_color($im,$s['title_color']),PT_FONT_BOLD,$dateTime);$oy+=(int)($H*0.1);}
+        if($venue) pt_text_block($im,PT_FONT_REG,(int)($H*0.038),$pad,$oy,$s['body_color'],$venue,$lw-$pad,(int)($H*0.038)*1.4,'left',2);
+        if($dress) pt_text_block($im,PT_FONT_REG,(int)($H*0.033),$pad,$oy+(int)($H*0.1),$s['body_color'],'Dress: '.$dress,$lw-$pad,(int)($H*0.033)*1.4,'left',1);
+        // Right: champagne glass illustration
+        $rx=(int)($W*0.57); $rw=$W-$rx-$pad; $rcx=$rx+(int)($rw/2); $rcy=(int)($H/2);
+        foreach([-(int)($rw*0.17),(int)($rw*0.17)] as $off){
+            $gx=$rcx+$off; $bR=(int)($H*0.11);
+            imagearc($im,$gx,$rcy-(int)($H*0.1),$bR*2,(int)($bR*1.25)*2,0,180,$acC);
+            imageline($im,$gx-$bR,$rcy-(int)($H*0.1),$gx-$bR,$rcy-(int)($H*0.1)+(int)($bR*0.35),$acC);
+            imageline($im,$gx+$bR,$rcy-(int)($H*0.1),$gx+$bR,$rcy-(int)($H*0.1)+(int)($bR*0.35),$acC);
+            imageline($im,$gx,$rcy-(int)($H*0.1)+(int)($bR*0.35),$gx,$rcy+(int)($H*0.1),$acC);
+            imageline($im,$gx-(int)($bR*0.65),$rcy+(int)($H*0.1),$gx+(int)($bR*0.65),$rcy+(int)($H*0.1),$acC);
+        }
+        for($k=0;$k<8;$k++) imagefilledellipse($im,$rcx+rand(-$rw/3,$rw/3),$rcy-rand(0,(int)($H*0.3)),5,5,$acC);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.04),$rx,$H-(int)($H*0.2),$s['body_color'],'cheers,',$rw,(int)($H*0.04)*1.4,'center',1);
+        pt_text_block($im,PT_FONT_BOLD,(int)($H*0.055),$rx,$H-(int)($H*0.13),$s['title_color'],$host,$rw,(int)($H*0.055)*1.3,'center',1);
 
-    // Username
-    if ($p['username']) {
-        $usz = (int)($H * 0.028);
-        pt_text_block($im, PT_FONT_REG, $usz, $ox, $pad + $ch - $ip/2 - $usz, $s['role_color'], $p['username'], $ow/2, $usz*1.4, 'left', 1);
-    }
-    if ($p['website']) {
-        $wsz = (int)($H * 0.028);
-        pt_text_block($im, PT_FONT_REG, $wsz, $ox + (int)($ow/2), $pad + $ch - $ip/2 - $wsz, $s['accent'], $p['website'], $ow/2, $wsz*1.4, 'right', 1);
+    } elseif ($s['layout']==='luxury') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $bp=(int)($H*0.065); $blen=(int)($H*0.14);
+        foreach([$bp,$W-$bp] as $bx) foreach([$bp,$H-$bp] as $by){$lx=$bx<$W/2?1:-1;$ly=$by<$H/2?1:-1;imagefilledrectangle($im,$bx,$by,$bx+$lx*$blen,$by+$ly*2,$acC);imagefilledrectangle($im,$bx,$by,$bx+$lx*2,$by+$ly*$blen,$acC);}
+        $oy=(int)($H*0.13);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.035),0,$oy,$s['subtitle_color'],strtoupper('You are invited'),$W,(int)($H*0.035)*1.3,'center',1);
+        $oy+=(int)($H*0.065); imagefilledrectangle($im,(int)($W*0.3),$oy,(int)($W*0.7),$oy+1,$acC); $oy+=(int)($H*0.04);
+        $tsz=min((int)($H*0.095),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$W-$pad*2,$tsz*1.2,'center',2);
+        $oy+=(int)($H*0.03); imagefilledrectangle($im,(int)($W*0.35),$oy,(int)($W*0.65),$oy+1,$acC); $oy+=(int)($H*0.05);
+        if($dateTime){pt_text_block($im,PT_FONT_REG,(int)($H*0.046),$pad,$oy,$s['subtitle_color'],$dateTime,$W-$pad*2,(int)($H*0.046)*1.4,'center',1);$oy+=(int)($H*0.065);}
+        if($venue) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['body_color'],$venue,$W-$pad*2,(int)($H*0.036)*1.4,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.04),$pad,$H-(int)($H*0.13),$s['accent'],'— '.$host.' —',$W-$pad*2,(int)($H*0.04)*1.4,'center',1);
+
+    } elseif ($s['layout']==='festive') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $colors=[$s['accent'],'ec4899','3b82f6','22c55e']; $bh=(int)($H*0.12); $bw2=(int)($W/count($colors));
+        foreach($colors as $i=>$c) pt_gradient_v($im,$i*$bw2,0,$bw2,$bh,$c,$c.'66');
+        $oy=$bh+(int)($H*0.04);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.038),$pad,$oy,$s['subtitle_color'],'You are invited to a',$W-$pad*2,(int)($H*0.038)*1.4,'center',1);
+        $oy+=(int)($H*0.06);
+        $tsz=min((int)($H*0.1),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$W-$pad*2,$tsz*1.2,'center',2);
+        $oy+=(int)($H*0.03); imagefilledrectangle($im,(int)($W*0.25),$oy,(int)($W*0.75),$oy+3,$acC); $oy+=(int)($H*0.04);
+        if($dateTime){pt_text_block($im,PT_FONT_BOLD,(int)($H*0.048),$pad,$oy,$s['subtitle_color'],$dateTime,$W-$pad*2,(int)($H*0.048)*1.4,'center',1);$oy+=(int)($H*0.065);}
+        if($venue) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['body_color'],$venue,$W-$pad*2,(int)($H*0.036)*1.4,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.038),$pad,$H-(int)($H*0.12),$s['body_color'],'Hosted by '.$host,$W-$pad*2,(int)($H*0.038)*1.4,'center',1);
+
+    } elseif ($s['layout']==='corporate') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        pt_gradient_h($im,0,0,$W,(int)($H*0.065),$s['accent'],$s['accent']);
+        imagefilledrectangle($im,0,(int)($H*0.065),$W,(int)($H*0.068),$acC);
+        $oy=(int)($H*0.11);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.034),$pad,$oy,$s['subtitle_color'],'You are invited to',$W-$pad*2,(int)($H*0.034)*1.4,'center',1);
+        $oy+=(int)($H*0.055); $tsz=min((int)($H*0.088),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$W-$pad*2,$tsz*1.2,'center',2);
+        $oy+=(int)($H*0.025); imagefilledrectangle($im,(int)($W*0.35),$oy,(int)($W*0.65),$oy+2,$acC); $oy+=(int)($H*0.04);
+        $infoPad=(int)($W*0.07); $infoW=(int)(($W-$infoPad*2-20)/2);
+        foreach([[0,$dateTime,'Date & Time'],[1,$venue,'Location']] as [$k,$val,$lbl]){
+            $ix=$infoPad+$k*($infoW+20);
+            pt_rounded_rect($im,$ix,$oy,$infoW,(int)($H*0.2),8,pt_color($im,'1a3a60'));
+            pt_text_block($im,PT_FONT_REG,(int)($H*0.026),$ix+12,$oy+10,$s['subtitle_color'],$lbl,$infoW-24,(int)($H*0.026)*1.3,'left',1);
+            pt_text_block($im,PT_FONT_BOLD,(int)($H*0.038),$ix+12,$oy+(int)($H*0.052),$s['title_color'],$val,$infoW-24,(int)($H*0.038)*1.4,'left',2);
+        }
+        $oy+=(int)($H*0.23);
+        if($dress) pt_text_block($im,PT_FONT_REG,(int)($H*0.034),$pad,$oy,$s['body_color'],'Dress code: '.$dress,$W-$pad*2,(int)($H*0.034)*1.4,'center',1);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$H-(int)($H*0.1),$s['subtitle_color'],$host,$W-$pad*2,(int)($H*0.036)*1.4,'center',1);
+
+    } elseif ($s['layout']==='elegant') {
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $fp=(int)($H*0.045);
+        imagefilledrectangle($im,$fp,$fp,$W-$fp,$fp+1,$acC); imagefilledrectangle($im,$fp,$H-$fp-1,$W-$fp,$H-$fp,$acC);
+        imagefilledrectangle($im,$fp,$fp,$fp+1,$H-$fp,$acC); imagefilledrectangle($im,$W-$fp-1,$fp,$W-$fp,$H-$fp,$acC);
+        $oy=$pad;
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.034),$pad,$oy,$s['subtitle_color'],'Together we celebrate',$W-$pad*2,(int)($H*0.034)*1.4,'center',1);
+        $oy+=(int)($H*0.065); imagefilledrectangle($im,(int)($W*0.25),$oy,(int)($W*0.75),$oy+1,$acC); $oy+=(int)($H*0.04);
+        $tsz=min((int)($H*0.095),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$W-$pad*2,$tsz*1.2,'center',2);
+        $oy+=(int)($H*0.025); imagefilledrectangle($im,(int)($W*0.25),$oy,(int)($W*0.75),$oy+1,$acC); $oy+=(int)($H*0.05);
+        if($dateTime){pt_text_block($im,PT_FONT_REG,(int)($H*0.042),$pad,$oy,$s['subtitle_color'],$dateTime,$W-$pad*2,(int)($H*0.042)*1.4,'center',1);$oy+=(int)($H*0.065);}
+        if($venue) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['body_color'],$venue,$W-$pad*2,(int)($H*0.036)*1.4,'center',2);
+        if($dress) pt_text_block($im,PT_FONT_REG,(int)($H*0.032),$pad,$oy+(int)($H*0.1),$s['body_color'],'Dress: '.$dress,$W-$pad*2,(int)($H*0.032)*1.4,'center',1);
+        pt_text_block($im,PT_FONT_BOLD,(int)($H*0.044),$pad,$H-(int)($H*0.13),$s['subtitle_color'],$host,$W-$pad*2,(int)($H*0.044)*1.4,'center',1);
+
+    } else { // garden
+        imagefill($im,0,0,pt_color($im,$s['bg']));
+        $decoC=pt_color($im,$s['accent'].'88');
+        foreach([[0,0],[$W,$H]] as [$gx,$gy]){
+            $sg=$gx===0?1:-1; $sy=$gy===0?1:-1;
+            imagefilledellipse($im,$gx+$sg*(int)($W*0.04),$gy+$sy*(int)($H*0.06),(int)($W*0.18),(int)($H*0.28),$decoC);
+            imagefilledellipse($im,$gx+$sg*(int)($W*0.1),$gy+$sy*(int)($H*0.04),(int)($W*0.12),(int)($H*0.2),$acC);
+        }
+        $oy=$pad;
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['subtitle_color'],'~ You\'re Invited ~',$W-$pad*2,(int)($H*0.036)*1.4,'center',1);
+        $oy+=(int)($H*0.06);
+        $tsz=min((int)($H*0.095),max(20,$p['font_size']));
+        $oy=pt_text_block($im,PT_FONT_BOLD,$tsz,$pad,$oy,$s['title_color'],$title,$W-$pad*2,$tsz*1.2,'center',2);
+        $oy+=(int)($H*0.025); imagefilledrectangle($im,(int)($W*0.3),$oy,(int)($W*0.7),$oy+2,$acC); $oy+=(int)($H*0.04);
+        if($dateTime){pt_text_block($im,PT_FONT_REG,(int)($H*0.044),$pad,$oy,$s['title_color'],$dateTime,$W-$pad*2,(int)($H*0.044)*1.4,'center',1);$oy+=(int)($H*0.065);}
+        if($venue) pt_text_block($im,PT_FONT_REG,(int)($H*0.036),$pad,$oy,$s['body_color'],$venue,$W-$pad*2,(int)($H*0.036)*1.4,'center',2);
+        pt_text_block($im,PT_FONT_REG,(int)($H*0.038),$pad,$H-(int)($H*0.12),$s['subtitle_color'],'Hosted by '.$host,$W-$pad*2,(int)($H*0.038)*1.4,'center',1);
     }
 }
 
@@ -1635,16 +2074,19 @@ function pt_render_github(GdImage $im, array $p, array $s): void {
 // ════════════════════════════════════════════════════════════════════════════
 
 $registry = [
-    'og'          => ['templates' => array_keys($OG_SPECS),       'default_w' => 1200, 'default_h' => 630],
-    'social'      => ['templates' => array_keys($SOCIAL_SPECS),   'default_w' => 1200, 'default_h' => 630],
-    'placeholder' => ['templates' => ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], 'default_w' => 800, 'default_h' => 600],
-    'browser'     => ['templates' => ['chrome','firefox','safari','edge','arc','generic','brave','opera','vivaldi','dark_mode','minimal_browser','retro_browser','high_contrast','material','warm_light'], 'default_w' => 1200, 'default_h' => 800],
-    'terminal'    => ['templates' => ['linux','modern','hacker','vscode','minimal','powerline','fish_shell','windows_cmd','powershell','ubuntu_term','matrix','amber','iterm2','p10k','dracula_term'], 'default_w' => 900, 'default_h' => 600],
-    'profile'     => ['templates' => array_keys($PROFILE_SPECS),  'default_w' => 900, 'default_h' => 500],
-    'code'        => ['templates' => ['vscode','github','monokai','nord','dracula','minimal','one_dark','synthwave','gruvbox','solarized','tokyo_night','catppuccin','atom_light','sublime','jetbrains'], 'default_w' => 1000, 'default_h' => 600],
-    'dashboard'   => ['templates' => array_keys($DASHBOARD_SPECS),'default_w' => 1200, 'default_h' => 630],
-    'docs'        => ['templates' => array_keys($DOC_SPECS),       'default_w' => 1200, 'default_h' => 630],
-    'github'      => ['templates' => array_keys($GITHUB_SPECS),    'default_w' => 1200, 'default_h' => 630],
+    'og'           => ['templates' => array_keys($OG_SPECS),          'default_w' => 1200, 'default_h' => 630],
+    'social'       => ['templates' => array_keys($SOCIAL_SPECS),      'default_w' => 1200, 'default_h' => 630],
+    'placeholder'  => ['templates' => ['simple','grid','gradient','glass','pattern','minimal','modern','empty_state','blueprint_grid','crosshatch','circuit','polka_dots','diagonal_stripes','noise_field','sketch','dots_dark','gradient_mesh','marble'], 'default_w' => 800, 'default_h' => 600],
+    'browser'      => ['templates' => ['chrome','firefox','safari','edge','arc','generic','brave','opera','vivaldi','dark_mode','minimal_browser','retro_browser','high_contrast','material','warm_light'], 'default_w' => 1200, 'default_h' => 800],
+    'terminal'     => ['templates' => ['linux','modern','hacker','vscode','minimal','powerline','fish_shell','windows_cmd','powershell','ubuntu_term','matrix','amber','iterm2','p10k','dracula_term'], 'default_w' => 900, 'default_h' => 600],
+    'profile'      => ['templates' => array_keys($PROFILE_SPECS),     'default_w' => 900, 'default_h' => 500],
+    'code'         => ['templates' => ['vscode','github','monokai','nord','dracula','minimal','one_dark','synthwave','gruvbox','solarized','tokyo_night','catppuccin','atom_light','sublime','jetbrains'], 'default_w' => 1000, 'default_h' => 600],
+    'dashboard'    => ['templates' => array_keys($DASHBOARD_SPECS),   'default_w' => 1200, 'default_h' => 630],
+    'docs'         => ['templates' => array_keys($DOC_SPECS),          'default_w' => 1200, 'default_h' => 630],
+    'github'       => ['templates' => array_keys($GITHUB_SPECS),       'default_w' => 1200, 'default_h' => 630],
+    'business_card'=> ['templates' => array_keys($BIZCARD_SPECS),      'default_w' => 1050, 'default_h' => 600],
+    'id_card'      => ['templates' => array_keys($IDCARD_SPECS),       'default_w' => 600,  'default_h' => 900],
+    'invitation'   => ['templates' => array_keys($INVITATION_SPECS),   'default_w' => 1200, 'default_h' => 800],
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1695,7 +2137,7 @@ try {
         case 'social':
             $spec = $SOCIAL_SPECS[$tpl] ?? $SOCIAL_SPECS['twitter'];
             if (isset($_GET['bg_color']))     $spec['bg'] = $p['bg_color'];
-            if (isset($_GET['accent_color'])) $spec['accent'] = $p['accent_color'];
+            if (isset($_GET['accent_color'])) { $spec['accent_color'] = $p['accent_color']; $spec['badge_color'] = $p['accent_color']; $spec['icon_color'] = $p['accent_color']; }
             pt_render_social($im, $p, $spec);
             break;
         case 'placeholder':
@@ -1712,6 +2154,24 @@ try {
             if (isset($_GET['bg_color']))     $spec['bg'] = $p['bg_color'];
             if (isset($_GET['accent_color'])) $spec['accent'] = $p['accent_color'];
             pt_render_profile($im, $p, $spec);
+            break;
+        case 'business_card':
+            $spec = $BIZCARD_SPECS[$tpl] ?? $BIZCARD_SPECS['wave_dark'];
+            if (isset($_GET['bg_color']))     $spec['bg'] = $p['bg_color'];
+            if (isset($_GET['accent_color'])) $spec['accent'] = $p['accent_color'];
+            pt_render_bizcard($im, $p, $spec);
+            break;
+        case 'id_card':
+            $spec = $IDCARD_SPECS[$tpl] ?? $IDCARD_SPECS['corporate_dark'];
+            if (isset($_GET['bg_color']))     $spec['bg'] = $p['bg_color'];
+            if (isset($_GET['accent_color'])) $spec['accent'] = $p['accent_color'];
+            pt_render_idcard($im, $p, $spec);
+            break;
+        case 'invitation':
+            $spec = $INVITATION_SPECS[$tpl] ?? $INVITATION_SPECS['vintage_cream'];
+            if (isset($_GET['bg_color']))     $spec['bg'] = $p['bg_color'];
+            if (isset($_GET['accent_color'])) $spec['accent'] = $p['accent_color'];
+            pt_render_invitation($im, $p, $spec);
             break;
         case 'code':
             pt_render_code($im, $p, $tpl);
