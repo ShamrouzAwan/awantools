@@ -14,7 +14,9 @@ const PT = (() => {
     thumbObserver: null,
   };
 
-  const PT_RENDER_BASE = 'render';
+  // PT_RENDER_BASE injected by index.php as a global before this script loads.
+  // Do NOT redeclare it here — that would shadow the absolute path with 'render',
+  // breaking image URLs when the page is served without a trailing slash.
 
   // ── Template registry (mirrors PHP) ───────────────────────────
   const REGISTRY = {
