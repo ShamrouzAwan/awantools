@@ -261,11 +261,11 @@ ob_start();
             <!-- icon -->
             <div class="pt-fgroup" data-group="icon">
               <div class="pt-field">
-                <label>Icon <span class="pt-field-hint">Font Awesome name</span></label>
+                <label>Icon <span class="pt-field-hint">any Font Awesome 6 solid name — e.g. car, truck, plane, laptop, brain</span></label>
                 <div class="pt-icon-row">
-                  <input type="text" id="p_icon" value="code" class="pt-input" oninput="PT.debounce()" placeholder="e.g. code, globe, star">
+                  <input type="text" id="p_icon" value="code" class="pt-input" oninput="PT.debounce()" placeholder="e.g. code, globe, star, car, truck, plane…">
                   <div class="pt-icon-chips" id="ptIconChips">
-                    <?php foreach (['code','globe','user','database','server','cloud','star','rocket','bolt','fire','gear','lock','shield','chart-bar','book','file-code'] as $ic): ?>
+                    <?php foreach (['code','globe','user','database','server','cloud','star','rocket','bolt','fire','gear','lock','shield','chart-bar','book','file-code','car','truck','plane','laptop','brain','heart','key','camera','music','video','gift','flag','map','wifi'] as $ic): ?>
                     <button class="pt-chip" onclick="PT.setIcon('<?= $ic ?>')" title="<?= $ic ?>"><i class="fa-solid fa-<?= $ic ?>"></i></button>
                     <?php endforeach; ?>
                   </div>

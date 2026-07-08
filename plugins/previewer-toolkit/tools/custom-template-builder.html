@@ -185,12 +185,110 @@
    100% client-side — open this file directly from disk, no server needed.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-// ── Valid icon names (must match pt_fa_codepoint() in render.php) ───────────
-const ICON_NAMES = ["code","globe","user","database","server","cloud","terminal","star","rocket","bolt","fire","gear","cog","lock","shield","chart-bar","chart-line","dashboard","tachometer-alt","puzzle-piece","wrench","book","file-code","address-card","image","camera","search","magnifying-glass","check","heart","envelope","home","arrow-right","download","upload","link","tag","calendar","clock","folder","paint-brush","mobile","laptop","desktop","wifi","plug","github","git-alt","cube","cubes","layer-group","sitemap","trophy","medal","crown","gem","microchip","network-wired","broadcast-tower","tools","hammer","magic","wand-magic-sparkles","robot","brain","infinity","atom"];
+// ── Valid icon names — any Font Awesome 6 Solid icon name is accepted.
+// This list powers the datalist autocomplete. The full codepoint map lives
+// in render.php's pt_fa_codepoint(). Any name not in that map falls back to
+// the 'code' icon at render time, so feel free to try any FA6 solid name. ──
+const ICON_NAMES = [
+  // Core & dev
+  "code","code-branch","code-commit","code-merge","code-pull-request","terminal","bug",
+  "laptop","laptop-code","desktop","mobile","tablet","keyboard","mouse","cpu","microchip",
+  "memory","hard-drive","server","database","network-wired","wifi","plug","satellite",
+  "satellite-dish","broadcast-tower","signal","tower-broadcast","webhook","display","watch",
+  // People & identity
+  "user","users","user-plus","user-minus","user-check","user-gear","user-group",
+  "user-shield","user-lock","user-tie","user-graduate","user-secret","user-circle",
+  "id-badge","id-card","address-card","address-book","fingerprint","person","child",
+  "baby","person-running","person-biking","person-hiking","person-swimming",
+  // Communication
+  "envelope","envelope-open","paper-plane","phone","fax","headset","headphones",
+  "microphone","microphone-slash","bell","bell-slash","comment","comments","message",
+  "bullhorn","rss","podcast","inbox","mailbox","volume-high","volume-off",
+  // Files & docs
+  "file","file-alt","file-pdf","file-word","file-excel","file-powerpoint",
+  "file-image","file-archive","file-audio","file-video","file-code","file-signature",
+  "book","book-open","book-bookmark","newspaper","clipboard","clipboard-check",
+  "copy","paste","save","floppy-disk","print","paperclip","folder","folder-open",
+  "archive","bookmark","tag","tags","qrcode","barcode",
+  // UI & navigation
+  "bars","ellipsis","ellipsis-vertical","filter","sliders","sort","sort-up","sort-down",
+  "toggle-on","toggle-off","check","check-circle","circle-check","circle-xmark",
+  "circle-info","circle-question","triangle-exclamation","exclamation-circle","ban",
+  "plus","minus","xmark","times","square","square-check","square-plus","square-minus",
+  "thumbs-up","thumbs-down","hand","hand-pointer","handshake","grip-vertical",
+  "grip-horizontal","crosshairs","bullseye","anchor","spinner","circle-notch","sync",
+  "arrow-right","arrow-left","arrow-up","arrow-down","angle-right","angle-left",
+  "angle-up","angle-down","chevron-right","chevron-left","chevron-up","chevron-down",
+  "caret-right","caret-left","caret-up","caret-down","expand","compress",
+  "external-link-alt","share","share-nodes","reply","rotate","undo","redo",
+  "right-from-bracket","right-to-bracket","magnifying-glass","magnifying-glass-plus",
+  "magnifying-glass-minus","search","eye","eye-slash","info","question",
+  // Editing & text
+  "pen","pen-alt","pen-to-square","edit","pencil","eraser","scissors","crop",
+  "highlighter","font","bold","italic","underline","strikethrough","list","list-ul",
+  "list-ol","list-check","table","paragraph","quote-left","subscript","superscript",
+  "align-left","align-center","align-right","align-justify","indent","language",
+  // Business & commerce
+  "briefcase","building","store","shopping-cart","shopping-bag","money-bill",
+  "credit-card","receipt","wallet","dollar-sign","percent","chart-pie","chart-area",
+  "chart-bar","chart-line","box","warehouse","award","certificate","copyright",
+  "trademark","gavel","scale-balanced","suitcase","passport",
+  // Media & entertainment
+  "play","pause","stop","forward","backward","film","video","camera","camera-retro",
+  "music","compact-disc","drum","guitar","tv","gamepad","chess","dice","ticket",
+  "image","images","photo-film","clapperboard",
+  // Location & travel
+  "map","map-marker-alt","location-dot","location-arrow","compass","map-pin","route",
+  "street-view","plane","plane-departure","plane-arrival","car","car-side","truck",
+  "truck-fast","bus","train","ship","bicycle","motorcycle","taxi","helicopter",
+  "jet-fighter","fighter-jet","road","gas-pump","traffic-light",
+  // Nature & weather
+  "sun","moon","cloud","cloud-sun","cloud-rain","snowflake","wind","umbrella",
+  "leaf","tree","seedling","mountain","water","fire","fire-flame-curved","earth-americas",
+  // Food & lifestyle
+  "utensils","coffee","mug-hot","pizza-slice","burger","hotdog","lemon",
+  "wine-glass","beer-mug-empty",
+  // Health & science
+  "hospital","stethoscope","heart-pulse","heartbeat","pills","syringe","bandage",
+  "thermometer","dumbbell","spa","graduation-cap","university","flask","microscope",
+  "dna","calculator","ruler","school",
+  // Symbols & misc
+  "star","rocket","bolt","gear","cog","lock","lock-open","shield","key",
+  "globe","home","house","heart","gem","crown","trophy","medal","infinity","atom",
+  "robot","brain","puzzle-piece","wrench","hammer","tools","magic","wand-magic",
+  "wand-magic-sparkles","lightbulb","palette","brush","paint-brush","feather",
+  "shapes","flag","gift","peace","recycle","layer-group","sitemap",
+  "cube","cubes","history","hourglass","clock","calendar","calendar-check",
+  "timeline","stream","gauge","power-off","battery-full","battery-half","battery-empty",
+  "trash","trash-can","clone","hashtag","at","asterisk","blog",
+  "github","git-alt","laptop-file","solar-panel","charging-station",
+  // Animals & fun
+  "paw","horse","dog","cat","fish","dragon","spider","skull","ghost",
+  "snowman","hat-wizard","face-smile","face-laugh","face-frown",
+  // Sports
+  "football","basketball","baseball","volleyball","golf-ball-tee","stopwatch",
+  "weight-hanging","person-skiing",
+];
 
-// ── Placeholder tokens available to every custom template (same $p fields
-// every other category can use — see render.php's parameter list) ──────────
-const TOKENS = ["heading","subheading","description","badge","footer","website","author","date","username","role","category_label","icon","bg_color","fg_color","accent_color","watermark"];
+// ── Placeholder tokens available to every custom template.
+// These are ALL the $p fields from render.php — use any in {{token}} syntax. ─
+const TOKENS = [
+  // Core content
+  "heading","subheading","description","badge","footer","website","author","date",
+  "category_label","icon","watermark",
+  // Identity / profile
+  "username","role",
+  // Color overrides (resolved as hex strings at render time)
+  "bg_color","fg_color","accent_color",
+  // Profile stats
+  "stat1_label","stat1_value","stat2_label","stat2_value","stat3_label","stat3_value",
+  // Dashboard metrics
+  "metric1","metric1_label","metric2","metric2_label","metric3","metric3_label",
+  // Repo / GitHub stats
+  "stars","forks","version","lang","filename",
+  // Terminal / code
+  "line1","line2","line3","line4","code","url_bar",
+];
 const SAMPLE_VALUES = {
   heading:"Ship faster with Custom Templates", subheading:"Built without touching GD code",
   description:"Design rich, on-brand cards using boxes, gradients, shadows and icons — no PHP required.",
