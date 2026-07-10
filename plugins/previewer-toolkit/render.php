@@ -544,6 +544,167 @@ function pt_noise(GdImage $im, int $x, int $y, int $w, int $h, string $noiseColo
     }
 }
 
+// ── New drawing helpers (used by the custom layout engine) ───────────────────
+
+function pt_grid_pattern(GdImage $im, int $x, int $y, int $w, int $h, string $hexColor, float $opacity = 0.05): void {
+    [$r,$g,$b] = pt_hex2rgb($hexColor);
+    $a = min(127, (int)(127 * (1 - $opacity)));
+    $color = imagecolorallocatealpha($im, $r, $g, $b, $a);
+    $spacing = max(24, (int)($w / 24));
+    for ($dy = $y; $dy <= $y + $h; $dy += $spacing) {
+        imagefilledrectangle($im, $x, $dy, $x + $w, $dy + 1, $color);
+    }
+    for ($dx = $x; $dx <= $x + $w; $dx += $spacing) {
+        imagefilledrectangle($im, $dx, $y, $dx + 1, $y + $h, $color);
+    }
+}
+
+function pt_diag_lines_pattern(GdImage $im, int $x, int $y, int $w, int $h, string $hexColor, float $opacity = 0.05): void {
+    [$r,$g,$b] = pt_hex2rgb($hexColor);
+    $a = min(127, (int)(127 * (1 - $opacity)));
+    $color = imagecolorallocatealpha($im, $r, $g, $b, $a);
+    $spacing = max(20, (int)($w / 28));
+    for ($d = -$h; $d < $w + $h; $d += $spacing) {
+        imageline($im, $x + $d, $y, $x + $d + $h, $y + $h, $color);
+    }
+}
+
+// Draws a filled shape primitive.
+function pt_draw_shape(GdImage $im, string $shape, int $x, int $y, int $w, int $h, int $color, int $radius = 0): void {
+    $cx = $x + (int)($w / 2); $cy = $y + (int)($h / 2);
+    switch ($shape) {
+        case 'circle':
+        case 'ellipse':
+            imagefilledellipse($im, $cx, $cy, $w, $h, $color);
+            break;
+        case 'triangle':
+            imagefilledpolygon($im, [$cx, $y, $x + $w, $y + $h, $x, $y + $h], $color);
+            break;
+        case 'triangle-down':
+            imagefilledpolygon($im, [$x, $y, $x + $w, $y, $cx, $y + $h], $color);
+            break;
+        case 'diamond':
+            imagefilledpolygon($im, [$cx, $y, $x + $w, $cy, $cx, $y + $h, $x, $cy], $color);
+            break;
+        case 'parallelogram':
+            $sk = (int)($w * 0.2);
+            imagefilledpolygon($im, [$x + $sk, $y, $x + $w, $y, $x + $w - $sk, $y + $h, $x, $y + $h], $color);
+            break;
+        case 'arrow-right':
+            $ah = (int)($h * 0.38); $bh = (int)($h * 0.28); $aw = (int)($w * 0.38);
+            imagefilledpolygon($im, [
+                $x, $cy - $bh, $x + $w - $aw, $cy - $bh, $x + $w - $aw, $cy - $ah,
+                $x + $w, $cy,
+                $x + $w - $aw, $cy + $ah, $x + $w - $aw, $cy + $bh, $x, $cy + $bh,
+            ], $color);
+            break;
+        case 'arrow-left':
+            $ah2 = (int)($h * 0.38); $bh2 = (int)($h * 0.28); $aw2 = (int)($w * 0.38);
+            imagefilledpolygon($im, [
+                $x + $w, $cy - $bh2, $x + $aw2, $cy - $bh2, $x + $aw2, $cy - $ah2,
+                $x, $cy,
+                $x + $aw2, $cy + $ah2, $x + $aw2, $cy + $bh2, $x + $w, $cy + $bh2,
+            ], $color);
+            break;
+        case 'star':
+            $pts = [];
+            for ($i = 0; $i < 10; $i++) {
+                $angle = (M_PI * 2 * $i / 10) - M_PI / 2;
+                $rad = ($i % 2 === 0) ? (min($w, $h) / 2) : (min($w, $h) / 4.2);
+                $pts[] = (int)($cx + $rad * cos($angle));
+                $pts[] = (int)($cy + $rad * sin($angle));
+            }
+            imagefilledpolygon($im, $pts, $color);
+            break;
+        case 'hexagon':
+            $pts2 = [];
+            for ($i = 0; $i < 6; $i++) {
+                $angle = (M_PI / 3) * $i - M_PI / 6;
+                $pts2[] = (int)($cx + ($w / 2) * cos($angle));
+                $pts2[] = (int)($cy + ($h / 2) * sin($angle));
+            }
+            imagefilledpolygon($im, $pts2, $color);
+            break;
+        case 'line':
+            imagesetthickness($im, max(1, $h));
+            imageline($im, $x, $cy, $x + $w, $cy, $color);
+            imagesetthickness($im, 1);
+            break;
+        case 'vline':
+            imagesetthickness($im, max(1, $w));
+            imageline($im, $cx, $y, $cx, $y + $h, $color);
+            imagesetthickness($im, 1);
+            break;
+        case 'pill':
+            pt_rounded_rect($im, $x, $y, $w, $h, (int)(min($w, $h) / 2), $color);
+            break;
+        case 'rect':
+        default:
+            pt_rounded_rect($im, $x, $y, $w, $h, $radius, $color);
+            break;
+    }
+}
+
+// Draws the stroke/outline of a shape.
+function pt_draw_shape_stroke(GdImage $im, string $shape, int $x, int $y, int $w, int $h, int $color, int $strokeW = 1, int $radius = 0): void {
+    imagesetthickness($im, max(1, $strokeW));
+    $cx = $x + (int)($w / 2); $cy = $y + (int)($h / 2);
+    switch ($shape) {
+        case 'circle':
+        case 'ellipse':
+            imageellipse($im, $cx, $cy, max(1, $w - $strokeW), max(1, $h - $strokeW), $color);
+            break;
+        case 'triangle':
+            imagepolygon($im, [$cx, $y, $x + $w, $y + $h, $x, $y + $h], $color);
+            break;
+        case 'triangle-down':
+            imagepolygon($im, [$x, $y, $x + $w, $y, $cx, $y + $h], $color);
+            break;
+        case 'diamond':
+            imagepolygon($im, [$cx, $y, $x + $w, $cy, $cx, $y + $h, $x, $cy], $color);
+            break;
+        case 'star':
+            $pts = [];
+            for ($i = 0; $i < 10; $i++) {
+                $angle = (M_PI * 2 * $i / 10) - M_PI / 2;
+                $rad = ($i % 2 === 0) ? (min($w, $h) / 2) : (min($w, $h) / 4.2);
+                $pts[] = (int)($cx + $rad * cos($angle));
+                $pts[] = (int)($cy + $rad * sin($angle));
+            }
+            imagepolygon($im, $pts, $color);
+            break;
+        case 'hexagon':
+            $pts2 = [];
+            for ($i = 0; $i < 6; $i++) {
+                $angle = (M_PI / 3) * $i - M_PI / 6;
+                $pts2[] = (int)($cx + ($w / 2) * cos($angle));
+                $pts2[] = (int)($cy + ($h / 2) * sin($angle));
+            }
+            imagepolygon($im, $pts2, $color);
+            break;
+        case 'pill':
+            pt_rounded_rect_border($im, $x, $y, $w, $h, (int)(min($w, $h) / 2), $color, $strokeW);
+            break;
+        case 'rect':
+        default:
+            pt_rounded_rect_border($im, $x, $y, $w, $h, $radius, $color, $strokeW);
+            break;
+    }
+    imagesetthickness($im, 1);
+}
+
+// Renders a node tree to a new truecolor canvas with alpha and returns it.
+// Caller is responsible for imagedestroy($canvas).
+function pt_render_to_canvas(array $node, array $p, int $w, int $h): GdImage {
+    $tmp = imagecreatetruecolor($w, $h);
+    imagealphablending($tmp, false);
+    imagesavealpha($tmp, true);
+    imagefill($tmp, 0, 0, imagecolorallocatealpha($tmp, 0, 0, 0, 127));
+    imagealphablending($tmp, true);
+    pt_layout_render($tmp, $node, $p, 0, 0, $w, $h);
+    return $tmp;
+}
+
 function pt_text_block(
     GdImage $im, string $font, float $size, int $x, int $y,
     string $hexColor, string $text, int $maxW, float $lineH,
@@ -715,13 +876,25 @@ function pt_layout_measure(array $node, array $p, int $availW, int $availH): arr
     if ($type === 'spacer') {
         return [(int)($node['width'] ?? 0), (int)($node['height'] ?? 0)];
     }
-    // box
+    if ($type === 'shape') {
+        return [(int)($node['width'] ?? 80), (int)($node['height'] ?? 80)];
+    }
+    if ($type === 'divider') {
+        $th = max(1, (int)($node['thickness'] ?? 1));
+        return ($node['axis'] ?? 'horizontal') === 'horizontal'
+            ? [$availW, $th + 4]
+            : [$th + 4, $availH];
+    }
+    // box — only flow-positioned children contribute to natural size
     [$pt_, $pr, $pb, $pl] = pt_layout_padding($node['padding'] ?? 0);
     $dir = ($node['direction'] ?? 'column') === 'row' ? 'row' : 'column';
     $gap = (int)($node['gap'] ?? 0);
     $innerW = max(0, $availW - $pl - $pr);
     $innerH = max(0, $availH - $pt_ - $pb);
-    $children = $node['children'] ?? [];
+    $children = array_values(array_filter(
+        $node['children'] ?? [],
+        fn($c) => ($c['position'] ?? 'flow') !== 'absolute'
+    ));
     $mainTotal = 0; $crossMax = 0; $n = count($children);
     foreach ($children as $child) {
         [$cw, $ch] = pt_layout_measure($child, $p, $innerW, $innerH);
@@ -748,6 +921,7 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
         $align = $node['align'] ?? 'left';
         $lineH = $size * (float)($node['lineHeight'] ?? 1.3);
         $maxLines = (int)($node['maxLines'] ?? 0);
+        $rotation = (float)($node['rotation'] ?? 0);
         $lines = pt_wrap_text($font, $size, $text, $w);
         if ($maxLines > 0 && count($lines) > $maxLines) {
             $lines = array_slice($lines, 0, $maxLines);
@@ -761,7 +935,46 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
         $startY = $y;
         if ($valign === 'middle') $startY = $y + (int)(($h - $textH) / 2);
         elseif ($valign === 'bottom') $startY = $y + $h - $textH;
-        pt_text_block($im, $font, $size, $x, $startY, $color, implode("\n", $lines), $w, $lineH, $align, 0);
+        // Text shadow
+        if (!empty($node['shadow']) && file_exists($font)) {
+            $sh = $node['shadow'];
+            $shHex = pt_layout_text($sh['color'] ?? '#000000', $p);
+            $shAlpha = min(127, (int)(127 * (1 - (float)($sh['shadow_opacity'] ?? $sh['opacity'] ?? 0.5))));
+            [$sr,$sg,$sb] = pt_hex2rgb($shHex);
+            $shadowC = imagecolorallocatealpha($im, $sr, $sg, $sb, $shAlpha);
+            $shX = (int)($sh['x'] ?? 2); $shY = (int)($sh['y'] ?? 2);
+            $shBlur = max(0, (int)($sh['blur'] ?? 4));
+            $shPasses = $shBlur > 0 ? 3 : 1;
+            $curY = (float)$startY;
+            foreach ($lines as $line) {
+                $bbox = imagettfbbox($size, 0, $font, $line);
+                $tw = abs($bbox[2] - $bbox[0]);
+                $tx = $x;
+                if ($align === 'center') $tx = $x + (int)(($w - $tw) / 2);
+                elseif ($align === 'right') $tx = $x + $w - $tw;
+                for ($sp = 0; $sp < $shPasses; $sp++) {
+                    $off = (int)($shBlur * $sp / max(1, $shPasses - 1));
+                    imagettftext($im, $size, -$rotation, $tx + $shX + $off, (int)($curY + $size) + $shY + $off, $shadowC, $font, $line);
+                }
+                $curY += $lineH;
+            }
+        }
+        // Main text — use direct imagettftext loop when rotation is needed
+        if ($rotation != 0 && file_exists($font)) {
+            $textColor = pt_color($im, $color);
+            $curY = (float)$startY;
+            foreach ($lines as $line) {
+                $bbox = imagettfbbox($size, 0, $font, $line);
+                $tw = abs($bbox[2] - $bbox[0]);
+                $tx = $x;
+                if ($align === 'center') $tx = $x + (int)(($w - $tw) / 2);
+                elseif ($align === 'right') $tx = $x + $w - $tw;
+                imagettftext($im, $size, -$rotation, $tx, (int)($curY + $size), $textColor, $font, $line);
+                $curY += $lineH;
+            }
+        } else {
+            pt_text_block($im, $font, $size, $x, $startY, $color, implode("\n", $lines), $w, $lineH, $align, 0);
+        }
         return;
     }
 
@@ -770,15 +983,213 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
         $color = pt_layout_text($node['color'] ?? '#ffffff', $p);
         $ix = $x + (int)(($w - $size) / 2);
         $iy = $y + (int)(($h - $size) / 2);
-        pt_icon($im, $node['icon'] ?? 'star', $ix, $iy, $size, $color);
+        $rotation = (float)($node['rotation'] ?? 0);
+        if ($rotation != 0 && file_exists(PT_FONT_FA)) {
+            $cp = pt_fa_codepoint($node['icon'] ?? 'star');
+            $char = pt_unicode_char($cp);
+            $iColor = pt_color($im, $color);
+            $iSize = $size * 0.75;
+            $bbox = imagettfbbox($iSize, 0, PT_FONT_FA, $char);
+            $tw = abs($bbox[2] - $bbox[0]); $th = abs($bbox[5] - $bbox[1]);
+            $tx = $ix + (int)(($size - $tw) / 2);
+            $ty = $iy + (int)(($size + $th) / 2);
+            imagettftext($im, $iSize, -$rotation, $tx, $ty, $iColor, PT_FONT_FA, $char);
+        } else {
+            pt_icon($im, $node['icon'] ?? 'star', $ix, $iy, $size, $color);
+        }
         return;
     }
 
     if ($type === 'spacer') return;
 
-    // box
+    // ── shape ────────────────────────────────────────────────────────────────
+    if ($type === 'shape') {
+        $shape = $node['shape'] ?? 'rect';
+        $fillHex = pt_layout_text($node['fill'] ?? '#3b82f6', $p);
+        $opacity = (float)($node['opacity'] ?? 1);
+        $rotation = (int)($node['rotation'] ?? 0);
+        $radius = (int)($node['radius'] ?? 0);
+        $alpha = $opacity < 1 ? min(127, (int)(127 * (1 - $opacity))) : 0;
+        [$fr,$fg,$fb] = pt_hex2rgb($fillHex);
+
+        // Gradient fill — draw to temp first so we can shape-mask it
+        $gradNode = $node['gradient'] ?? null;
+        if ($gradNode) {
+            $tmp = imagecreatetruecolor($w, $h);
+            imagealphablending($tmp, false); imagesavealpha($tmp, true);
+            $transp = imagecolorallocatealpha($tmp, 0, 0, 0, 127);
+            imagefill($tmp, 0, 0, $transp);
+            imagealphablending($tmp, true);
+            $gFrom = pt_layout_text($gradNode['from'] ?? '#000000', $p);
+            $gTo = pt_layout_text($gradNode['to'] ?? '#ffffff', $p);
+            $gAng = $gradNode['angle'] ?? 'vertical';
+            if ($gAng === 'horizontal') pt_gradient_h($tmp, 0, 0, $w, $h, $gFrom, $gTo);
+            elseif ($gAng === 'diagonal') pt_gradient_diag($tmp, 0, 0, $w, $h, $gFrom, $gTo);
+            else pt_gradient_v($tmp, 0, 0, $w, $h, $gFrom, $gTo);
+            // Mask gradient to shape outline
+            $mask = imagecreatetruecolor($w, $h);
+            imagealphablending($mask, false); imagesavealpha($mask, true);
+            imagefill($mask, 0, 0, imagecolorallocatealpha($mask, 0, 0, 0, 127));
+            $mFill = imagecolorallocatealpha($mask, 0, 0, 0, 0);
+            pt_draw_shape($mask, $shape, 0, 0, $w, $h, $mFill, $radius);
+            imagealphablending($tmp, false);
+            for ($py = 0; $py < $h; $py++) {
+                for ($px2 = 0; $px2 < $w; $px2++) {
+                    $maskA = (imagecolorat($mask, $px2, $py) >> 24) & 0x7F;
+                    if ($maskA === 127) {
+                        imagesetpixel($tmp, $px2, $py, $transp);
+                    } elseif ($alpha > 0) {
+                        // Apply shape opacity to visible pixels
+                        $c = imagecolorat($tmp, $px2, $py);
+                        $newA = min(127, (int)(($alpha / 127.0) * 127 + (($c >> 24) & 0x7F)));
+                        imagesetpixel($tmp, $px2, $py, ($newA << 24) | ($c & 0xFFFFFF));
+                    }
+                }
+            }
+            imagedestroy($mask);
+            // Stroke on gradient shape
+            if (!empty($node['stroke'])) {
+                imagealphablending($tmp, true);
+                $sc = imagecolorallocate($tmp, ...pt_hex2rgb(pt_layout_text($node['stroke']['color'] ?? '#ffffff', $p)));
+                pt_draw_shape_stroke($tmp, $shape, 0, 0, $w, $h, $sc, (int)($node['stroke']['width'] ?? 1), $radius);
+            }
+            // Rotation of gradient shape
+            if ($rotation !== 0) {
+                $gpad = (int)(max($w, $h) * 0.55);
+                $gtw = $w + $gpad * 2; $gth = $h + $gpad * 2;
+                $gBig = imagecreatetruecolor($gtw, $gth);
+                imagealphablending($gBig, false); imagesavealpha($gBig, true);
+                $gBg = imagecolorallocatealpha($gBig, 0, 0, 0, 127);
+                imagefill($gBig, 0, 0, $gBg);
+                imagealphablending($gBig, true);
+                imagecopy($gBig, $tmp, $gpad, $gpad, 0, 0, $w, $h);
+                imagedestroy($tmp);
+                $rotated = imagerotate($gBig, -$rotation, $gBg, true);
+                imagedestroy($gBig);
+                $rw = imagesx($rotated); $rh2 = imagesy($rotated);
+                imagealphablending($im, true);
+                imagecopy($im, $rotated, $x - (int)(($rw - $w) / 2), $y - (int)(($rh2 - $h) / 2), 0, 0, $rw, $rh2);
+                imagedestroy($rotated);
+            } else {
+                imagealphablending($im, true);
+                imagecopy($im, $tmp, $x, $y, 0, 0, $w, $h);
+                imagedestroy($tmp);
+            }
+        } else {
+            // Solid fill with optional rotation via temp canvas
+            if ($rotation !== 0) {
+                $pad = (int)(max($w, $h) * 0.55);
+                $tw2 = $w + $pad * 2; $th2 = $h + $pad * 2;
+                $tmp2 = imagecreatetruecolor($tw2, $th2);
+                imagealphablending($tmp2, false); imagesavealpha($tmp2, true);
+                $bg2 = imagecolorallocatealpha($tmp2, 0, 0, 0, 127);
+                imagefill($tmp2, 0, 0, $bg2);
+                imagealphablending($tmp2, true);
+                $tColor = imagecolorallocatealpha($tmp2, $fr, $fg, $fb, $alpha);
+                pt_draw_shape($tmp2, $shape, $pad, $pad, $w, $h, $tColor, $radius);
+                if (!empty($node['stroke'])) {
+                    $sc = imagecolorallocate($tmp2, ...pt_hex2rgb(pt_layout_text($node['stroke']['color'] ?? '#ffffff', $p)));
+                    pt_draw_shape_stroke($tmp2, $shape, $pad, $pad, $w, $h, $sc, (int)($node['stroke']['width'] ?? 1), $radius);
+                }
+                $rotated = imagerotate($tmp2, -$rotation, $bg2, true);
+                imagedestroy($tmp2);
+                $rw = imagesx($rotated); $rh2 = imagesy($rotated);
+                imagealphablending($im, true);
+                imagecopy($im, $rotated, $x - (int)(($rw - $w) / 2), $y - (int)(($rh2 - $h) / 2), 0, 0, $rw, $rh2);
+                imagedestroy($rotated);
+            } else {
+                $fillColor = imagecolorallocatealpha($im, $fr, $fg, $fb, $alpha);
+                pt_draw_shape($im, $shape, $x, $y, $w, $h, $fillColor, $radius);
+                if (!empty($node['stroke'])) {
+                    $sc = pt_color($im, pt_layout_text($node['stroke']['color'] ?? '#ffffff', $p));
+                    pt_draw_shape_stroke($im, $shape, $x, $y, $w, $h, $sc, (int)($node['stroke']['width'] ?? 1), $radius);
+                }
+            }
+        }
+        return;
+    }
+
+    // ── divider ──────────────────────────────────────────────────────────────
+    if ($type === 'divider') {
+        $axis = $node['axis'] ?? 'horizontal';
+        $hexColor = pt_layout_text($node['color'] ?? '#30363d', $p);
+        $opacity = (float)($node['opacity'] ?? 1);
+        $thickness = max(1, (int)($node['thickness'] ?? 1));
+        $alpha = $opacity < 1 ? min(127, (int)(127 * (1 - $opacity))) : 0;
+        [$dr,$dg,$db] = pt_hex2rgb($hexColor);
+        $lineColor = imagecolorallocatealpha($im, $dr, $dg, $db, $alpha);
+        imagesetthickness($im, $thickness);
+        if ($axis === 'horizontal') {
+            $my = $y + (int)($h / 2);
+            imageline($im, $x, $my, $x + $w, $my, $lineColor);
+        } else {
+            $mx = $x + (int)($w / 2);
+            imageline($im, $mx, $y, $mx, $y + $h, $lineColor);
+        }
+        imagesetthickness($im, 1);
+        return;
+    }
+
+    // ── box ──────────────────────────────────────────────────────────────────
     $opacity = (float)($node['opacity'] ?? 1);
     if ($opacity <= 0) return;
+
+    // Box rotation: render box to a temp canvas, rotate, composite
+    $rotation = (int)($node['rotation'] ?? 0);
+    if ($rotation !== 0) {
+        $pad = (int)(max($w, $h) * 0.55);
+        $tw2 = $w + $pad * 2; $th2 = $h + $pad * 2;
+        $tmp2 = imagecreatetruecolor($tw2, $th2);
+        imagealphablending($tmp2, false); imagesavealpha($tmp2, true);
+        $bg2 = imagecolorallocatealpha($tmp2, 0, 0, 0, 127);
+        imagefill($tmp2, 0, 0, $bg2);
+        imagealphablending($tmp2, true);
+        // Render the box (without rotation) into $tmp2 at offset $pad,$pad
+        $nodeNoRot = $node; unset($nodeNoRot['rotation']);
+        pt_layout_render($tmp2, $nodeNoRot, $p, $pad, $pad, $w, $h);
+        $rotated = imagerotate($tmp2, -$rotation, $bg2, true);
+        imagedestroy($tmp2);
+        $rw = imagesx($rotated); $rh2 = imagesy($rotated);
+        imagealphablending($im, true);
+        imagecopy($im, $rotated, $x - (int)(($rw - $w) / 2), $y - (int)(($rh2 - $h) / 2), 0, 0, $rw, $rh2);
+        imagedestroy($rotated);
+        return;
+    }
+
+    // Clip mask: render box to temp, pixel-mask, composite
+    $clip = $node['clip'] ?? '';
+    if ($clip === 'circle' || $clip === 'pill') {
+        $tmp3 = imagecreatetruecolor($w, $h);
+        imagealphablending($tmp3, false); imagesavealpha($tmp3, true);
+        $trans3 = imagecolorallocatealpha($tmp3, 0, 0, 0, 127);
+        imagefill($tmp3, 0, 0, $trans3);
+        imagealphablending($tmp3, true);
+        $nodeNoClip = $node; unset($nodeNoClip['clip']);
+        pt_layout_render($tmp3, $nodeNoClip, $p, 0, 0, $w, $h);
+        // Build mask
+        $mask3 = imagecreatetruecolor($w, $h);
+        imagealphablending($mask3, false); imagesavealpha($mask3, true);
+        imagefill($mask3, 0, 0, imagecolorallocatealpha($mask3, 0, 0, 0, 127));
+        $mFill3 = imagecolorallocatealpha($mask3, 0, 0, 0, 0);
+        if ($clip === 'circle') {
+            imagefilledellipse($mask3, (int)($w/2), (int)($h/2), $w, $h, $mFill3);
+        } else { // pill
+            $r = (int)(min($w, $h) / 2);
+            pt_rounded_rect($mask3, 0, 0, $w, $h, $r, $mFill3);
+        }
+        imagealphablending($tmp3, false);
+        for ($py = 0; $py < $h; $py++) {
+            for ($px3 = 0; $px3 < $w; $px3++) {
+                if ((imagecolorat($mask3, $px3, $py) >> 24 & 0x7F) === 127)
+                    imagesetpixel($tmp3, $px3, $py, $trans3);
+            }
+        }
+        imagedestroy($mask3);
+        imagealphablending($im, true);
+        imagecopy($im, $tmp3, $x, $y, 0, 0, $w, $h);
+        imagedestroy($tmp3);
+        return;
+    }
 
     $radius = (int)($node['radius'] ?? 0);
     if (!empty($node['shadow'])) {
@@ -803,8 +1214,6 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
             $to = pt_layout_text($bg['to'] ?? '#333333', $p);
             $angle = $bg['angle'] ?? 'vertical';
             if ($radius > 0) {
-                // Render gradient onto a temp canvas, then stamp it through a
-                // rounded-rect mask so corners stay clean.
                 $tmp = imagecreatetruecolor($w, $h);
                 imagesavealpha($tmp, true);
                 imagealphablending($tmp, true);
@@ -841,6 +1250,31 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
         }
     }
 
+    // Background pattern (drawn on top of background fill)
+    if (!empty($node['bgPattern'])) {
+        $pat = $node['bgPattern'];
+        $patType = $pat['type'] ?? 'grid';
+        $patColor = pt_layout_text($pat['color'] ?? '#ffffff', $p);
+        $patOpacity = (float)($pat['opacity'] ?? 0.15);
+        $patSize = (int)($pat['size'] ?? 20);
+        $patWidth = (int)($pat['width'] ?? 1);
+        [$pr2,$pg2,$pb2] = pt_hex2rgb($patColor);
+        $patAlpha = min(127, (int)(127 * (1 - $patOpacity)));
+        $patC = imagecolorallocatealpha($im, $pr2, $pg2, $pb2, $patAlpha);
+        if ($patType === 'grid') {
+            pt_grid_pattern($im, $x, $y, $w, $h, $patColor, $patOpacity);
+        } elseif ($patType === 'diagonal') {
+            pt_diag_lines_pattern($im, $x, $y, $w, $h, $patColor, $patOpacity);
+        } elseif ($patType === 'dots') {
+            $r2 = max(1, (int)($patSize / 6));
+            for ($dy = $y + $patSize; $dy < $y + $h; $dy += $patSize) {
+                for ($dx = $x + $patSize; $dx < $x + $w; $dx += $patSize) {
+                    imagefilledellipse($im, $dx, $dy, $r2 * 2, $r2 * 2, $patC);
+                }
+            }
+        }
+    }
+
     if (!empty($node['border'])) {
         $bWidth = (int)($node['border']['width'] ?? 1);
         $bColor = pt_color($im, pt_layout_text($node['border']['color'] ?? '#ffffff', $p));
@@ -850,8 +1284,15 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
     [$pt_, $pr, $pb, $pl] = pt_layout_padding($node['padding'] ?? 0);
     $cx = $x + $pl; $cy = $y + $pt_;
     $cw = max(0, $w - $pl - $pr); $ch = max(0, $h - $pt_ - $pb);
-    $children = $node['children'] ?? [];
-    if (empty($children)) return;
+    $allChildren = $node['children'] ?? [];
+    if (empty($allChildren)) return;
+
+    // Split into flow and absolute children
+    $flowChildren = []; $absChildren = [];
+    foreach ($allChildren as $child) {
+        if (($child['position'] ?? 'flow') === 'absolute') $absChildren[] = $child;
+        else $flowChildren[] = $child;
+    }
 
     $dir = ($node['direction'] ?? 'column') === 'row' ? 'row' : 'column';
     $justify = $node['justify'] ?? 'start';
@@ -859,12 +1300,11 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
     $gap = (int)($node['gap'] ?? 0);
     $mainAvail = $dir === 'row' ? $cw : $ch;
     $crossAvail = $dir === 'row' ? $ch : $cw;
-    $n = count($children);
+    $n = count($flowChildren);
 
-    // Pass 1: resolve each child's main-axis size; 'fill' children share
-    // whatever space is left after fixed/auto-sized siblings and gaps.
+    // Pass 1: resolve each flow child's main-axis size
     $sizes = []; $fixedTotal = 0; $fillCount = 0;
-    foreach ($children as $i => $child) {
+    foreach ($flowChildren as $i => $child) {
         $mainKey = $dir === 'row' ? 'width' : 'height';
         $val = $child[$mainKey] ?? 'auto';
         if ($val === 'fill' || $val === 'stretch') { $sizes[$i] = null; $fillCount++; continue; }
@@ -888,7 +1328,7 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
         case 'around': $cursor = $leftover / ($n + 1); $extraGap = $leftover / ($n + 1); break;
     }
 
-    foreach ($children as $i => $child) {
+    foreach ($flowChildren as $i => $child) {
         $mainKey = $dir === 'row' ? 'width' : 'height';
         $crossKey = $dir === 'row' ? 'height' : 'width';
         $mainSize = $sizes[$i];
@@ -915,6 +1355,16 @@ function pt_layout_render(GdImage $im, array $node, array $p, int $x, int $y, in
             pt_layout_render($im, $child, $p, $childX, $childY, $crossSize, $mainSize);
         }
         $cursor += $mainSize + $gap + $extraGap;
+    }
+
+    // Absolute children — positioned relative to content origin ($cx, $cy)
+    foreach ($absChildren as $child) {
+        $childAbsX = $cx + (int)($child['x'] ?? 0);
+        $childAbsY = $cy + (int)($child['y'] ?? 0);
+        [$childW, $childH] = pt_layout_measure($child, $p, $cw, $ch);
+        $childW = isset($child['width']) && is_numeric($child['width']) ? (int)$child['width'] : $childW;
+        $childH = isset($child['height']) && is_numeric($child['height']) ? (int)$child['height'] : $childH;
+        pt_layout_render($im, $child, $p, $childAbsX, $childAbsY, $childW, $childH);
     }
 }
 

@@ -133,8 +133,10 @@
       <button id="addText" title="Text bound to a placeholder or fixed text"><i class="fa-solid fa-font"></i> Text</button>
       <button id="addIcon" title="A Font Awesome icon"><i class="fa-solid fa-star"></i> Icon</button>
       <button id="addSpacer" title="Invisible flexible spacer — use with 'fill' to push siblings apart"><i class="fa-solid fa-arrows-left-right"></i> Spacer</button>
+      <button id="addShape" title="Circle, rectangle, triangle, or diamond with fill/stroke/rotation"><i class="fa-solid fa-shapes"></i> Shape</button>
+      <button id="addDivider" title="Horizontal or vertical separator line"><i class="fa-solid fa-minus"></i> Divider</button>
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Select a <b>Box</b> first — new elements are added inside it.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Select a <b>Box</b> first — new elements are added inside it.<br>Tip: <kbd>Del</kbd> removes, <kbd>Ctrl+D</kbd> duplicates, <kbd>Ctrl+Z</kbd>/<kbd>Ctrl+Y</kbd> undo/redo.</div>
     <h2 class="section-title">Layers</h2>
     <div id="layerTree"></div>
   </div>
@@ -300,10 +302,12 @@ const SAMPLE_VALUES = {
 // ── Node defaults — anything equal to these is omitted from the PHP export
 // to keep pasted code short and readable ────────────────────────────────────
 const DEFAULTS = {
-  box:   {direction:"column", justify:"start", align:"start", gap:0, padding:0, width:"auto", height:"auto", background:null, radius:0, border:null, shadow:null, opacity:1},
-  text:  {content:"Text", font:"regular", size:24, color:"#ffffff", align:"left", valign:"top", lineHeight:1.3, maxLines:0, transform:"none", width:"auto", height:"auto"},
-  icon:  {icon:"star", size:32, color:"#ffffff", width:"auto", height:"auto"},
+  box:   {direction:"column", justify:"start", align:"start", gap:0, padding:0, width:"auto", height:"auto", background:null, radius:0, border:null, shadow:null, opacity:1, rotation:0, bgPattern:null, clip:""},
+  text:  {content:"Text", font:"regular", size:24, color:"#ffffff", align:"left", valign:"top", lineHeight:1.3, maxLines:0, transform:"none", width:"auto", height:"auto", rotation:0, shadow:null},
+  icon:  {icon:"star", size:32, color:"#ffffff", width:"auto", height:"auto", rotation:0},
   spacer:{width:0, height:0},
+  shape: {shape:"rect", width:80, height:80, fill:"#3b82f6", stroke:null, radius:0, opacity:1, rotation:0, gradient:null, position:"flow", x:0, y:0},
+  divider:{axis:"horizontal", color:"#30363d", thickness:1, opacity:1},
 };
 
 let idSeq = 1;
@@ -390,12 +394,14 @@ function resolveToken(str){
 }
 
 // ── Rendering: layer tree ────────────────────────────────────────────────
-const ICON_FOR_TYPE = {box:"fa-square", text:"fa-font", icon:"fa-star", spacer:"fa-arrows-left-right"};
+const ICON_FOR_TYPE = {box:"fa-square", text:"fa-font", icon:"fa-star", spacer:"fa-arrows-left-right", shape:"fa-shapes", divider:"fa-minus"};
 function labelFor(node){
   if (node.id === state.root.id) return "Root (canvas)";
   if (node.type === "text") return (node.content || "Text").slice(0, 22) || "Text";
   if (node.type === "icon") return "Icon: " + node.icon;
   if (node.type === "spacer") return "Spacer";
+  if (node.type === "shape") return "Shape: " + (node.shape || "rect");
+  if (node.type === "divider") return "Divider (" + (node.axis || "horizontal") + ")";
   return node.direction === "row" ? "Row" : "Column";
 }
 function renderLayerNode(node, container, depth){
@@ -535,6 +541,57 @@ function renderPreviewNode(node){
   } else if (node.type === "spacer"){
     s.flex = "1 1 0%";
     s.minWidth = "0"; s.minHeight = "0";
+  } else if (node.type === "shape"){
+    const sw = (typeof node.width === "number" ? node.width : 80);
+    const sh2 = (typeof node.height === "number" ? node.height : 80);
+    s.width = sw + "px"; s.height = sh2 + "px";
+    s.flexShrink = "0";
+    s.opacity = node.opacity !== undefined ? node.opacity : 1;
+    const fillColor = resolveToken(node.fill || "#3b82f6");
+    const shapeKind = node.shape || "rect";
+    const rad = node.radius || 0;
+    if (shapeKind === "circle") {
+      s.borderRadius = "50%";
+      s.background = fillColor;
+    } else if (shapeKind === "pill") {
+      s.borderRadius = Math.min(sw, sh2) / 2 + "px";
+      s.background = fillColor;
+    } else if (shapeKind === "triangle") {
+      s.width = "0"; s.height = "0";
+      s.background = "transparent";
+      s.borderLeft = (sw/2) + "px solid transparent";
+      s.borderRight = (sw/2) + "px solid transparent";
+      s.borderBottom = sh2 + "px solid " + fillColor;
+    } else if (shapeKind === "diamond") {
+      s.background = fillColor;
+      s.transform = (node.rotation ? `rotate(${node.rotation}deg) ` : "") + "rotate(45deg)";
+    } else {
+      s.background = fillColor;
+      s.borderRadius = rad + "px";
+    }
+    if (shapeKind !== "diamond" && node.rotation) s.transform = `rotate(${node.rotation}deg)`;
+    if (node.stroke) s.outline = `${node.stroke.width||1}px solid ${resolveToken(node.stroke.color||"#fff")}`;
+    if (node.position === "absolute") { s.position = "absolute"; s.left = (node.x||0)+"px"; s.top = (node.y||0)+"px"; }
+  } else if (node.type === "divider"){
+    const axis = node.axis || "horizontal";
+    const thick = node.thickness || 1;
+    if (axis === "horizontal") {
+      s.width = "100%"; s.height = thick + "px";
+      s.background = resolveToken(node.color || "#30363d");
+      s.opacity = node.opacity !== undefined ? node.opacity : 1;
+      s.flexShrink = "0";
+    } else {
+      s.width = thick + "px"; s.height = "100%";
+      s.background = resolveToken(node.color || "#30363d");
+      s.opacity = node.opacity !== undefined ? node.opacity : 1;
+      s.flexShrink = "0";
+    }
+  }
+  // Absolute positioning for any node type
+  if (node.type !== "shape" && node.position === "absolute") {
+    s.position = "absolute";
+    s.left = (node.x || 0) + "px";
+    s.top = (node.y || 0) + "px";
   }
   return el;
 }
@@ -635,6 +692,91 @@ function renderInspector(){
     }
     html += `<div class="divider"></div>`;
     html += `<div class="field"><label>Opacity (0–1)</label><input type="number" step="0.05" min="0" max="1" data-k="opacity" value="${node.opacity}"></div>`;
+    html += `<div class="field"><label>Rotation (deg)</label><input type="number" step="1" min="-180" max="180" data-k="rotation" value="${node.rotation||0}"></div>`;
+    html += `<div class="divider"></div><h2 class="section-title">Clip &amp; Shape</h2>`;
+    html += `<div class="field"><label>Clip mask</label><div class="btn-group" data-group="clip"><button data-v="" class="${!node.clip?'active':''}">None</button><button data-v="circle" class="${node.clip==='circle'?'active':''}">Circle</button><button data-v="pill" class="${node.clip==='pill'?'active':''}">Pill</button></div></div>`;
+    html += `<div class="divider"></div><h2 class="section-title">Background Pattern</h2>`;
+    const hasPattern = !!node.bgPattern;
+    html += `<div class="toggle-row"><label>Pattern overlay</label><input type="checkbox" data-k="bgPatternEnabled" ${hasPattern?"checked":""}></div>`;
+    if (hasPattern){
+      const pt2 = node.bgPattern;
+      html += `<div class="field"><label>Type</label><div class="btn-group" data-group="pattype"><button data-v="grid" class="${pt2.type==='grid'?'active':''}">Grid</button><button data-v="diagonal" class="${pt2.type==='diagonal'?'active':''}">Lines</button><button data-v="dots" class="${pt2.type==='dots'?'active':''}">Dots</button></div></div>`;
+      html += `<div class="field-row">
+        <div class="field"><label>Size (px)</label><input type="number" data-k="patsize" value="${pt2.size||20}" min="4" max="120"></div>
+        <div class="field"><label>Line width</label><input type="number" data-k="patwidth" value="${pt2.width||1}" min="1" max="10"></div>
+      </div>`;
+      html += `<div class="field"><label>Color</label>` + colorRow("patcolor", pt2.color||"#ffffff") + `</div>`;
+      html += `<div class="field"><label>Opacity</label><input type="number" step="0.05" min="0" max="1" data-k="patopacity" value="${pt2.opacity!==undefined?pt2.opacity:0.15}"></div>`;
+    }
+  }
+
+  if (node.type === "shape"){
+    const shapeKind = node.shape || "rect";
+    html += `<div class="field"><label>Shape type</label><div class="btn-group" data-group="shape"><button data-v="rect" class="${shapeKind==='rect'?'active':''}">Rect</button><button data-v="circle" class="${shapeKind==='circle'?'active':''}">Circle</button><button data-v="pill" class="${shapeKind==='pill'?'active':''}">Pill</button><button data-v="triangle" class="${shapeKind==='triangle'?'active':''}">△</button><button data-v="diamond" class="${shapeKind==='diamond'?'active':''}">◇</button></div></div>`;
+    html += `<div class="field-row">
+      <div class="field"><label>Width (px)</label><input type="number" data-k="width" value="${node.width||80}" min="1"></div>
+      <div class="field"><label>Height (px)</label><input type="number" data-k="height" value="${node.height||80}" min="1"></div>
+    </div>`;
+    html += `<div class="field"><label>Fill color</label>` + colorRow("shapefill", node.fill||"#3b82f6") + `</div>`;
+    html += `<div class="field"><label>Border radius (px, rect only)</label><input type="number" data-k="radius" value="${node.radius||0}" min="0" max="500"></div>`;
+    html += `<div class="toggle-row"><label>Stroke (outline)</label><input type="checkbox" data-k="strokeEnabled" ${node.stroke?"checked":""}></div>`;
+    if (node.stroke){
+      html += `<div class="field-row">
+        <div class="field"><label>Stroke width (px)</label><input type="number" data-k="strokewidth" value="${node.stroke.width||1}" min="1" max="30"></div>
+        <div class="field"><label>Stroke color</label>` + colorRow("strokecolor", node.stroke.color||"#ffffff") + `</div>
+      </div>`;
+    }
+    html += `<div class="field-row">
+      <div class="field"><label>Opacity</label><input type="number" step="0.05" min="0" max="1" data-k="opacity" value="${node.opacity!==undefined?node.opacity:1}"></div>
+      <div class="field"><label>Rotation (deg)</label><input type="number" step="1" min="-180" max="180" data-k="rotation" value="${node.rotation||0}"></div>
+    </div>`;
+    html += `<div class="divider"></div><h2 class="section-title">Gradient fill</h2>`;
+    const hasGrad = !!node.gradient;
+    html += `<div class="toggle-row"><label>Gradient</label><input type="checkbox" data-k="shapeGradientEnabled" ${hasGrad?"checked":""}></div>`;
+    if (hasGrad){
+      const g = node.gradient;
+      html += `<div class="field"><label>Direction</label><div class="btn-group" data-group="shapeGradAngle"><button data-v="vertical" class="${g.angle==='vertical'?'active':''}">↓</button><button data-v="horizontal" class="${g.angle==='horizontal'?'active':''}">→</button><button data-v="diagonal" class="${g.angle==='diagonal'?'active':''}">↘</button></div></div>`;
+      html += `<div class="field-row">
+        <div class="field"><label>From</label>` + colorRow("shapegfrom", g.from||"#000000") + `</div>
+        <div class="field"><label>To</label>` + colorRow("shapegto", g.to||"#ffffff") + `</div>
+      </div>`;
+    }
+    html += `<div class="divider"></div><h2 class="section-title">Position</h2>`;
+    html += `<div class="field"><label>Position mode</label><div class="btn-group" data-group="position"><button data-v="flow" class="${(node.position||'flow')==='flow'?'active':''}">Flow</button><button data-v="absolute" class="${node.position==='absolute'?'active':''}">Absolute</button></div></div>`;
+    if (node.position === "absolute"){
+      html += `<div class="field-row">
+        <div class="field"><label>X (px from parent left)</label><input type="number" data-k="x" value="${node.x||0}"></div>
+        <div class="field"><label>Y (px from parent top)</label><input type="number" data-k="y" value="${node.y||0}"></div>
+      </div>`;
+    }
+  }
+
+  if (node.type === "divider"){
+    html += `<div class="field"><label>Axis</label><div class="btn-group" data-group="axis"><button data-v="horizontal" class="${(node.axis||'horizontal')==='horizontal'?'active':''}">— Horizontal</button><button data-v="vertical" class="${node.axis==='vertical'?'active':''}">| Vertical</button></div></div>`;
+    html += `<div class="field-row">
+      <div class="field"><label>Thickness (px)</label><input type="number" data-k="thickness" value="${node.thickness||1}" min="1" max="40"></div>
+      <div class="field"><label>Opacity</label><input type="number" step="0.05" min="0" max="1" data-k="opacity" value="${node.opacity!==undefined?node.opacity:1}"></div>
+    </div>`;
+    html += `<div class="field"><label>Color</label>` + colorRow("divcolor", node.color||"#30363d") + `</div>`;
+  }
+
+  // Rotation + shadow on text/icon
+  if (node.type === "text"){
+    html += `<div class="divider"></div><h2 class="section-title">Text rotation &amp; shadow</h2>`;
+    html += `<div class="field"><label>Rotation (deg)</label><input type="number" step="1" min="-180" max="180" data-k="rotation" value="${node.rotation||0}"></div>`;
+    html += `<div class="toggle-row"><label>Text shadow</label><input type="checkbox" data-k="textShadowEnabled" ${node.shadow?"checked":""}></div>`;
+    if (node.shadow){
+      const ts = node.shadow;
+      html += `<div class="quad">
+        <input type="number" data-k="tshadowx" value="${ts.x||2}" placeholder="X" title="Offset X">
+        <input type="number" data-k="tshadowy" value="${ts.y||2}" placeholder="Y" title="Offset Y">
+        <input type="number" data-k="tshadowblur" value="${ts.blur!==undefined?ts.blur:4}" placeholder="Blur" title="Blur passes">
+        <input type="number" step="0.05" data-k="tshadowopacity" value="${ts.shadow_opacity!==undefined?ts.shadow_opacity:ts.opacity!==undefined?ts.opacity:0.5}" placeholder="Opacity" title="Opacity" min="0" max="1">
+      </div>` + `<div style="margin-top:6px">` + colorRow("tshadowcolor", ts.color||"#000000") + `</div>`;
+    }
+  }
+  if (node.type === "icon"){
+    html += `<div class="field"><label>Rotation (deg)</label><input type="number" step="1" min="-180" max="180" data-k="rotation" value="${node.rotation||0}"></div>`;
   }
 
   box.innerHTML = html;
@@ -700,6 +842,10 @@ function applySimpleField(node, el){
   const k = el.dataset.k;
   if (k === "borderEnabled"){ node.border = el.checked ? {width:2, color:"#ffffff"} : null; renderAll(); return; }
   if (k === "shadowEnabled"){ node.shadow = el.checked ? {x:0, y:6, blur:16, color:"#000000", opacity:0.35} : null; renderAll(); return; }
+  if (k === "strokeEnabled"){ node.stroke = el.checked ? {width:2, color:"#ffffff"} : null; renderAll(); return; }
+  if (k === "textShadowEnabled"){ node.shadow = el.checked ? {x:2, y:2, blur:4, color:"#000000", shadow_opacity:0.5} : null; renderAll(); return; }
+  if (k === "bgPatternEnabled"){ node.bgPattern = el.checked ? {type:"grid", size:20, width:1, color:"#ffffff", opacity:0.15} : null; renderAll(); return; }
+  if (k === "shapeGradientEnabled"){ node.gradient = el.checked ? {angle:"vertical", from:"#000000", to:"#ffffff"} : null; renderAll(); return; }
   if (k.startsWith("padding")){
     const i = parseInt(k.slice(7), 10);
     if (typeof node.padding !== "object") node.padding = [node.padding||0, node.padding||0, node.padding||0, node.padding||0];
@@ -707,10 +853,18 @@ function applySimpleField(node, el){
     renderAll(); return;
   }
   if (k === "borderwidth"){ node.border.width = parseInt(el.value,10)||1; renderAll(); return; }
+  if (k === "strokewidth"){ if (node.stroke) { node.stroke.width = parseInt(el.value,10)||1; renderAll(); } return; }
   if (k === "shadowx"){ node.shadow.x = parseInt(el.value,10)||0; renderAll(); return; }
   if (k === "shadowy"){ node.shadow.y = parseInt(el.value,10)||0; renderAll(); return; }
   if (k === "shadowblur"){ node.shadow.blur = parseInt(el.value,10)||0; renderAll(); return; }
   if (k === "shadowopacity"){ node.shadow.opacity = parseFloat(el.value)||0; renderAll(); return; }
+  if (k === "tshadowx"){ if (node.shadow) { node.shadow.x = parseInt(el.value,10)||0; renderAll(); } return; }
+  if (k === "tshadowy"){ if (node.shadow) { node.shadow.y = parseInt(el.value,10)||0; renderAll(); } return; }
+  if (k === "tshadowblur"){ if (node.shadow) { node.shadow.blur = parseInt(el.value,10)||0; renderAll(); } return; }
+  if (k === "tshadowopacity"){ if (node.shadow) { node.shadow.shadow_opacity = parseFloat(el.value)||0; renderAll(); } return; }
+  if (k === "patsize"){ if (node.bgPattern) { node.bgPattern.size = parseInt(el.value,10)||20; renderAll(); } return; }
+  if (k === "patwidth"){ if (node.bgPattern) { node.bgPattern.width = parseInt(el.value,10)||1; renderAll(); } return; }
+  if (k === "patopacity"){ if (node.bgPattern) { node.bgPattern.opacity = parseFloat(el.value)||0.15; renderAll(); } return; }
   if (k.endsWith("text")) return; // handled via color input sync / free text below
   if (el.tagName === "TEXTAREA"){ node[k] = el.value; renderPreviewOnly(); return; }
   if (el.type === "number"){ node[k] = el.value === "" ? 0 : parseFloat(el.value); renderPreviewOnly(); return; }
@@ -724,6 +878,13 @@ function applyColorField(node, key, value){
   else if (key === "bgto") node.background.to = value;
   else if (key === "bordercolor") node.border.color = value;
   else if (key === "shadowcolor") node.shadow.color = value;
+  else if (key === "shapefill") node.fill = value;
+  else if (key === "strokecolor") { if (node.stroke) node.stroke.color = value; }
+  else if (key === "shapegfrom") { if (node.gradient) node.gradient.from = value; }
+  else if (key === "shapegto") { if (node.gradient) node.gradient.to = value; }
+  else if (key === "patcolor") { if (node.bgPattern) node.bgPattern.color = value; }
+  else if (key === "divcolor") node.color = value;
+  else if (key === "tshadowcolor") { if (node.shadow) node.shadow.color = value; }
   renderPreviewOnly();
 }
 function applyGroupField(node, group, val){
@@ -740,6 +901,12 @@ function applyGroupField(node, group, val){
   if (group === "valign"){ node.valign = val; renderAll(); return; }
   if (group === "transform"){ node.transform = val; renderAll(); return; }
   if (group === "direction"){ node.direction = val; renderAll(); return; }
+  if (group === "shape"){ node.shape = val; renderAll(); return; }
+  if (group === "clip"){ node.clip = val; renderAll(); return; }
+  if (group === "position"){ node.position = val; renderAll(); return; }
+  if (group === "axis"){ node.axis = val; renderAll(); return; }
+  if (group === "shapeGradAngle"){ if (node.gradient) node.gradient.angle = val; renderAll(); return; }
+  if (group === "pattype"){ if (node.bgPattern) node.bgPattern.type = val; renderAll(); return; }
   node[group] = val;
   renderAll();
 }
@@ -775,8 +942,43 @@ function insertToken(node, tokenEl){
   }
 }
 
+// ── Undo / redo history ──────────────────────────────────────────────────
+const history = { stack: [], cursor: -1, maxLen: 50 };
+function historyPush(){
+  const snap = JSON.stringify({root: state.root, selectedId: state.selectedId, canvasW: state.canvasW, canvasH: state.canvasH});
+  // Discard forward branch
+  if (history.cursor < history.stack.length - 1)
+    history.stack.splice(history.cursor + 1);
+  // Avoid duplicate consecutive entries
+  if (history.stack[history.cursor] !== snap){
+    history.stack.push(snap);
+    if (history.stack.length > history.maxLen) history.stack.shift();
+    history.cursor = history.stack.length - 1;
+  }
+}
+function historyUndo(){
+  if (history.cursor <= 0) return;
+  history.cursor--;
+  historyApply();
+}
+function historyRedo(){
+  if (history.cursor >= history.stack.length - 1) return;
+  history.cursor++;
+  historyApply();
+}
+function historyApply(){
+  const s = JSON.parse(history.stack[history.cursor]);
+  // Re-assign ids tracking seq to avoid collisions
+  state.root = s.root; state.selectedId = s.selectedId;
+  state.canvasW = s.canvasW; state.canvasH = s.canvasH;
+  document.getElementById("canvasW").value = state.canvasW;
+  document.getElementById("canvasH").value = state.canvasH;
+  renderAll(/*skipHistory*/true);
+}
+
 // ── Main render loop ─────────────────────────────────────────────────────
-function renderAll(){
+function renderAll(skipHistory){
+  if (!skipHistory) historyPush();
   document.getElementById("layerTree").innerHTML = "";
   renderLayerNode(state.root, document.getElementById("layerTree"), 0);
   renderInspector();
@@ -816,6 +1018,12 @@ document.getElementById("addIcon").addEventListener("click", () => {
 });
 document.getElementById("addSpacer").addEventListener("click", () => {
   const n = makeNode("spacer"); currentContainer().children.push(n); state.selectedId = n.id; renderAll();
+});
+document.getElementById("addShape").addEventListener("click", () => {
+  const n = makeNode("shape"); currentContainer().children.push(n); state.selectedId = n.id; renderAll();
+});
+document.getElementById("addDivider").addEventListener("click", () => {
+  const n = makeNode("divider"); currentContainer().children.push(n); state.selectedId = n.id; renderAll();
 });
 
 // ── Canvas size controls ──────────────────────────────────────────────────
@@ -942,6 +1150,45 @@ document.getElementById("btnCopyExport").addEventListener("click", () => {
 document.getElementById("btnDownloadExport").addEventListener("click", () => {
   const id = slug(document.getElementById("exportId").value);
   downloadText(document.getElementById("exportCode").value, id + ".php.txt", "text/plain");
+});
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────
+document.addEventListener("keydown", (e) => {
+  // Skip when typing in an input/textarea
+  const tag = document.activeElement && document.activeElement.tagName;
+  const editing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+  // Undo / Redo (always active)
+  if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey){ e.preventDefault(); historyUndo(); return; }
+  if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))){ e.preventDefault(); historyRedo(); return; }
+
+  if (editing) return;
+
+  // Delete selected node
+  if ((e.key === "Delete" || e.key === "Backspace") && state.selectedId !== state.root.id){
+    e.preventDefault();
+    handleLayerAction(state.selectedId, "del");
+    return;
+  }
+  // Duplicate (Ctrl+D)
+  if ((e.ctrlKey || e.metaKey) && e.key === "d"){
+    e.preventDefault();
+    if (state.selectedId !== state.root.id) handleLayerAction(state.selectedId, "dup");
+    return;
+  }
+  // Arrow keys: nudge absolute-position node
+  if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){
+    const node = findNode(state.root, state.selectedId);
+    if (node && node.position === "absolute"){
+      e.preventDefault();
+      const step = e.shiftKey ? 10 : 1;
+      if (e.key === "ArrowLeft")  node.x = (node.x || 0) - step;
+      if (e.key === "ArrowRight") node.x = (node.x || 0) + step;
+      if (e.key === "ArrowUp")    node.y = (node.y || 0) - step;
+      if (e.key === "ArrowDown")  node.y = (node.y || 0) + step;
+      renderAll();
+    }
+  }
 });
 
 // ── Boot ───────────────────────────────────────────────────────────────────
