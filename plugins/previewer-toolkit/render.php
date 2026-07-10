@@ -141,7 +141,7 @@ function pt_fa_codepoint(string $name): int {
         'sitemap'           => 0xf0e8, 'trophy'            => 0xf091,
         'medal'             => 0xf5a2, 'crown'             => 0xf521,
         'gem'               => 0xf3a5, 'microchip'         => 0xf2db,
-        'cpu'               => 0xf2db, 'network-wired'     => 0xf6ff,
+        'cpu'               => 0xe4e4, 'network-wired'     => 0xf6ff,
         'broadcast-tower'   => 0xf519, 'tools'             => 0xf7d9,
         'hammer'            => 0xf6e3, 'magic'             => 0xf0d0,
         'wand-magic-sparkles'=> 0xe2ca,'robot'             => 0xf544,
@@ -476,17 +476,23 @@ function pt_gradient_h(GdImage $im, int $x, int $y, int $w, int $h, string $c1, 
 function pt_gradient_diag(GdImage $im, int $x, int $y, int $w, int $h, string $c1, string $c2): void {
     [$r1,$g1,$b1] = pt_hex2rgb($c1);
     [$r2,$g2,$b2] = pt_hex2rgb($c2);
+    // Cache colors by quantised blend level (512 steps) so we call
+    // imagecolorallocate at most 512 times instead of once per pixel.
+    $cache = [];
     for ($i = 0; $i < $h; $i++) {
         $t = $h > 1 ? $i / ($h - 1) : 0;
         for ($j = 0; $j < $w; $j++) {
             $tj = $w > 1 ? $j / ($w - 1) : 0;
-            $tt = ($t + $tj) / 2;
-            $color = imagecolorallocate($im,
-                (int)($r1 + ($r2-$r1)*$tt),
-                (int)($g1 + ($g2-$g1)*$tt),
-                (int)($b1 + ($b2-$b1)*$tt)
-            );
-            imagesetpixel($im, $x+$j, $y+$i, $color);
+            $tt  = ($t + $tj) / 2;
+            $lvl = (int)round($tt * 511);          // 0–511
+            if (!isset($cache[$lvl])) {
+                $cache[$lvl] = imagecolorallocate($im,
+                    (int)($r1 + ($r2-$r1)*$tt),
+                    (int)($g1 + ($g2-$g1)*$tt),
+                    (int)($b1 + ($b2-$b1)*$tt)
+                );
+            }
+            imagesetpixel($im, $x+$j, $y+$i, $cache[$lvl]);
         }
     }
 }
@@ -523,11 +529,12 @@ function pt_dot_grid(GdImage $im, int $x, int $y, int $w, int $h, string $dotCol
     [$r,$g,$b] = pt_hex2rgb($dotColor);
     $a = min(127, (int)(127 * (1 - $opacity)));
     $color = imagecolorallocatealpha($im, $r, $g, $b, $a);
-    imagecolortransparent($im, $color);
+    // NOTE: do NOT call imagecolortransparent() here — it would make the dot
+    // color transparent and render nothing. Alpha blending handles the opacity.
     $spacing = max(20, (int)($w / 30));
     for ($dy = $y + $spacing; $dy < $y + $h; $dy += $spacing) {
         for ($dx = $x + $spacing; $dx < $x + $w; $dx += $spacing) {
-            imagefilledellipse($im, $dx, $dy, 2, 2, $color);
+            imagefilledellipse($im, $dx, $dy, 3, 3, $color);
         }
     }
 }
@@ -538,8 +545,8 @@ function pt_noise(GdImage $im, int $x, int $y, int $w, int $h, string $noiseColo
     $count = (int)($total * $density);
     $c = imagecolorallocatealpha($im, $r, $g, $b, 100);
     for ($i = 0; $i < $count; $i++) {
-        $px = $x + rand(0, $w - 1);
-        $py = $y + rand(0, $h - 1);
+        $px = $x + mt_rand(0, $w - 1);
+        $py = $y + mt_rand(0, $h - 1);
         imagesetpixel($im, $px, $py, $c);
     }
 }

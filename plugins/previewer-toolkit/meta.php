@@ -67,7 +67,22 @@ function pt_fetch_url(string $url): string|false {
         ], 'ssl' => [
             'verify_peer'      => true,
             'verify_peer_name' => true,
-            'cafile'           => '/etc/ssl/certs/ca-certificates.crt',
+            // Resolve the system CA bundle portably across Debian, CentOS,
+            // cPanel, and macOS hosts. Fall back to PHP's compiled-in default
+            // when no bundle is found at the expected paths.
+            'cafile'           => (static function (): ?string {
+                static $paths = [
+                    '/etc/ssl/certs/ca-certificates.crt',      // Debian/Ubuntu
+                    '/etc/pki/tls/certs/ca-bundle.crt',        // RHEL/CentOS/cPanel
+                    '/etc/ssl/ca-bundle.pem',                  // OpenSUSE
+                    '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem', // Fedora
+                    '/usr/local/etc/openssl/cert.pem',         // macOS brew
+                ];
+                foreach ($paths as $p) {
+                    if (is_readable($p)) return $p;
+                }
+                return null;  // let PHP use its compiled-in default
+            })(),
         ]]);
 
         $body = @file_get_contents($current, false, $ctx, 0, 500000);

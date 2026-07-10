@@ -136,7 +136,7 @@ ob_start();
           <button class="pt-cat-btn <?= $c['id'] === 'og' ? 'pt-cat-active' : '' ?>"
                   data-cat="<?= $c['id'] ?>"
                   onclick="PT.selectCategory('<?= $c['id'] ?>', this)">
-            <span class="pt-cat-icon"><i class="fa-solid fa-<?= $c['icon'] ?>"></i></span>
+            <span class="pt-cat-icon"><i class="fa-solid fa-<?= htmlspecialchars($c['icon'], ENT_QUOTES) ?>"></i></span>
             <span class="pt-cat-info">
               <span class="pt-cat-name"><?= $c['label'] ?></span>
               <span class="pt-cat-count"><?= $tplCount ?> template<?= $tplCount === 1 ? '' : 's' ?></span>

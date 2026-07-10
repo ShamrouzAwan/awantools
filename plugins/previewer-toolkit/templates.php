@@ -435,18 +435,42 @@ $GITHUB_SPECS = [
 //       'root'       => [ ... a node tree, see below ... ],
 //   ];
 // A node is one of:
+//
 //   ['type'=>'box',  'direction'=>'row'|'column', 'justify'=>.., 'align'=>..,
 //    'gap'=>int, 'padding'=>[t,r,b,l]|int, 'width'=>'auto'|'fill'|'NN%'|int,
 //    'height'=>same, 'background'=>['type'=>'solid','color'=>'#hex'] or
 //    ['type'=>'gradient','angle'=>'vertical'|'horizontal'|'diagonal','from'=>'#hex','to'=>'#hex'],
 //    'radius'=>int, 'border'=>['width'=>int,'color'=>'#hex'],
 //    'shadow'=>['x'=>int,'y'=>int,'blur'=>int,'color'=>'#hex','opacity'=>0..1],
-//    'opacity'=>0..1, 'children'=>[ ...nodes... ]]
+//    'opacity'=>0..1, 'rotation'=>0..359 (degrees, clockwise),
+//    'clip'=>'circle'|'pill' (pixel-mask the box to that shape),
+//    'bgPattern'=>['type'=>'grid'|'diagonal'|'dots','color'=>'#hex','opacity'=>0..1,
+//                  'size'=>int,'width'=>int],
+//    'position'=>'absolute', 'x'=>int, 'y'=>int  (absolute coords within parent)
+//    'children'=>[ ...nodes... ]]
+//
 //   ['type'=>'text', 'content'=>'{{heading}}', 'font'=>'regular'|'bold',
 //    'size'=>int, 'color'=>'#hex', 'align'=>'left'|'center'|'right',
 //    'valign'=>'top'|'middle'|'bottom', 'lineHeight'=>float, 'maxLines'=>int,
-//    'transform'=>'none'|'uppercase', 'width'=>.., 'height'=>..]
-//   ['type'=>'icon', 'icon'=>'star', 'size'=>int, 'color'=>'#hex']
+//    'transform'=>'none'|'uppercase', 'width'=>.., 'height'=>..,
+//    'rotation'=>0..359,
+//    'shadow'=>['x'=>int,'y'=>int,'blur'=>int,'color'=>'#hex','opacity'=>0..1]]
+//
+//   ['type'=>'icon', 'icon'=>'star', 'size'=>int, 'color'=>'#hex',
+//    'rotation'=>0..359]
+//
+//   ['type'=>'shape', 'shape'=>'rect'|'circle'|'pill'|'triangle'|'triangle-down'|
+//    'diamond'|'hexagon'|'star'|'parallelogram'|'arrow-right'|'arrow-left'|'line'|'vline',
+//    'width'=>int, 'height'=>int,
+//    'fill'=>'#hex', 'opacity'=>0..1, 'rotation'=>0..359,
+//    'stroke'=>['color'=>'#hex','width'=>int],
+//    'gradient'=>['angle'=>'vertical'|'horizontal'|'diagonal','from'=>'#hex','to'=>'#hex']]
+//
+//   ['type'=>'divider', 'orientation'=>'horizontal'|'vertical',
+//    'width'=>int (for horizontal: length; for vertical: thickness)|'fill',
+//    'height'=>int (for vertical: length; for horizontal: thickness)|'fill',
+//    'color'=>'#hex', 'opacity'=>0..1]
+//
 // `content` and any 'color' value may use {{placeholder}} tokens resolved
 // from the same fields every other category uses: heading, subheading,
 // description, badge, footer, website, author, date, username, role,
