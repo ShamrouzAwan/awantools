@@ -992,32 +992,9 @@ $content = ob_get_clean();
 // --- Dynamic OG Image (Previewer Toolkit profile card) ---
 // Use siteUrl() so the URL is always the public-facing host (respects site_url DB
 // setting, falls back to REPLIT_DOMAINS on Replit dev, then HTTP_HOST elsewhere).
-$_ogBase    = rtrim(siteUrl(), '/');
-// Tool count: real sum of offered tools for active plugins, rounded down to nearest 10
+
 $_ogCount   = max(10, (int)(floor(max(1, $totalPlugins) / 10) * 10));
-$_ogBadge   = $_ogCount . '+ Active Tools,No Subscriptions,Free Forever';
-$_ogParams  = http_build_query([
-    'category'          => 'profile',
-    'template'          => 'minimal',
-    'icon'              => 'terminal',
-    'heading'           => 'Awan Tools',
-    'subheading'        => 'Free Online Utilities',
-    'description'       => "Free collection of fast, reliable, and privacy-friendly online tools designed to simplify everyday tasks. From quick utilities to professional workflows.\nNo complexity, No extra logins, No subscriptions.",
-    'footer'            => 'Developer: Shamrouz Awan',
-    'badge'             => $_ogBadge,
-    'bg_color'          => 'ffffff',
-    'heading_color'     => '111827',
-    'description_color' => '6b7280',
-    'accent_color'      => '3d8bff',
-    'font'              => 'Poppins',
-    'radius'            => '20',
-    'padding'           => '54',
-    'width'             => '800',
-    'height'            => '470',
-    'format'            => 'png',
-    'username'          => '@shamrouzawan',
-]);
-$_ogImageUrl = $_ogBase . '/plugins/previewer-toolkit/?' . $_ogParams;
+$_ogImageUrl = "https://awantools.site/plugins/previewer-toolkit/render?category=custom&template=platform_homepage&width=1200&height=630&format=png&heading=Awan+Tools&description=Awan+Tools+is+a+free+collection+of+fast%2C+reliable%2C+and+privacy-friendly+online+tools+designed+to+simplify+everyday+tasks.+From+quick+utilities+to+professional+workflows.+No+complexity%2C+No+extra+logins%2C+No+subscriptions.&badge=".$_ogCount."&icon=tools&website=AwanTools.SIte&author=%40Shamrouz&font_size=43&padding=10&radius=0&bg_color=0d1117&accent_color=3b82f6&heading_color=ffffff&description_color=8b949e";
 
 require THEMES_PATH . '/default/templates/layout.php';
 render_page($settings->siteName(), $content, [
