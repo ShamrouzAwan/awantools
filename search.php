@@ -232,4 +232,5 @@ $content = ob_get_clean();
 require THEMES_PATH . '/default/templates/layout.php';
 render_page('Search' . ($q ? ' — ' . $q : ''), $content, [
     'description' => 'Search Awan Tools for free online tools, articles, and pages.',
+    'robots'      => 'noindex, follow',
 ]);

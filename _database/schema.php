@@ -9,7 +9,7 @@ function schema_init(object $db): void {
     // ─── Schema version cache ─────────────────────────────────────────────────
     // Bump SCHEMA_VERSION whenever tables, columns, or seeded data change.
     // On each request, this function returns early if the DB is already at this version.
-    $schemaVersion = '2.7';
+    $schemaVersion = '2.8';
     try {
         $row = $db->fetch("SELECT value FROM settings WHERE `key` = 'schema_version'");
         if ($row && $row['value'] === $schemaVersion) return;
@@ -476,6 +476,12 @@ function schema_init(object $db): void {
         "ALTER TABLE user_preferences ADD COLUMN email_notifications INTEGER NOT NULL DEFAULT 1",
         "ALTER TABLE user_preferences ADD COLUMN theme VARCHAR(20) DEFAULT NULL",
         "ALTER TABLE user_preferences ADD COLUMN items_per_page INTEGER DEFAULT NULL",
+        // Plugins: per-plugin SEO overrides (v2.8)
+        "ALTER TABLE plugins ADD COLUMN seo_title      VARCHAR(255) DEFAULT NULL",
+        "ALTER TABLE plugins ADD COLUMN seo_desc       VARCHAR(500) DEFAULT NULL",
+        "ALTER TABLE plugins ADD COLUMN og_title       VARCHAR(255) DEFAULT NULL",
+        "ALTER TABLE plugins ADD COLUMN og_description VARCHAR(500) DEFAULT NULL",
+        "ALTER TABLE plugins ADD COLUMN og_image       VARCHAR(500) DEFAULT NULL",
     ];
     foreach ($migrations as $sql) {
         try { $db->query($sql); } catch (Throwable $e) {}

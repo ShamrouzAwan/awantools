@@ -342,8 +342,13 @@ if ($seo instanceof Seo) {
 }
 
 render_page($post['title'], $content, [
-    'description' => $post['meta_desc'] ?? $post['excerpt'] ?? substr(strip_tags($post['content'] ?? ''), 0, 160),
-    'og_image'    => $post['og_image'] ?? $post['cover_image'] ?? '',
-    'canonical'   => '/blog/' . $slug,
-    'schema_org'  => $blogJsonLd,
+    'description'        => $post['meta_desc'] ?? $post['excerpt'] ?? substr(strip_tags($post['content'] ?? ''), 0, 160),
+    'og_image'           => $post['og_image'] ?? $post['cover_image'] ?? '',
+    'og_type'            => 'article',
+    'og_title'           => $post['og_title'] ?? '',
+    'og_description'     => $post['og_description'] ?? '',
+    'canonical'          => '/blog/' . $slug,
+    'article_published'  => $post['published_at'] ?? $post['created_at'] ?? '',
+    'article_modified'   => $post['updated_at'] ?? $post['published_at'] ?? $post['created_at'] ?? '',
+    'schema_org'         => $blogJsonLd,
 ]);

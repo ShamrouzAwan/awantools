@@ -135,4 +135,6 @@ ob_start();
 <?php
 $pageContent = ob_get_clean();
 require THEMES_PATH . '/default/templates/layout.php';
-render_page('@' . $profileUser['username'] . ' — ' . $settings->get('site_name', 'AWAN Platform'), $pageContent);
+render_page('@' . $profileUser['username'] . ' — ' . $settings->get('site_name', 'AWAN Platform'), $pageContent, [
+    'robots' => 'noindex, follow',
+]);

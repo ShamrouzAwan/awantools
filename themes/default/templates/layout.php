@@ -41,13 +41,78 @@ function render_page(string $title, string $content, array $opts = []): void {
         ) ?: [];
     } catch (Throwable $e) {}
 
+    // Detect if current page is a plugin page (must come before SEO override logic)
+    $isPluginPage = (bool) preg_match('#^/plugins/([a-z0-9_\-]+)#i', $currentPath);
+    $pluginSlugMatch = [];
+    preg_match('#^/plugins/([a-z0-9_\-]+)#i', $currentPath, $pluginSlugMatch);
+    $currentPluginSlug = $pluginSlugMatch[1] ?? '';
+
+    // ── Static page SEO overrides (editable via Admin → Page SEO Manager) ──
+    $_staticPageMap = [
+        '/'               => 'homepage',
+        '/faq'            => 'faq',
+        '/contact'        => 'contact',
+        '/terms'          => 'terms',
+        '/terms-of-service' => 'terms',
+        '/privacy'        => 'privacy',
+        '/privacy-policy' => 'privacy',
+        '/disclaimer'     => 'disclaimer',
+        '/cookie-policy'  => 'cookie_policy',
+        '/blog'           => 'blog',
+        '/blog/'          => 'blog',
+        '/plugins'        => 'plugins_list',
+        '/plugins/'       => 'plugins_list',
+        '/search'         => 'search',
+        '/register'       => 'register',
+        '/login'          => 'login',
+    ];
+    $_spKey = $_staticPageMap[$currentPath] ?? null;
+    if ($_spKey) {
+        $_spTitle   = $settings->get("seo_page_{$_spKey}_title", '');
+        $_spDesc    = $settings->get("seo_page_{$_spKey}_desc", '');
+        $_spOgImage = $settings->get("seo_page_{$_spKey}_og_image", '');
+        if ($_spTitle)   $title = $_spTitle;
+        if ($_spDesc)    $opts['description'] = $_spDesc;
+        if ($_spOgImage) $opts['og_image']    = $_spOgImage;
+    }
+
+    // ── Plugin page SEO overrides (editable via Admin → Page SEO Manager) ──
+    if ($isPluginPage && $currentPluginSlug && !in_array($currentPluginSlug, ['_sdk', 'index', 'rate'])) {
+        try {
+            $_plugSeo = $db->fetch(
+                "SELECT name, seo_title, seo_desc, og_title, og_description, og_image FROM plugins WHERE slug = ?",
+                [$currentPluginSlug]
+            );
+            if ($_plugSeo) {
+                if (!empty($_plugSeo['seo_title']))       $title = $_plugSeo['seo_title'];
+                if (!empty($_plugSeo['seo_desc']))        $opts['description']    = $_plugSeo['seo_desc'];
+                if (!empty($_plugSeo['og_title']))        $opts['og_title']       = $_plugSeo['og_title'];
+                if (!empty($_plugSeo['og_description']))  $opts['og_description'] = $_plugSeo['og_description'];
+                if (!empty($_plugSeo['og_image']))        $opts['og_image']       = $_plugSeo['og_image'];
+                if (empty($opts['schema_org']) && $seo instanceof Seo) {
+                    $opts['schema_org'] = $seo->pluginSchema([
+                        'slug'        => $currentPluginSlug,
+                        'name'        => $_plugSeo['name'] ?? $title,
+                        'description' => $opts['description'] ?? '',
+                    ]);
+                }
+            }
+        } catch (Throwable $_e) {}
+    }
+
     // SEO
     $htmlTitle = ($seo instanceof Seo) ? $seo->formatTitle($title) : ($title . ' — ' . $siteName);
     $seoTags   = ($seo instanceof Seo) ? $seo->headTags([
-        'title'       => $title,
-        'description' => $opts['description'] ?? $settings->siteTagline(),
-        'image'       => $opts['og_image'] ?? '',
-        'canonical'   => $opts['canonical'] ?? '',
+        'title'              => $title,
+        'description'        => $opts['description'] ?? $settings->siteTagline(),
+        'image'              => $opts['og_image'] ?? '',
+        'canonical'          => $opts['canonical'] ?? '',
+        'og_title'           => $opts['og_title'] ?? '',
+        'og_description'     => $opts['og_description'] ?? '',
+        'og_type'            => $opts['og_type'] ?? '',
+        'robots'             => $opts['robots'] ?? '',
+        'article_published'  => $opts['article_published'] ?? '',
+        'article_modified'   => $opts['article_modified'] ?? '',
     ]) : '    <meta name="description" content="' . e($settings->siteTagline()) . '">' . "\n";
     $gtmNoscript = ($seo instanceof Seo) ? $seo->bodyStart() : '';
     $bodyScripts = ($seo instanceof Seo) ? $seo->bodyEnd() : '';
@@ -56,18 +121,13 @@ function render_page(string $title, string $content, array $opts = []): void {
     $schemaOrgTags = '';
     if ($seo instanceof Seo) {
         if (!empty($opts['schema_org'])) {
-            // Per-page custom schema (e.g. BlogPosting) passed from individual page
+            // Per-page custom schema (e.g. BlogPosting, FAQPage, SoftwareApplication) passed from page
             $schemaOrgTags = $opts['schema_org'];
         } elseif ($currentPath === '/') {
             $schemaOrgTags = $seo->homepageSchema();
         }
     }
 
-    // Detect if current page is a plugin page for global issue report button
-    $isPluginPage = (bool) preg_match('#^/plugins/([a-z0-9_\-]+)#i', $currentPath);
-    $pluginSlugMatch = [];
-    preg_match('#^/plugins/([a-z0-9_\-]+)#i', $currentPath, $pluginSlugMatch);
-    $currentPluginSlug = $pluginSlugMatch[1] ?? '';
     ?>
 <!DOCTYPE html>
 <html lang="<?= e($lang) ?>" data-theme="">

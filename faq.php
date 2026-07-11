@@ -87,4 +87,17 @@ ob_start();
 <?php
 $content = ob_get_clean();
 require THEMES_PATH . '/default/templates/layout.php';
-render_page('FAQ', $content, ['description' => 'Frequently asked questions about AWAN Platform — installation, plugins, security, and more.']);
+
+// FAQPage JSON-LD — flatten all categories into a single entity list
+$_faqItems = [];
+foreach ($faqs as $_items) {
+    foreach ($_items as $_faq) {
+        $_faqItems[] = ['q' => $_faq['q'], 'a' => $_faq['a']];
+    }
+}
+$_faqSchema = ($seo instanceof Seo) ? $seo->faqPageSchema($_faqItems) : '';
+
+render_page('FAQ', $content, [
+    'description' => 'Frequently asked questions about AWAN Platform — installation, plugins, security, and more.',
+    'schema_org'  => $_faqSchema,
+]);

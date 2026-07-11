@@ -58,14 +58,25 @@ class Seo {
             if ($base) $image = rtrim($base, '/') . '/' . ltrim($image, '/');
         }
 
+        // ── Per-page OG overrides & article dates ──
+        $ogTitle  = !empty($opts['og_title'])       ? $opts['og_title']       : $title;
+        $ogDesc   = !empty($opts['og_description']) ? $opts['og_description'] : $desc;
+        $ogTypeOv = $opts['og_type']           ?? null;
+        $artPub   = $opts['article_published'] ?? '';
+        $artMod   = $opts['article_modified']  ?? '';
+
         // ── Standard meta ──
         if ($desc)     $out .= '    <meta name="description" content="' . e($desc) . '">' . "\n";
         if ($keywords) $out .= '    <meta name="keywords" content="' . e($keywords) . '">' . "\n";
 
         // ── Robots ──
-        $idx = $this->settings->get('seo_robots_index', '1') === '1' ? 'index' : 'noindex';
-        $flw = $this->settings->get('seo_robots_follow', '1') === '1' ? 'follow' : 'nofollow';
-        $out .= '    <meta name="robots" content="' . $idx . ', ' . $flw . '">' . "\n";
+        if (!empty($opts['robots'])) {
+            $out .= '    <meta name="robots" content="' . e($opts['robots']) . '">' . "\n";
+        } else {
+            $idx = $this->settings->get('seo_robots_index', '1') === '1' ? 'index' : 'noindex';
+            $flw = $this->settings->get('seo_robots_follow', '1') === '1' ? 'follow' : 'nofollow';
+            $out .= '    <meta name="robots" content="' . $idx . ', ' . $flw . '">' . "\n";
+        }
 
         // ── Canonical ──
         if ($canonUrl) $out .= '    <link rel="canonical" href="' . e($canonUrl) . '">' . "\n";
@@ -79,16 +90,19 @@ class Seo {
         // ── OpenGraph ──
         if ($this->settings->get('og_enabled', '1') === '1') {
             $ogSite   = $this->settings->get('og_site_name', '') ?: $siteName;
-            $ogType   = $this->settings->get('og_type', 'website');
+            $ogType   = $ogTypeOv ?: $this->settings->get('og_type', 'website');
             $ogLocale = $this->settings->get('og_locale', 'en_US');
 
             $out .= '    <meta property="og:type" content="'      . e($ogType)   . '">' . "\n";
             $out .= '    <meta property="og:site_name" content="' . e($ogSite)   . '">' . "\n";
             $out .= '    <meta property="og:locale" content="'    . e($ogLocale) . '">' . "\n";
-            if ($title)    $out .= '    <meta property="og:title" content="'       . e($title)   . '">' . "\n";
-            if ($desc)     $out .= '    <meta property="og:description" content="' . e($desc)    . '">' . "\n";
-            if ($image)    $out .= '    <meta property="og:image" content="'       . e($image)   . '">' . "\n";
-            if ($canonUrl) $out .= '    <meta property="og:url" content="'         . e($canonUrl). '">' . "\n";
+            if ($ogTitle)  $out .= '    <meta property="og:title" content="'       . e($ogTitle)  . '">' . "\n";
+            if ($ogDesc)   $out .= '    <meta property="og:description" content="' . e($ogDesc)   . '">' . "\n";
+            if ($image)    $out .= '    <meta property="og:image" content="'       . e($image)    . '">' . "\n";
+            if ($canonUrl) $out .= '    <meta property="og:url" content="'         . e($canonUrl) . '">' . "\n";
+            // Article-specific Open Graph tags (for blog posts)
+            if ($artPub)  $out .= '    <meta property="article:published_time" content="' . e($artPub) . '">' . "\n";
+            if ($artMod)  $out .= '    <meta property="article:modified_time" content="'  . e($artMod) . '">' . "\n";
         }
 
         // ── Twitter / X Card ──
@@ -99,9 +113,9 @@ class Seo {
             $out .= '    <meta name="twitter:card" content="' . e($tCard) . '">' . "\n";
             if ($twSite)    $out .= '    <meta name="twitter:site" content="@' . e($twSite) . '">' . "\n";
             if ($twCreator) $out .= '    <meta name="twitter:creator" content="@' . e($twCreator) . '">' . "\n";
-            if ($title)  $out .= '    <meta name="twitter:title" content="'       . e($title) . '">' . "\n";
-            if ($desc)   $out .= '    <meta name="twitter:description" content="' . e($desc)  . '">' . "\n";
-            if ($image)  $out .= '    <meta name="twitter:image" content="'       . e($image) . '">' . "\n";
+            if ($ogTitle) $out .= '    <meta name="twitter:title" content="'       . e($ogTitle) . '">' . "\n";
+            if ($ogDesc)  $out .= '    <meta name="twitter:description" content="' . e($ogDesc)  . '">' . "\n";
+            if ($image)   $out .= '    <meta name="twitter:image" content="'       . e($image)   . '">' . "\n";
         }
 
         // ── Webmaster verification meta tags ──
@@ -343,5 +357,65 @@ class Seo {
         if ($this->settings->get('recaptcha_enabled', '0') !== '1') return false;
         if (!$this->settings->get('recaptcha_site_key', '')) return false;
         return $this->settings->get('recaptcha_on_' . $form, '1') === '1';
+    }
+
+    // ─── FAQPage Schema ────────────────────────────────────────────────────────
+
+    /**
+     * Return JSON-LD FAQPage schema.
+     * @param array $items  Flat array of ['q' => ..., 'a' => ...] pairs (HTML allowed in 'a').
+     */
+    public function faqPageSchema(array $items): string {
+        if (empty($items)) return '';
+        $entities = [];
+        foreach ($items as $item) {
+            if (empty($item['q'])) continue;
+            $entities[] = [
+                '@type' => 'Question',
+                'name'  => $item['q'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => strip_tags($item['a'] ?? ''),
+                ],
+            ];
+        }
+        if (empty($entities)) return '';
+        return $this->schemaOrg([
+            '@context'   => 'https://schema.org',
+            '@type'      => 'FAQPage',
+            'mainEntity' => $entities,
+        ]);
+    }
+
+    // ─── Plugin / WebApplication Schema ────────────────────────────────────────
+
+    /**
+     * Return JSON-LD SoftwareApplication schema for a plugin page.
+     * @param array $plugin  Keys: slug, name, description. siteUrl resolved internally.
+     */
+    public function pluginSchema(array $plugin): string {
+        $siteUrl = rtrim($this->settings->get('seo_canonical_url') ?: $this->settings->get('site_url', ''), '/');
+        if (!$siteUrl) {
+            $scheme  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host    = $_SERVER['HTTP_HOST'] ?? '';
+            if ($host) $siteUrl = $scheme . '://' . $host;
+        }
+        $slug = $plugin['slug'] ?? '';
+        $url  = $siteUrl ? $siteUrl . '/plugins/' . $slug . '/' : '/plugins/' . $slug . '/';
+        $data = [
+            '@context'            => 'https://schema.org',
+            '@type'               => 'SoftwareApplication',
+            'name'                => $plugin['name'] ?? '',
+            'url'                 => $url,
+            'applicationCategory' => 'WebApplication',
+            'operatingSystem'     => 'Any',
+            'offers'              => [
+                '@type'         => 'Offer',
+                'price'         => '0',
+                'priceCurrency' => 'USD',
+            ],
+        ];
+        if (!empty($plugin['description'])) $data['description'] = $plugin['description'];
+        return $this->schemaOrg($data);
     }
 }

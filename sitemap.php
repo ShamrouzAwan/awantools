@@ -16,9 +16,10 @@ $priHome    = $settings->get('sitemap_priority_home', '1.0');
 $priPages   = $settings->get('sitemap_priority_pages', '0.8');
 $incUsers   = $settings->get('sitemap_include_users', '0') === '1';
 
-$pages   = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
-$users   = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
-$plugins = $db->fetchAll("SELECT slug, installed_at FROM plugins WHERE status='active' ORDER BY slug ASC");
+$pages      = $db->fetchAll("SELECT slug, updated_at, created_at FROM pages WHERE status='published' ORDER BY updated_at DESC");
+$users      = $incUsers ? $db->fetchAll("SELECT username, updated_at FROM users WHERE status='active' ORDER BY username ASC") : [];
+$plugins    = $db->fetchAll("SELECT slug, installed_at FROM plugins WHERE status='active' ORDER BY slug ASC");
+$blogPosts  = $db->fetchAll("SELECT slug, updated_at, published_at FROM blog_posts WHERE status='published' ORDER BY published_at DESC");
 
 $base = $siteUrl ?: 'http://localhost';
 
@@ -35,6 +36,18 @@ echo "    <changefreq>daily</changefreq>\n";
 echo "    <priority>" . e($priHome) . "</priority>\n";
 echo "    <lastmod>" . date('Y-m-d') . "</lastmod>\n";
 echo "  </url>\n";
+
+// Published blog posts
+foreach ($blogPosts as $post) {
+    $lastmod = $post['updated_at'] ?? $post['published_at'] ?? null;
+    $lastmod = $lastmod ? date('Y-m-d', strtotime($lastmod)) : date('Y-m-d');
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($base . '/blog/' . $post['slug'], ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>" . $lastmod . "</lastmod>\n";
+    echo "    <changefreq>monthly</changefreq>\n";
+    echo "    <priority>0.7</priority>\n";
+    echo "  </url>\n";
+}
 
 // Published CMS pages
 foreach ($pages as $page) {

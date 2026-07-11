@@ -5,7 +5,7 @@ requireAdmin();
 
 $logger   = Logger::getInstance($db);
 $tab      = Security::sanitize($_GET['tab'] ?? 'general');
-$validTabs = ['general', 'opengraph', 'analytics', 'verification', 'recaptcha', 'sitemap'];
+$validTabs = ['general', 'opengraph', 'analytics', 'verification', 'recaptcha', 'sitemap', 'audit'];
 if (!in_array($tab, $validTabs)) $tab = 'general';
 
 // ─── POST handler ─────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 $siteUrl    = rtrim($settings->get('seo_canonical_url') ?: $settings->get('site_url', ''), '/');
-$tabLabels  = ['general' => 'General', 'opengraph' => 'OpenGraph & Social', 'analytics' => 'Analytics', 'verification' => 'Webmaster', 'recaptcha' => 'reCAPTCHA', 'sitemap' => 'Sitemap & Robots'];
+$tabLabels  = ['general' => 'General', 'opengraph' => 'OpenGraph & Social', 'analytics' => 'Analytics', 'verification' => 'Webmaster', 'recaptcha' => 'reCAPTCHA', 'sitemap' => 'Sitemap & Robots', 'audit' => 'SEO Audit'];
 
 ob_start();
 ?>
@@ -506,12 +506,149 @@ ob_start();
         </div>
     </div>
 
+    <?php /* ===================== SEO AUDIT ===================== */ elseif ($tab === 'audit'): ?>
+    <?php
+    // ── Gather data for audit ──────────────────────────────────────────────────
+    $_auditPlugins   = [];
+    $_auditBlog      = [];
+    $_auditPages     = [];
+    $_auditStatic    = [];
+
+    try { $_auditPlugins = $db->fetchAll("SELECT slug, name, description, seo_title, seo_desc FROM plugins WHERE status='active' ORDER BY name ASC") ?: []; } catch (Throwable $e) {}
+    try { $_auditBlog    = $db->fetchAll("SELECT id, title, slug, meta_desc, og_image FROM blog_posts WHERE status='published' ORDER BY published_at DESC LIMIT 50") ?: []; } catch (Throwable $e) {}
+    try { $_auditPages   = $db->fetchAll("SELECT id, title, slug, seo_title, seo_desc, og_image FROM pages WHERE status='published' ORDER BY title ASC") ?: []; } catch (Throwable $e) {}
+
+    $_auditStaticDef = [
+        ['id' => 'homepage',     'label' => 'Homepage',          'url' => '/'],
+        ['id' => 'plugins_list', 'label' => 'Tools (/plugins)',   'url' => '/plugins'],
+        ['id' => 'blog',         'label' => 'Blog Index',         'url' => '/blog'],
+        ['id' => 'faq',          'label' => 'FAQ',                'url' => '/faq'],
+        ['id' => 'contact',      'label' => 'Contact',            'url' => '/contact'],
+        ['id' => 'terms',        'label' => 'Terms of Service',   'url' => '/terms'],
+        ['id' => 'privacy',      'label' => 'Privacy Policy',     'url' => '/privacy'],
+        ['id' => 'disclaimer',   'label' => 'Disclaimer',         'url' => '/disclaimer'],
+        ['id' => 'cookie_policy','label' => 'Cookie Policy',      'url' => '/cookie-policy'],
+    ];
+    foreach ($_auditStaticDef as &$_sp) {
+        $_sp['seo_title'] = $settings->get("seo_page_{$_sp['id']}_title", '');
+        $_sp['seo_desc']  = $settings->get("seo_page_{$_sp['id']}_desc", '');
+        $_sp['og_image']  = $settings->get("seo_page_{$_sp['id']}_og_image", '');
+    }
+    unset($_sp);
+
+    function _auditHealth(string $desc, string $og_image, string $title_override = ''): array {
+        $score = 0; $issues = [];
+        $len = mb_strlen($desc);
+        if ($desc) {
+            if ($len >= 50 && $len <= 160) $score += 2;
+            else { $score++; $issues[] = "Desc {$len} chars (ideal 50–160)"; }
+        } else { $issues[] = 'No meta description'; }
+        if ($og_image) $score++;
+        else $issues[] = 'No OG image';
+        if ($title_override) $score++;
+        $cls = $score >= 4 ? 'success' : ($score >= 2 ? 'warning' : 'danger');
+        $lbl = $score >= 4 ? 'Good'    : ($score >= 2 ? 'Fair'    : 'Weak');
+        return ['cls' => $cls, 'lbl' => $lbl, 'issues' => $issues];
+    }
+
+    // Counts
+    $_counts = ['good' => 0, 'fair' => 0, 'weak' => 0];
+    foreach ($_auditPlugins as $r) {
+        $h = _auditHealth($r['seo_desc'] ?? $r['description'] ?? '', '', $r['seo_title'] ?? '');
+        $_counts[$h['cls'] === 'success' ? 'good' : ($h['cls'] === 'warning' ? 'fair' : 'weak')]++;
+    }
+    foreach ($_auditBlog as $r) {
+        $h = _auditHealth($r['meta_desc'] ?? '', $r['og_image'] ?? '');
+        $_counts[$h['cls'] === 'success' ? 'good' : ($h['cls'] === 'warning' ? 'fair' : 'weak')]++;
+    }
+    foreach ($_auditPages as $r) {
+        $h = _auditHealth($r['seo_desc'] ?? '', $r['og_image'] ?? '', $r['seo_title'] ?? '');
+        $_counts[$h['cls'] === 'success' ? 'good' : ($h['cls'] === 'warning' ? 'fair' : 'weak')]++;
+    }
+    foreach ($_auditStaticDef as $r) {
+        $h = _auditHealth($r['seo_desc'] ?? '', $r['og_image'] ?? '', $r['seo_title'] ?? '');
+        $_counts[$h['cls'] === 'success' ? 'good' : ($h['cls'] === 'warning' ? 'fair' : 'weak')]++;
+    }
+    $_total = array_sum($_counts);
+    ?>
+    <div class="grid-3" style="gap:16px;margin-bottom:24px">
+        <div class="card" style="border-left:3px solid var(--color-success)">
+            <div class="card-body" style="padding:16px">
+                <div style="font-size:28px;font-weight:700;color:var(--color-success)"><?= $_counts['good'] ?></div>
+                <div style="font-size:13px;color:var(--color-text-muted)">Good — full SEO coverage</div>
+            </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--color-warning)">
+            <div class="card-body" style="padding:16px">
+                <div style="font-size:28px;font-weight:700;color:var(--color-warning)"><?= $_counts['fair'] ?></div>
+                <div style="font-size:13px;color:var(--color-text-muted)">Fair — minor issues</div>
+            </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--color-danger)">
+            <div class="card-body" style="padding:16px">
+                <div style="font-size:28px;font-weight:700;color:var(--color-danger)"><?= $_counts['weak'] ?></div>
+                <div style="font-size:13px;color:var(--color-text-muted)">Weak — needs attention</div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    // Build a combined "needs attention" list
+    $_needsAttention = [];
+    foreach ($_auditPlugins as $r) {
+        $h = _auditHealth($r['seo_desc'] ?? $r['description'] ?? '', '', $r['seo_title'] ?? '');
+        if ($h['cls'] !== 'success') $_needsAttention[] = ['type' => 'Plugin', 'name' => $r['name'], 'url' => '/plugins/' . $r['slug'] . '/', 'health' => $h];
+    }
+    foreach ($_auditBlog as $r) {
+        $h = _auditHealth($r['meta_desc'] ?? '', $r['og_image'] ?? '');
+        if ($h['cls'] !== 'success') $_needsAttention[] = ['type' => 'Blog', 'name' => $r['title'], 'url' => '/blog/' . $r['slug'], 'health' => $h];
+    }
+    foreach ($_auditPages as $r) {
+        $h = _auditHealth($r['seo_desc'] ?? '', $r['og_image'] ?? '', $r['seo_title'] ?? '');
+        if ($h['cls'] !== 'success') $_needsAttention[] = ['type' => 'CMS Page', 'name' => $r['title'], 'url' => '/' . $r['slug'], 'health' => $h];
+    }
+    foreach ($_auditStaticDef as $r) {
+        $h = _auditHealth($r['seo_desc'], $r['og_image'], $r['seo_title']);
+        if ($h['cls'] !== 'success') $_needsAttention[] = ['type' => 'Static', 'name' => $r['label'], 'url' => $r['url'], 'health' => $h];
+    }
+    // Sort: weak first, fair second
+    usort($_needsAttention, fn($a, $b) => ($a['health']['cls'] === 'danger' ? 0 : 1) - ($b['health']['cls'] === 'danger' ? 0 : 1));
+    ?>
+
+    <?php if (!empty($_needsAttention)): ?>
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Pages Needing Attention (<?= count($_needsAttention) ?>)</span>
+            <a href="/admin/seo-pages" class="btn btn-primary btn-sm">Fix in Page SEO Manager →</a>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Page</th><th>Type</th><th>Status</th><th>Issues</th></tr></thead>
+                <tbody>
+                <?php foreach ($_needsAttention as $_row): ?>
+                <tr>
+                    <td><a href="<?= e($_row['url']) ?>" target="_blank" style="color:var(--color-primary)"><?= e($_row['name']) ?></a></td>
+                    <td><span class="badge badge-ghost" style="font-size:11px"><?= e($_row['type']) ?></span></td>
+                    <td><span class="badge badge-<?= $_row['health']['cls'] ?>"><?= $_row['health']['lbl'] ?></span></td>
+                    <td style="font-size:12px;color:var(--color-text-muted)"><?= e(implode(' · ', $_row['health']['issues'])) ?></td>
+                </tr>
+                <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php else: ?>
+    <div class="alert alert-success">All tracked pages have good SEO coverage. 🎉</div>
     <?php endif ?>
 
+    <?php endif ?>
+
+    <?php if ($tab !== 'audit'): ?>
     <div style="margin-top:16px">
         <button type="submit" class="btn btn-primary">Save Settings</button>
         <a href="?tab=<?= e($tab) ?>" class="btn btn-ghost">Reset</a>
     </div>
+    <?php endif ?>
 </form>
 </div>
 <?php
