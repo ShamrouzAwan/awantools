@@ -476,40 +476,727 @@ $GITHUB_SPECS = [
 // description, badge, footer, website, author, date, username, role,
 // category_label, icon, bg_color, fg_color, accent_color, watermark.
 // ════════════════════════════════════════════════════════════════════════════
-
-$CUSTOM_SPECS = [
-    // Paste your exported templates here. This one ships as a live example so
-    // you can see the shape of a real entry and try the "custom" category
-    // immediately — feel free to delete it once you've added your own.
-    'sample_card' => [
-        'name' => 'Sample Rich Card',
-        'default_w' => 1200,
-        'default_h' => 630,
-        'root' => [
-            'type' => 'box', 'direction' => 'column', 'justify' => 'center', 'align' => 'stretch',
-            'padding' => 64, 'gap' => 20,
-            'background' => ['type' => 'gradient', 'angle' => 'diagonal', 'from' => '#0f172a', 'to' => '#1e293b'],
-            'children' => [
-                [
-                    'type' => 'box', 'direction' => 'row', 'align' => 'center', 'gap' => 12,
-                    'width' => 'auto', 'height' => 'auto',
-                    'children' => [
-                        [
-                            'type' => 'box', 'width' => 56, 'height' => 56, 'radius' => 16, 'align' => 'center', 'justify' => 'center',
-                            'background' => ['type' => 'gradient', 'angle' => 'diagonal', 'from' => '{{accent_color}}', 'to' => '#60a5fa'],
-                            'shadow' => ['x' => 0, 'y' => 6, 'blur' => 16, 'color' => '#000000', 'opacity' => 0.35],
-                            'children' => [['type' => 'icon', 'icon' => '{{icon}}', 'size' => 28, 'color' => '#ffffff']],
+$CUSTOM_SPECS['platform_homepage'] = [
+    'name' => 'Awan Tools - Homepage',
+    'default_w' => 1200,
+    'default_h' => 630,
+    'root' => [
+        'type' => 'box',
+        'justify' => 'center',
+        'gap' => 20,
+        'padding' => 64,
+        'background' => [
+            'type' => 'solid',
+            'color' => '#ffffff',
+        ],
+        'children' => [
+            [
+                'type' => 'box',
+                'justify' => 'center',
+                'align' => 'center',
+                'gap' => 12,
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'padding' => [
+                            30,
+                            30,
+                            30,
+                            30,
                         ],
-                        ['type' => 'text', 'content' => '{{badge}}', 'size' => 18, 'color' => '{{accent_color}}', 'font' => 'bold', 'valign' => 'middle', 'height' => 56],
+                        'width' => 200,
+                        'height' => 200,
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#ffffff',
+                        ],
+                        'radius' => 100,
+                        'clip' => 'circle',
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'tools',
+                                'size' => 120,
+                                'color' => '#0066ff',
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'text',
+                        'content' => '{{heading}}',
+                        'font' => 'bold',
+                        'size' => 36,
+                        'color' => '#0066ff',
+                        'align' => 'center',
+                        'valign' => 'middle',
+                        'lineHeight' => 2,
+                    ],
+                    [
+                        'type' => 'text',
+                        'content' => '{{description}}',
+                        'color' => '#8f8f8f',
+                        'align' => 'center',
+                        'valign' => 'middle',
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'gap' => 30,
+                        'padding' => [
+                            3,
+                            0,
+                            33,
+                            0,
+                        ],
+                        'children' => [
+                            [
+                                'type' => 'box',
+                                'direction' => 'row',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'gap' => 5,
+                                'padding' => [
+                                    10,
+                                    20,
+                                    10,
+                                    20,
+                                ],
+                                'background' => [
+                                    'type' => 'solid',
+                                    'color' => '#0066ff',
+                                ],
+                                'radius' => 204,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'tools',
+                                        'size' => 26,
+                                    ],
+                                    [
+                                        'type' => 'text',
+                                        'content' => '{{badge}}+ Tools',
+                                        'size' => 18,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'box',
+                                'direction' => 'row',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'gap' => 5,
+                                'padding' => [
+                                    10,
+                                    20,
+                                    10,
+                                    20,
+                                ],
+                                'background' => [
+                                    'type' => 'solid',
+                                    'color' => '#0066ff',
+                                ],
+                                'radius' => 204,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'user',
+                                        'size' => 26,
+                                    ],
+                                    [
+                                        'type' => 'text',
+                                        'content' => 'No Logins',
+                                        'size' => 18,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'box',
+                                'direction' => 'row',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'gap' => 5,
+                                'padding' => [
+                                    10,
+                                    20,
+                                    10,
+                                    20,
+                                ],
+                                'background' => [
+                                    'type' => 'solid',
+                                    'color' => '#0066ff',
+                                ],
+                                'radius' => 204,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'dollar-sign',
+                                        'size' => 26,
+                                    ],
+                                    [
+                                        'type' => 'text',
+                                        'content' => '100% Free',
+                                        'size' => 18,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'divider',
+                        'color' => '#cfcfcf',
+                        'thickness' => 3,
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'between',
+                        'align' => 'end',
+                        'width' => 'fill',
+                        'children' => [
+                            [
+                                'type' => 'box',
+                                'direction' => 'row',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'gap' => 7,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'globe',
+                                        'size' => 20,
+                                        'color' => '#8f8f8f',
+                                    ],
+                                    [
+                                        'type' => 'text',
+                                        'content' => '{{website}}',
+                                        'size' => 18,
+                                        'color' => '#8f8f8f',
+                                        'align' => 'center',
+                                        'valign' => 'middle',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'box',
+                                'direction' => 'row',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'gap' => 7,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'code',
+                                        'size' => 20,
+                                        'color' => '#8f8f8f',
+                                    ],
+                                    [
+                                        'type' => 'text',
+                                        'content' => '{{author}}',
+                                        'size' => 18,
+                                        'color' => '#8f8f8f',
+                                        'align' => 'center',
+                                        'valign' => 'middle',
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
-                ['type' => 'text', 'content' => '{{heading}}', 'size' => 56, 'font' => 'bold', 'color' => '#f8fafc', 'maxLines' => 2, 'lineHeight' => 1.15],
-                ['type' => 'text', 'content' => '{{description}}', 'size' => 24, 'color' => '#94a3b8', 'maxLines' => 2, 'lineHeight' => 1.4],
-                [
-                    'type' => 'box', 'direction' => 'row', 'justify' => 'between', 'align' => 'center', 'height' => 'fill',
-                    'children' => [
-                        ['type' => 'spacer'],
-                        ['type' => 'text', 'content' => '{{website}}', 'size' => 20, 'color' => '#64748b', 'align' => 'right', 'valign' => 'bottom'],
+            ],
+        ],
+    ],
+];
+$CUSTOM_SPECS['my_card'] = [
+    'name' => 'Blog',
+    'default_w' => 1200,
+    'default_h' => 630,
+    'root' => [
+        'type' => 'box',
+        'justify' => 'center',
+        'gap' => 20,
+        'padding' => 64,
+        'background' => [
+            'type' => 'gradient',
+            'angle' => 'vertical',
+            'from' => '#759cff',
+            'to' => '#0048f0',
+        ],
+        'children' => [
+            [
+                'type' => 'shape',
+                'shape' => 'circle',
+                'width' => 500,
+                'height' => 500,
+                'fill' => '#80b0ff',
+                'opacity' => 0.3,
+                'position' => 'absolute',
+                'x' => 902,
+                'y' => 352,
+            ],
+            [
+                'type' => 'shape',
+                'shape' => 'circle',
+                'width' => 500,
+                'height' => 500,
+                'fill' => '#80b0ff',
+                'opacity' => 0.3,
+                'position' => 'absolute',
+                'x' => -260,
+                'y' => -310,
+            ],
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'between',
+                'align' => 'center',
+                'gap' => 12,
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 20,
+                        'children' => [
+                            [
+                                'type' => 'box',
+                                'justify' => 'center',
+                                'align' => 'center',
+                                'padding' => [
+                                    10,
+                                    10,
+                                    10,
+                                    10,
+                                ],
+                                'width' => 100,
+                                'height' => 100,
+                                'background' => [
+                                    'type' => 'solid',
+                                    'color' => '#ffffff',
+                                ],
+                                'radius' => 10,
+                                'children' => [
+                                    [
+                                        'type' => 'icon',
+                                        'icon' => 'comment',
+                                        'size' => 80,
+                                        'color' => '#0066ff',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => '{{watermark}}',
+                                'font' => 'bold',
+                                'size' => 60,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'gap' => 20,
+                        'padding' => [
+                            10,
+                            15,
+                            10,
+                            15,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#ffffff',
+                        ],
+                        'radius' => 50,
+                        'children' => [
+                            [
+                                'type' => 'text',
+                                'content' => '{{badge}}',
+                                'size' => 18,
+                                'color' => '#0066ff',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'divider',
+                'color' => '#3d98ff',
+                'thickness' => 10,
+            ],
+            [
+                'type' => 'text',
+                'content' => '{{heading}}',
+                'font' => 'bold',
+                'size' => 56,
+                'color' => '#f8fafc',
+                'lineHeight' => 1.15,
+                'maxLines' => 2,
+            ],
+            [
+                'type' => 'text',
+                'content' => '{{description}}',
+                'size' => 20,
+                'color' => '#dedede',
+                'lineHeight' => 1.4,
+                'maxLines' => 8,
+            ],
+            [
+                'type' => 'spacer',
+            ],
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'between',
+                'align' => 'center',
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 3,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'globe',
+                                'size' => 26,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => '{{website}}',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 3,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'code',
+                                'size' => 26,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => '{{author}}',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+$CUSTOM_SPECS['pugins'] = [
+    'name' => 'Plugins',
+    'default_w' => 1200,
+    'default_h' => 630,
+    'root' => [
+        'type' => 'box',
+        'justify' => 'center',
+        'gap' => 20,
+        'padding' => 64,
+        'background' => [
+            'type' => 'solid',
+            'color' => '#020f22',
+        ],
+        'children' => [
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'center',
+                'align' => 'center',
+                'gap' => 20,
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'padding' => [
+                            10,
+                            10,
+                            10,
+                            10,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 20,
+                        'border' => [
+                            'width' => 1,
+                            'color' => '#ffffff',
+                        ],
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => '{{icon}}',
+                                'size' => 60,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'text',
+                        'content' => '{{heading}}',
+                        'font' => 'bold',
+                        'size' => 44,
+                    ],
+                ],
+            ],
+            [
+                'type' => 'text',
+                'content' => '{{description}}',
+                'size' => 20,
+                'color' => '#bfbfbf',
+            ],
+            [
+                'type' => 'spacer',
+            ],
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'center',
+                'align' => 'center',
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'text',
+                        'content' => '{{badge}}',
+                        'size' => 18,
+                        'color' => '#0066ff',
+                        'align' => 'center',
+                        'shadow' => [
+                            'x' => 2,
+                            'y' => 2,
+                            'blur' => 4,
+                            'color' => '#000000',
+                            'shadow_opacity' => 0.5,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'center',
+                'align' => 'center',
+                'gap' => 20,
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 2,
+                        'padding' => [
+                            5,
+                            10,
+                            5,
+                            10,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 20,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'dollar-sign',
+                                'size' => 22,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => 'Free',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 2,
+                        'padding' => [
+                            5,
+                            10,
+                            5,
+                            10,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 20,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'bolt',
+                                'size' => 22,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => 'Fast',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 2,
+                        'padding' => [
+                            5,
+                            10,
+                            5,
+                            10,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 20,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'user-lock',
+                                'size' => 22,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => 'Private',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 2,
+                        'padding' => [
+                            5,
+                            10,
+                            5,
+                            10,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 20,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'gauge',
+                                'size' => 22,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => 'Accurate',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'box',
+                'align' => 'center',
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'box',
+                        'padding' => [
+                            10,
+                            20,
+                            10,
+                            20,
+                        ],
+                        'background' => [
+                            'type' => 'solid',
+                            'color' => '#0066ff',
+                        ],
+                        'radius' => 100,
+                        'children' => [
+                            [
+                                'type' => 'text',
+                                'content' => '{{metric1}} Login Required',
+                                'color' => '#1c2739',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'box',
+                'direction' => 'row',
+                'justify' => 'between',
+                'align' => 'end',
+                'width' => 'fill',
+                'children' => [
+                    [
+                        'type' => 'shape',
+                        'shape' => 'circle',
+                        'width' => 1000,
+                        'height' => 1000,
+                        'fill' => '#ffffff',
+                        'opacity' => 0.1,
+                        'position' => 'absolute',
+                        'x' => 35,
+                        'y' => -200,
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 10,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'globe',
+                                'size' => 26,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => '{{website}}',
+                                'size' => 18,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'box',
+                        'direction' => 'row',
+                        'justify' => 'center',
+                        'align' => 'center',
+                        'gap' => 10,
+                        'children' => [
+                            [
+                                'type' => 'icon',
+                                'icon' => 'code',
+                                'size' => 26,
+                            ],
+                            [
+                                'type' => 'text',
+                                'content' => '{{author}}',
+                                'size' => 18,
+                            ],
+                        ],
                     ],
                 ],
             ],
