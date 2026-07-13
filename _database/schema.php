@@ -9,7 +9,7 @@ function schema_init(object $db): void {
     // ─── Schema version cache ─────────────────────────────────────────────────
     // Bump SCHEMA_VERSION whenever tables, columns, or seeded data change.
     // On each request, this function returns early if the DB is already at this version.
-    $schemaVersion = '2.8';
+    $schemaVersion = '2.9';
     try {
         $row = $db->fetch("SELECT value FROM settings WHERE `key` = 'schema_version'");
         if ($row && $row['value'] === $schemaVersion) return;
@@ -482,6 +482,13 @@ function schema_init(object $db): void {
         "ALTER TABLE plugins ADD COLUMN og_title       VARCHAR(255) DEFAULT NULL",
         "ALTER TABLE plugins ADD COLUMN og_description VARCHAR(500) DEFAULT NULL",
         "ALTER TABLE plugins ADD COLUMN og_image       VARCHAR(500) DEFAULT NULL",
+        // Advanced SEO (v2.9): one JSON column per entity holding keywords, canonical,
+        // robots, og_type, twitter overrides, schema/JSON-LD, and custom meta tags.
+        "ALTER TABLE plugins     ADD COLUMN seo_meta TEXT DEFAULT NULL",
+        "ALTER TABLE blog_posts  ADD COLUMN seo_meta TEXT DEFAULT NULL",
+        "ALTER TABLE pages       ADD COLUMN seo_meta TEXT DEFAULT NULL",
+        // Plugin manifest content: rich SEO-content extra field lives in manifest.json,
+        // no column needed. Font Awesome icon already used via manifest.og_icon.
     ];
     foreach ($migrations as $sql) {
         try { $db->query($sql); } catch (Throwable $e) {}

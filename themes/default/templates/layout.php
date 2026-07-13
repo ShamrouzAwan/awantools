@@ -67,6 +67,7 @@ function render_page(string $title, string $content, array $opts = []): void {
         '/login'          => 'login',
     ];
     $_spKey = $_staticPageMap[$currentPath] ?? null;
+    $_staticTokenContext = [];
     if ($_spKey) {
         $_spTitle   = $settings->get("seo_page_{$_spKey}_title", '');
         $_spDesc    = $settings->get("seo_page_{$_spKey}_desc", '');
@@ -74,13 +75,33 @@ function render_page(string $title, string $content, array $opts = []): void {
         if ($_spTitle)   $title = $_spTitle;
         if ($_spDesc)    $opts['description'] = $_spDesc;
         if ($_spOgImage) $opts['og_image']    = $_spOgImage;
+
+        // Advanced SEO overrides (keywords, canonical, robots, og_type, twitter, schema, custom meta)
+        $_spAdvMeta = json_decode($settings->get("seo_page_{$_spKey}_meta", '') ?: '', true) ?: [];
+        if ($_spAdvMeta) {
+            $opts = array_merge([
+                'keywords'     => $_spAdvMeta['keywords']     ?? null,
+                'canonical'    => $_spAdvMeta['canonical']    ?? null,
+                'robots'       => $_spAdvMeta['robots']       ?? null,
+                'og_type'      => $_spAdvMeta['og_type']      ?? null,
+                'twitter_card' => $_spAdvMeta['twitter_card'] ?? null,
+                'custom_meta'  => $_spAdvMeta['custom_meta']  ?? null,
+            ], $opts);
+            $opts = array_filter($opts, fn($v) => $v !== null);
+            if (empty($opts['schema_org']) && !empty($_spAdvMeta['schema_json']) && $seo instanceof Seo) {
+                $_spCustomSchema = json_decode($_spAdvMeta['schema_json'], true);
+                if ($_spCustomSchema) $opts['schema_org'] = $seo->schemaOrg($_spCustomSchema);
+            }
+        }
+        $_staticTokenContext = ['page_title' => $title, 'page_url' => $currentPath];
     }
 
     // ── Plugin page SEO overrides (editable via Admin → Page SEO Manager) ──
+    $_tokenContext = array_merge($_staticTokenContext, $opts['token_context'] ?? []);
     if ($isPluginPage && $currentPluginSlug && !in_array($currentPluginSlug, ['_sdk', 'index', 'rate'])) {
         try {
             $_plugSeo = $db->fetch(
-                "SELECT name, seo_title, seo_desc, og_title, og_description, og_image FROM plugins WHERE slug = ?",
+                "SELECT name, description, author, manifest, seo_title, seo_desc, og_title, og_description, og_image, seo_meta FROM plugins WHERE slug = ?",
                 [$currentPluginSlug]
             );
             if ($_plugSeo) {
@@ -89,15 +110,52 @@ function render_page(string $title, string $content, array $opts = []): void {
                 if (!empty($_plugSeo['og_title']))        $opts['og_title']       = $_plugSeo['og_title'];
                 if (!empty($_plugSeo['og_description']))  $opts['og_description'] = $_plugSeo['og_description'];
                 if (!empty($_plugSeo['og_image']))        $opts['og_image']       = $_plugSeo['og_image'];
-                if (empty($opts['schema_org']) && $seo instanceof Seo) {
-                    $opts['schema_org'] = $seo->pluginSchema([
-                        'slug'        => $currentPluginSlug,
-                        'name'        => $_plugSeo['name'] ?? $title,
-                        'description' => $opts['description'] ?? '',
-                    ]);
+
+                // Advanced SEO overrides (keywords, canonical, robots, og_type, twitter, schema, custom meta)
+                $_advMeta = json_decode($_plugSeo['seo_meta'] ?? '', true) ?: [];
+                if ($_advMeta) {
+                    $opts = array_merge([
+                        'keywords'     => $_advMeta['keywords']     ?? null,
+                        'canonical'    => $_advMeta['canonical']    ?? null,
+                        'robots'       => $_advMeta['robots']       ?? null,
+                        'og_type'      => $_advMeta['og_type']      ?? null,
+                        'twitter_card' => $_advMeta['twitter_card'] ?? null,
+                        'custom_meta'  => $_advMeta['custom_meta']  ?? null,
+                    ], $opts);
+                    $opts = array_filter($opts, fn($v) => $v !== null);
                 }
+
+                if (empty($opts['schema_org']) && $seo instanceof Seo) {
+                    if (!empty($_advMeta['schema_json'])) {
+                        $_customSchema = json_decode($_advMeta['schema_json'], true);
+                        if ($_customSchema) $opts['schema_org'] = $seo->schemaOrg($_customSchema);
+                    }
+                    if (empty($opts['schema_org'])) {
+                        $opts['schema_org'] = $seo->pluginSchema([
+                            'slug'        => $currentPluginSlug,
+                            'name'        => $_plugSeo['name'] ?? $title,
+                            'description' => $opts['description'] ?? '',
+                        ]);
+                    }
+                }
+
+                $_pManifest = json_decode($_plugSeo['manifest'] ?? '', true) ?: [];
+                $_tokenContext = array_merge([
+                    'plugin_name'        => $_plugSeo['name'] ?? '',
+                    'plugin_description' => $_plugSeo['description'] ?? '',
+                    'plugin_slug'        => $currentPluginSlug,
+                    'plugin_author'      => $_plugSeo['author'] ?? '',
+                    'tool_count'         => (int)($_pManifest['offered'] ?? 1),
+                ], $_tokenContext);
             }
         } catch (Throwable $_e) {}
+    }
+
+    // ── Resolve {{token}} placeholders in SEO fields (site + entity data) ──
+    foreach (['description', 'og_image', 'og_title', 'og_description', 'canonical'] as $_seoKey) {
+        if (!empty($opts[$_seoKey]) && is_string($opts[$_seoKey]) && str_contains($opts[$_seoKey], '{{')) {
+            $opts[$_seoKey] = SeoTokens::resolve($opts[$_seoKey], $_tokenContext);
+        }
     }
 
     // SEO
@@ -111,6 +169,9 @@ function render_page(string $title, string $content, array $opts = []): void {
         'og_description'     => $opts['og_description'] ?? '',
         'og_type'            => $opts['og_type'] ?? '',
         'robots'             => $opts['robots'] ?? '',
+        'keywords'           => $opts['keywords'] ?? '',
+        'twitter_card'       => $opts['twitter_card'] ?? '',
+        'custom_meta'        => $opts['custom_meta'] ?? [],
         'article_published'  => $opts['article_published'] ?? '',
         'article_modified'   => $opts['article_modified'] ?? '',
     ]) : '    <meta name="description" content="' . e($settings->siteTagline()) . '">' . "\n";

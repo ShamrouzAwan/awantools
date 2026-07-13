@@ -106,12 +106,26 @@ function plugin_og_image(string $slug): string {
  */
 function plugin_render(string $title, string $content, array $opts = []): void {
     global $theme, $settings, $auth;
-    if (!isset($opts['og_image'])) {
-        $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-        if (preg_match('#^/plugins/([a-z0-9_\-]+)#i', $uriPath, $match)) {
-            $opts['og_image'] = plugin_og_image($match[1]);
+    $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    $slugMatch = [];
+    preg_match('#^/plugins/([a-z0-9_\-]+)#i', $uriPath, $slugMatch);
+    $currentSlug = $slugMatch[1] ?? '';
+
+    if (!isset($opts['og_image']) && $currentSlug) {
+        $opts['og_image'] = plugin_og_image($currentSlug);
+    }
+
+    // Inject the admin-authored "extra content" block (manifest.content) between the
+    // plugin's own tool content and the theme's footer/related-tools section. This gives
+    // every plugin page real, crawlable content depth without editing each plugin file.
+    if ($currentSlug) {
+        $m = plugin_manifest($currentSlug);
+        if (!empty($m['content'])) {
+            $content .= "\n<section class=\"plugin-extra-content\" style=\"max-width:900px;margin:32px auto 0;padding:24px;border-top:1px solid var(--color-border)\">"
+                . $m['content'] . "</section>";
         }
     }
+
     require $theme->template('layout');
     render_page($title, $content, $opts);
 }

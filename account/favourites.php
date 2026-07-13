@@ -36,7 +36,7 @@ ob_start();
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
         <?php foreach ($favourites as $plugin):
             $manifest = json_decode($plugin['manifest'] ?? '{}', true) ?? [];
-            $icon = $manifest['icon'] ?? '';
+            $icon = $manifest['og_icon'] ?? '';
             $cats = $manifest['categories'] ?? (isset($manifest['category']) && $manifest['category'] ? [$manifest['category']] : []);
         ?>
         <div class="plugin-card" style="position:relative">
@@ -49,7 +49,7 @@ ob_start();
             </button>
             <a href="/plugins/<?= e($plugin['slug']) ?>/" style="text-decoration:none;color:inherit;display:block">
                 <?php if ($icon): ?>
-                <div class="plugin-icon"><?= $icon ?></div>
+                <div class="plugin-icon" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--color-background);border:1px solid var(--color-border)"><i class="fa-solid fa-<?= e($icon) ?>" style="font-size:18px;color:var(--color-primary)"></i></div>
                 <?php else: ?>
                 <div class="plugin-icon" style="background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;border-radius:10px;width:44px;height:44px"><?= strtoupper(substr($plugin['name'], 0, 1)) ?></div>
                 <?php endif ?>

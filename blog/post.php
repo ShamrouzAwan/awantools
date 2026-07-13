@@ -341,7 +341,31 @@ if ($seo instanceof Seo) {
     ]);
 }
 
-render_page($post['title'], $content, [
+// Advanced SEO overrides saved via Admin -> SEO -> Blog Posts (keywords, canonical,
+// robots, og_type, twitter card, custom JSON-LD, custom meta tags).
+$_blogAdvMeta = json_decode($post['seo_meta'] ?? '', true) ?: [];
+$_blogOpts = array_filter([
+    'keywords'     => $_blogAdvMeta['keywords']     ?? null,
+    'robots'       => $_blogAdvMeta['robots']       ?? null,
+    'twitter_card' => $_blogAdvMeta['twitter_card'] ?? null,
+    'custom_meta'  => $_blogAdvMeta['custom_meta']  ?? null,
+    // og_type/canonical below already have explicit defaults, only override if advanced meta set one
+    'og_type'      => $_blogAdvMeta['og_type']      ?? null,
+], fn($v) => $v !== null);
+
+if (!empty($_blogAdvMeta['schema_json'])) {
+    $_blogCustomSchema = json_decode($_blogAdvMeta['schema_json'], true);
+    if ($_blogCustomSchema && $seo instanceof Seo) $blogJsonLd = $seo->schemaOrg($_blogCustomSchema);
+}
+
+// Token context for {{blog_title}}/{{blog_excerpt}}/{{author_name}} in OG image URLs etc.
+$_blogTokenContext = [
+    'blog_title'   => $post['title'] ?? '',
+    'blog_excerpt' => $post['excerpt'] ?? '',
+    'author_name'  => $post['author_name'] ?? '',
+];
+
+render_page($post['title'], array_merge([
     'description'        => $post['meta_desc'] ?? $post['excerpt'] ?? substr(strip_tags($post['content'] ?? ''), 0, 160),
     'og_image'           => $post['og_image'] ?? $post['cover_image'] ?? '',
     'og_type'            => 'article',
@@ -351,4 +375,5 @@ render_page($post['title'], $content, [
     'article_published'  => $post['published_at'] ?? $post['created_at'] ?? '',
     'article_modified'   => $post['updated_at'] ?? $post['published_at'] ?? $post['created_at'] ?? '',
     'schema_org'         => $blogJsonLd,
-]);
+    'token_context'      => $_blogTokenContext,
+], $_blogOpts));

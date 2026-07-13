@@ -994,10 +994,14 @@ $content = ob_get_clean();
 // setting, falls back to REPLIT_DOMAINS on Replit dev, then HTTP_HOST elsewhere).
 
 $_ogCount   = max(10, (int)(floor(max(1, $totalPlugins) / 10) * 10));
-$_ogImageUrl = "https://awantools.site/plugins/previewer-toolkit/render?category=custom&template=platform_homepage&width=1200&height=630&format=png&heading=Awan+Tools&description=Awan+Tools+is+a+free+collection+of+fast%2C+reliable%2C+and+privacy-friendly+online+tools+designed+to+simplify+everyday+tasks.+From+quick+utilities+to+professional+workflows.+No+complexity%2C+No+extra+logins%2C+No+subscriptions.&badge=".$_ogCount."&icon=tools&website=AwanTools.SIte&author=%40Shamrouz&font_size=43&padding=10&radius=0&bg_color=0d1117&accent_color=3b82f6&heading_color=ffffff&description_color=8b949e";
+// Legacy hardcoded OG image, kept as the fallback when no homepage OG image has
+// been configured yet in Admin -> SEO -> Static Pages (layout.php's static-page
+// SEO block reads seo_page_homepage_og_image/_meta and overrides this, including
+// {{token}} resolution, if the admin has set one up).
+$_legacyOgImageUrl = "https://awantools.site/plugins/previewer-toolkit/render?category=custom&template=platform_homepage&width=1200&height=630&format=png&heading=Awan+Tools&description=Awan+Tools+is+a+free+collection+of+fast%2C+reliable%2C+and+privacy-friendly+online+tools+designed+to+simplify+everyday+tasks.+From+quick+utilities+to+professional+workflows.+No+complexity%2C+No+extra+logins%2C+No+subscriptions.&badge=".$_ogCount."&icon=tools&website=AwanTools.SIte&author=%40Shamrouz&font_size=43&padding=10&radius=0&bg_color=0d1117&accent_color=3b82f6&heading_color=ffffff&description_color=8b949e";
 
 require THEMES_PATH . '/default/templates/layout.php';
 render_page($settings->siteName(), $content, [
     'description' => $settings->siteTagline(),
-    'og_image'    => $_ogImageUrl,
+    'og_image'    => $_legacyOgImageUrl,
 ]);

@@ -44,7 +44,7 @@ class Seo {
 
         $title    = $opts['title'] ?? '';
         $desc     = $opts['description'] ?? $this->settings->get('seo_meta_description', $this->settings->siteTagline());
-        $keywords = $this->settings->get('seo_meta_keywords', '');
+        $keywords = !empty($opts['keywords']) ? $opts['keywords'] : $this->settings->get('seo_meta_keywords', '');
         $image    = $opts['image'] ?? $this->settings->get('og_default_image', '');
 
         // Ensure image is absolute — fall back to auto-detecting scheme+host when site_url is blank
@@ -106,7 +106,7 @@ class Seo {
         }
 
         // ── Twitter / X Card ──
-        $tCard = $this->settings->get('twitter_card', '');
+        $tCard = !empty($opts['twitter_card']) ? $opts['twitter_card'] : $this->settings->get('twitter_card', '');
         if ($tCard && $tCard !== 'none') {
             $twSite    = ltrim($this->settings->get('twitter_site', ''), '@');
             $twCreator = ltrim($this->settings->get('twitter_creator', ''), '@');
@@ -116,6 +116,19 @@ class Seo {
             if ($ogTitle) $out .= '    <meta name="twitter:title" content="'       . e($ogTitle) . '">' . "\n";
             if ($ogDesc)  $out .= '    <meta name="twitter:description" content="' . e($ogDesc)  . '">' . "\n";
             if ($image)   $out .= '    <meta name="twitter:image" content="'       . e($image)   . '">' . "\n";
+        }
+
+        // ── Custom meta tags (admin-defined, per-page) ──
+        if (!empty($opts['custom_meta']) && is_array($opts['custom_meta'])) {
+            foreach ($opts['custom_meta'] as $tag) {
+                $val = trim($tag['content'] ?? '');
+                if ($val === '') continue;
+                if (!empty($tag['property'])) {
+                    $out .= '    <meta property="' . e($tag['property']) . '" content="' . e($val) . '">' . "\n";
+                } elseif (!empty($tag['name'])) {
+                    $out .= '    <meta name="' . e($tag['name']) . '" content="' . e($val) . '">' . "\n";
+                }
+            }
         }
 
         // ── Webmaster verification meta tags ──

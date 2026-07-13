@@ -17,6 +17,7 @@ require_once __DIR__ . '/_core/Lang.php';
 require_once __DIR__ . '/_core/Mailer.php';
 require_once __DIR__ . '/_core/Scheduler.php';
 require_once __DIR__ . '/_core/Seo.php';
+require_once __DIR__ . '/_core/SeoTokens.php';
 require_once __DIR__ . '/_core/Shortcode.php';
 
 // Ensure storage directories exist (before DB init so schema can write version file)

@@ -5,6 +5,48 @@ requireAdmin();
 
 $logger = Logger::getInstance($db);
 
+// ─── AJAX: best-effort extraction of existing descriptive content ──────────────
+// Scans a plugin's index.php for hero/header text so the admin can review and
+// promote it into the manifest's rich "extra content" field instead of retyping it.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'extract_content') {
+    header('Content-Type: application/json');
+    $slug = Security::sanitizeSlug($_GET['slug'] ?? '');
+    $file = PLUGINS_PATH . '/' . $slug . '/index.php';
+    if (!$slug || !file_exists($file)) {
+        echo json_encode(['success' => false, 'error' => 'Plugin file not found.']);
+        exit;
+    }
+    $src = file_get_contents($file);
+    $pieces = [];
+
+    // Hero/header title + subtitle blocks (header-hero, page-header, plugin-hero conventions)
+    if (preg_match('#<div[^>]*class="[^"]*(?:header-hero|page-header|plugin-hero)[^"]*"[^>]*>(.*?)</div>\s*</div>#is', $src, $heroMatch)) {
+        $heroHtml = $heroMatch[1];
+        if (preg_match('#<h1[^>]*>(.*?)</h1>#is', $heroHtml, $m)) $pieces[] = '<h2>' . trim(strip_tags($m[1])) . '</h2>';
+        if (preg_match_all('#<p[^>]*>(.*?)</p>#is', $heroHtml, $ms)) {
+            foreach ($ms[1] as $p) {
+                $t = trim(strip_tags($p));
+                if (strlen($t) > 15 && !preg_match('/^<\?php|\$/', $t)) $pieces[] = '<p>' . e($t) . '</p>';
+            }
+        }
+    }
+    // Any other descriptive-looking <p> tags with substantial static text (skip PHP-heavy lines)
+    if (count($pieces) < 2 && preg_match_all('#<p[^>]*>([^<]{25,400})</p>#i', $src, $ms2)) {
+        foreach (array_slice($ms2[1], 0, 4) as $p) {
+            $t = trim(html_entity_decode(strip_tags($p)));
+            if ($t && !str_contains($t, '<?')) $pieces[] = '<p>' . e($t) . '</p>';
+        }
+    }
+
+    $html = implode("\n", array_unique($pieces));
+    if (!$html) {
+        echo json_encode(['success' => false, 'error' => 'No obvious descriptive text was found in this plugin — write your own content below.']);
+        exit;
+    }
+    echo json_encode(['success' => true, 'html' => $html]);
+    exit;
+}
+
 // Sync all filesystem plugins to DB
 $pluginDirs = glob(PLUGINS_PATH . '/*/plugin.json') ?: [];
 foreach ($pluginDirs as $manifestFile) {
@@ -86,13 +128,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newCats    = $rawCats ? array_map('trim', explode(',', $rawCats)) : ($manifest['categories'] ?? []);
             $newKeys    = $rawKeys ? array_map('trim', explode(',', strtolower($rawKeys))) : ($manifest['keywords'] ?? []);
             $newTags    = $rawTags ? array_map('trim', explode(',', strtolower($rawTags))) : ($manifest['tags'] ?? []);
-            $newIcon    = trim($_POST['icon'] ?? ($manifest['icon'] ?? ''));
+            // Font Awesome icon class (bare name, no "fa-solid fa-" prefix) — replaces the old raw-SVG icon field.
+            $newOgIcon  = preg_replace('/^fa-(solid|regular|brands)\s+fa-/i', '', trim($_POST['og_icon'] ?? ($manifest['og_icon'] ?? '')));
+            $newOgIcon  = trim(str_replace(['fa-solid', 'fa-regular', 'fa-brands', 'fa-'], '', $newOgIcon));
+            // Rich "extra content" HTML rendered on the plugin's public page (admin-trusted, not tag-stripped).
+            $newContent = trim($_POST['content'] ?? ($manifest['content'] ?? ''));
 
             $manifest['name']        = $newName;
             $manifest['description'] = $newDesc;
             $manifest['version']     = $newVer;
             $manifest['offered']     = $newOffered;
-            $manifest['icon']        = $newIcon;
+            $manifest['og_icon']     = $newOgIcon;
+            $manifest['content']     = $newContent;
             $manifest['license']     = $newLicense;
             $manifest['author_url']  = $newAuthorUrl;
             $manifest['homepage']    = $newHomepage;
@@ -163,8 +210,8 @@ ob_start();
                 <tr>
                     <td>
                         <div style="display:flex;align-items:center;gap:8px">
-                            <?php if (!empty($manifest['icon'])): ?>
-                            <span style="font-size:18px"><?= $manifest['icon'] ?></span>
+                            <?php $listIcon = $manifest['og_icon'] ?? ''; if ($listIcon): ?>
+                            <i class="fa-solid fa-<?= e($listIcon) ?>" style="font-size:18px;color:var(--color-primary);width:22px;text-align:center"></i>
                             <?php endif ?>
                             <div>
                                 <div style="font-weight:600"><?= e($plugin['name']) ?></div>
@@ -204,7 +251,8 @@ ob_start();
                                     'description' => $plugin['description'] ?? '',
                                     'version'     => $plugin['version'] ?? '1.0',
                                     'offered'     => (int)($plugin['offered'] ?? $manifest['offered'] ?? 1),
-                                    'icon'        => $manifest['icon'] ?? '',
+                                    'og_icon'     => $manifest['og_icon'] ?? '',
+                                    'content'     => $manifest['content'] ?? '',
                                     'license'     => $manifest['license'] ?? '',
                                     'author_url'  => $manifest['author_url'] ?? '',
                                     'homepage'    => $manifest['homepage'] ?? '',
@@ -212,7 +260,7 @@ ob_start();
                                     'categories'  => implode(', ', $manifest['categories'] ?? (isset($manifest['category']) ? [$manifest['category']] : [])),
                                     'keywords'    => implode(', ', $manifest['keywords'] ?? []),
                                     'tags'        => implode(', ', $manifest['tags'] ?? []),
-                                ]), ENT_QUOTES) ?>)">Edit</button>
+                                ]), ENT_QUOTES) ?>)" data-slug="<?= e($plugin['slug']) ?>">Edit</button>
                             <?php if ($plugin['status'] === 'active'): ?>
                             <form method="POST" style="display:inline">
                                 <?= Security::csrfField() ?>
@@ -316,9 +364,14 @@ ob_start();
                         </div>
                     </div>
                     <div class="form-group" style="margin:0">
-                        <label class="form-label">Icon <small class="text-muted">(inline SVG markup)</small></label>
-                        <textarea name="icon" id="em-icon" class="form-input" rows="2" style="resize:vertical;font-family:monospace;font-size:12px" placeholder="<svg ...>...</svg>"></textarea>
-                        <div class="form-hint">Paste an inline SVG for the plugin icon. Leave blank to use the default icon.</div>
+                        <label class="form-label">Icon <small class="text-muted">(Font Awesome class name)</small></label>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <div id="em-icon-preview" style="width:38px;height:38px;flex:0 0 auto;border-radius:8px;background:var(--color-background);border:1px solid var(--color-border);display:flex;align-items:center;justify-content:center">
+                                <i id="em-icon-preview-i" class="fa-solid fa-puzzle-piece" style="font-size:16px;color:var(--color-primary)"></i>
+                            </div>
+                            <input type="text" name="og_icon" id="em-icon" class="form-input" placeholder="e.g. code, wand-magic-sparkles, file-zipper" oninput="document.getElementById('em-icon-preview-i').className='fa-solid fa-' + (this.value.trim() || 'puzzle-piece')">
+                        </div>
+                        <div class="form-hint">Bare Font Awesome icon name (no <code>fa-solid fa-</code> prefix) — icons are already delivered site-wide via Font Awesome. Leave blank for the default icon.</div>
                     </div>
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Categories <small class="text-muted">(comma-separated)</small></label>
@@ -335,6 +388,11 @@ ob_start();
                         <input type="text" name="tags" id="em-tags" class="form-input" placeholder="json-formatter, json-validator, developer-tools">
                         <div class="form-hint">Granular tags for SEO and discovery — aim for 20-40 specific tags.</div>
                     </div>
+                    <div class="form-group" style="margin:0">
+                        <label class="form-label">Extra Page Content <small class="text-muted">(rendered between the tool and the footer)</small></label>
+                        <textarea name="content" id="em-content" class="form-input" rows="8"></textarea>
+                        <div class="form-hint">Rich descriptive content shown on the plugin's public page — adds real, crawlable content depth for SEO/AdSense review. <a href="#" id="em-extract-link" onclick="extractPluginContent();return false">Suggest content from this plugin's page →</a></div>
+                    </div>
                 </div>
                 <div style="padding:16px 24px;border-top:1px solid var(--color-border);display:flex;gap:8px;justify-content:flex-end">
                     <button type="button" onclick="closeEditModal()" class="btn btn-ghost">Cancel</button>
@@ -343,7 +401,29 @@ ob_start();
             </form>
         </div>
     </div>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+    var emEditorReady = false;
+    function emInitEditor() {
+        if (emEditorReady || typeof tinymce === 'undefined') return;
+        tinymce.init({
+            selector: '#em-content',
+            height: 260,
+            menubar: false,
+            plugins: 'link lists code',
+            toolbar: 'undo redo | formatselect | bold italic | bullist numlist | link | code',
+            skin: (document.documentElement.getAttribute('data-theme') === 'dark') ? 'oxide-dark' : 'oxide',
+            content_css: (document.documentElement.getAttribute('data-theme') === 'dark') ? 'dark' : 'default',
+        });
+        emEditorReady = true;
+    }
+    function emSetContent(html) {
+        if (window.tinymce && tinymce.get('em-content')) {
+            tinymce.get('em-content').setContent(html || '');
+        } else {
+            document.getElementById('em-content').value = html || '';
+        }
+    }
     function openEditModal(d) {
         document.getElementById('em-slug').value        = d.slug;
         document.getElementById('em-name').value        = d.name;
@@ -354,16 +434,37 @@ ob_start();
         document.getElementById('em-min-php').value     = d.min_php || '';
         document.getElementById('em-author-url').value  = d.author_url || '';
         document.getElementById('em-homepage').value    = d.homepage || '';
-        document.getElementById('em-icon').value        = d.icon || '';
+        document.getElementById('em-icon').value        = d.og_icon || '';
+        document.getElementById('em-icon-preview-i').className = 'fa-solid fa-' + (d.og_icon || 'puzzle-piece');
         document.getElementById('em-categories').value  = d.categories;
         document.getElementById('em-keywords').value    = d.keywords;
         document.getElementById('em-tags').value        = d.tags || '';
+        document.getElementById('edit-manifest-form').dataset.currentSlug = d.slug;
+        emInitEditor();
+        setTimeout(function () { emSetContent(d.content || ''); }, 60);
         var m = document.getElementById('edit-manifest-modal');
         m.style.display = 'flex';
         document.getElementById('em-name').focus();
     }
     function closeEditModal() {
         document.getElementById('edit-manifest-modal').style.display = 'none';
+    }
+    function extractPluginContent() {
+        var slug = document.getElementById('edit-manifest-form').dataset.currentSlug;
+        if (!slug) return;
+        var link = document.getElementById('em-extract-link');
+        link.textContent = 'Scanning…';
+        fetch('/admin/plugins?action=extract_content&slug=' + encodeURIComponent(slug))
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                link.textContent = 'Suggest content from this plugin\'s page →';
+                if (data.success && data.html) {
+                    emSetContent(data.html);
+                } else {
+                    alert(data.error || 'No extractable content found — write your own below.');
+                }
+            })
+            .catch(function () { link.textContent = 'Suggest content from this plugin\'s page →'; });
     }
     document.getElementById('edit-manifest-modal').addEventListener('click', function(e) {
         if (e.target === this) closeEditModal();
@@ -388,7 +489,8 @@ ob_start();
                 'license'           => 'MIT',
                 'min_php'           => '8.0',
                 'offered'           => 1,
-                'icon'              => '<svg ...>...</svg>',
+                'og_icon'           => 'wand-magic-sparkles',
+                'content'           => '<h2>About this tool</h2><p>Extra descriptive HTML rendered on the plugin page.</p>',
                 'requires_login'    => false,
                 'stores_user_data'  => false,
                 'dashboard_enabled' => false,

@@ -325,6 +325,21 @@ if ($slug !== '' && !str_contains($slug, '/') && !str_contains($slug, '.')) {
         $seoTitle = $page['seo_title'] ?: $page['title'];
         $seoDesc  = $page['seo_desc'] ?: '';
 
+        // Advanced SEO overrides saved via Admin -> SEO -> CMS Pages.
+        $_pageAdvMeta = json_decode($page['seo_meta'] ?? '', true) ?: [];
+        $_pageOpts = array_filter([
+            'keywords'     => $_pageAdvMeta['keywords']     ?? null,
+            'robots'       => $_pageAdvMeta['robots']       ?? null,
+            'og_type'      => $_pageAdvMeta['og_type']      ?? null,
+            'twitter_card' => $_pageAdvMeta['twitter_card'] ?? null,
+            'custom_meta'  => $_pageAdvMeta['custom_meta']  ?? null,
+        ], fn($v) => $v !== null);
+        $_pageSchema = '';
+        if (!empty($_pageAdvMeta['schema_json']) && $seo instanceof Seo) {
+            $_pageCustomSchema = json_decode($_pageAdvMeta['schema_json'], true);
+            if ($_pageCustomSchema) $_pageSchema = $seo->schemaOrg($_pageCustomSchema);
+        }
+
         ob_start();
         ?>
         <div class="cms-page">
@@ -343,7 +358,15 @@ if ($slug !== '' && !str_contains($slug, '/') && !str_contains($slug, '.')) {
         <?php
         $content = ob_get_clean();
         require THEMES_PATH . '/default/templates/layout.php';
-        render_page($seoTitle, $content, ['description' => $seoDesc]);
+        render_page($seoTitle, $content, array_merge([
+            'description'   => $seoDesc,
+            'og_title'      => $page['og_title'] ?? '',
+            'og_description'=> $page['og_description'] ?? '',
+            'og_image'      => $page['og_image'] ?? '',
+            'canonical'     => $page['canonical_url'] ?? '',
+            'schema_org'    => $_pageSchema,
+            'token_context' => ['page_title' => $seoTitle, 'page_url' => '/' . $slug],
+        ], $_pageOpts));
         exit;
     }
 }
