@@ -620,7 +620,8 @@ const PT = (() => {
     if (!url) { out.innerHTML = '<p style="color:#e04">Enter a URL first.</p>'; return; }
     out.innerHTML = '<div class="pt-meta-loading">Fetching…</div>';
     try {
-      const resp = await fetch(`meta.php?url=${encodeURIComponent(url)}`);
+      const base = (typeof PT_META_BASE !== 'undefined' && PT_META_BASE) ? PT_META_BASE : 'meta.php';
+      const resp = await fetch(`${base}?url=${encodeURIComponent(url)}`);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const data = await resp.json();
       out.innerHTML = renderMeta(data);
