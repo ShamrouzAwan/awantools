@@ -54,5 +54,8 @@ When the user says "revert all changes you made in [response]", immediately:
 ### Proposals in suggest_next_ideas
 Keep suggestions realistic and single-file when possible. Avoid suggesting approaches that would require touching many plugin files — the user consistently prefers minimal-touch solutions.
 
+### New files are the highest-risk item to forget
+Site-wide 500 (every page, including homepage) after a change that added a new file was caused by forgetting to upload one newly-created file (`_core/SeoTokens.php`) that `_bootstrap.php` unconditionally `require_once`s. Any new file required unconditionally by a file loaded on every request will fatal the whole site if missed during manual upload — always call out "Created" files most prominently in the Files Changed list and flag that they must be uploaded first/verified, since a missing edit to an existing file degrades a feature, but a missing new file that's required unconditionally takes down the entire site.
+
 ## Why
 User runs production on shared hosting and uploads files manually. Unexpected file changes or schema diffs break the live site. Precision and transparency are critical.
