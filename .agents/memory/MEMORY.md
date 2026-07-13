@@ -3,3 +3,4 @@
 - [siteUrl Replit localhost fix](siteurl-replit-fix.md) — siteUrl() fell back to HTTP_HOST (127.0.0.1:5000) on Replit dev, making og:image URLs unreachable; fix: check REPLIT_DOMAINS env var
 - [Templates.php dead variable bug](templates-php-pd-y-warning.md) — every template function had 4 undefined-$pd_y lines; E_WARNING before ob_start corrupts image responses on shared hosting with display_errors=On
 - [Previewer Toolkit meta.php SSRF hardening](previewer-toolkit-meta-ssrf.md) — follow_location=true bypasses IP blocklist on redirects; always follow manually and validate each hop
+- [AWAN plugin CSS link](awan-plugin-css-link.md) — plugin_render() has no 'stylesheet' opts key; new plugins must emit their own <link> tag in index.php content or ship unstyled
