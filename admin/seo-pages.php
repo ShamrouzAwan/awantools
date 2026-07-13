@@ -72,19 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Session::flash('danger', 'Save failed: ' . $e->getMessage());
         }
     } elseif ($type === 'blog' && $id) {
-        $db->query(
-            "UPDATE blog_posts SET meta_desc=?, og_title=?, og_description=?, og_image=?, seo_meta=? WHERE id=?",
-            [$seo_desc ?: null, $og_title ?: null, $og_desc ?: null, $og_image ?: null, $seoMetaJson, (int)$id]
-        );
-        $logger->info("Blog SEO updated: id={$id}", [], $auth->id());
-        Session::flash('success', 'Blog post SEO saved.');
+        try {
+            $db->query(
+                "UPDATE blog_posts SET meta_desc=?, og_title=?, og_description=?, og_image=?, seo_meta=? WHERE id=?",
+                [$seo_desc ?: null, $og_title ?: null, $og_desc ?: null, $og_image ?: null, $seoMetaJson, (int)$id]
+            );
+            $logger->info("Blog SEO updated: id={$id}", [], $auth->id());
+            Session::flash('success', 'Blog post SEO saved.');
+        } catch (Throwable $e) {
+            Session::flash('danger', 'Save failed: ' . $e->getMessage());
+        }
     } elseif ($type === 'page' && $id) {
-        $db->query(
-            "UPDATE pages SET seo_title=?, seo_desc=?, og_title=?, og_description=?, og_image=?, canonical_url=?, seo_meta=? WHERE id=?",
-            [$seo_title ?: null, $seo_desc ?: null, $og_title ?: null, $og_desc ?: null, $og_image ?: null, $canonical ?: null, $seoMetaJson, (int)$id]
-        );
-        $logger->info("CMS page SEO updated: id={$id}", [], $auth->id());
-        Session::flash('success', 'Page SEO saved.');
+        try {
+            $db->query(
+                "UPDATE pages SET seo_title=?, seo_desc=?, og_title=?, og_description=?, og_image=?, canonical_url=?, seo_meta=? WHERE id=?",
+                [$seo_title ?: null, $seo_desc ?: null, $og_title ?: null, $og_desc ?: null, $og_image ?: null, $canonical ?: null, $seoMetaJson, (int)$id]
+            );
+            $logger->info("CMS page SEO updated: id={$id}", [], $auth->id());
+            Session::flash('success', 'Page SEO saved.');
+        } catch (Throwable $e) {
+            Session::flash('danger', 'Save failed: ' . $e->getMessage());
+        }
     } elseif ($type === 'static' && $id) {
         // Validate static page id (alphanumeric + underscore only)
         if (preg_match('/^[a-z0-9_]+$/', $id)) {
@@ -109,13 +117,29 @@ try {
     $plugins = $db->fetchAll("SELECT slug, name, description FROM plugins WHERE status='active' ORDER BY name ASC") ?: [];
 }
 
-$blogPosts = $db->fetchAll(
-    "SELECT id, title, slug, meta_desc, og_title, og_description, og_image, seo_meta FROM blog_posts WHERE status='published' ORDER BY published_at DESC"
-) ?: [];
+try {
+    $blogPosts = $db->fetchAll(
+        "SELECT id, title, slug, meta_desc, og_title, og_description, og_image, seo_meta FROM blog_posts WHERE status='published' ORDER BY published_at DESC"
+    ) ?: [];
+} catch (Throwable $e) {
+    $blogPosts = $db->fetchAll(
+        "SELECT id, title, slug, meta_desc, og_title, og_description, og_image FROM blog_posts WHERE status='published' ORDER BY published_at DESC"
+    ) ?: [];
+    foreach ($blogPosts as &$_bp) { $_bp['seo_meta'] = null; }
+    unset($_bp);
+}
 
-$cmsPages = $db->fetchAll(
-    "SELECT id, title, slug, seo_title, seo_desc, og_title, og_description, og_image, canonical_url, seo_meta FROM pages WHERE status='published' ORDER BY title ASC"
-) ?: [];
+try {
+    $cmsPages = $db->fetchAll(
+        "SELECT id, title, slug, seo_title, seo_desc, og_title, og_description, og_image, canonical_url, seo_meta FROM pages WHERE status='published' ORDER BY title ASC"
+    ) ?: [];
+} catch (Throwable $e) {
+    $cmsPages = $db->fetchAll(
+        "SELECT id, title, slug, seo_title, seo_desc, og_title, og_description, og_image FROM pages WHERE status='published' ORDER BY title ASC"
+    ) ?: [];
+    foreach ($cmsPages as &$_cp) { $_cp['canonical_url'] = null; $_cp['seo_meta'] = null; }
+    unset($_cp);
+}
 
 $staticPages = [
     ['id' => 'homepage',     'label' => 'Homepage',          'url' => '/'],
