@@ -631,28 +631,54 @@ const PT = (() => {
   }
 
   function renderMeta(data) {
-    const tags = data.tags || {};
-    const og   = data.og   || {};
-    const tw   = data.twitter || {};
+    if (data.error) return `<p style="color:#e04">Error: ${escHtml(data.error)}</p>`;
+
+    const og = data.og || {};
+    const tw = data.twitter || {};
+    const ogImage = og.image || '';
     let html = '';
-    if (data.og_image) {
+
+    if (ogImage) {
       html += `<div class="pt-og-preview">
-        <img src="${escHtml(data.og_image)}" class="pt-og-img" onerror="this.style.display='none'">
+        <img src="${escHtml(ogImage)}" class="pt-og-img" onerror="this.style.display='none'">
         <div class="pt-og-info">
-          <div class="pt-og-title">${escHtml(og['og:title'] || tags.title || 'No title')}</div>
-          <div class="pt-og-desc">${escHtml((og['og:description'] || tags.description || '').slice(0,150))}</div>
+          <div class="pt-og-title">${escHtml(og.title || data.title || 'No title')}</div>
+          <div class="pt-og-desc">${escHtml((og.description || data.description || '').slice(0,150))}</div>
         </div>
       </div>`;
     }
+
     html += '<div class="pt-meta-rows">';
-    if (tags.title)       html += row('Title', escHtml(tags.title));
-    if (tags.description) html += row('Description', escHtml(tags.description));
-    const ogKeys = ['og:title','og:description','og:image','og:url','og:type','og:site_name'];
-    ogKeys.forEach(k => { if (og[k]) html += row(k, escHtml(og[k])); });
-    const twKeys = ['twitter:card','twitter:title','twitter:description','twitter:image'];
-    twKeys.forEach(k => { if (tw[k]) html += row(k, escHtml(tw[k])); });
-    if (data.canonical) html += row('Canonical', escHtml(data.canonical));
+    if (data.title)       html += row('Title', escHtml(data.title));
+    if (data.description) html += row('Description', escHtml(data.description));
+    if (data.author)      html += row('Author', escHtml(data.author));
+    if (data.robots)      html += row('Robots', escHtml(data.robots));
+    if (data.canonical)   html += row('Canonical', escHtml(data.canonical));
+    if (data.favicon)     html += row('Favicon', escHtml(data.favicon));
+
+    const ogKeys = ['title','description','image','url','type','site_name'];
+    ogKeys.forEach(k => { if (og[k]) html += row('og:' + k, escHtml(og[k])); });
+
+    const twKeys = ['card','title','description','image'];
+    twKeys.forEach(k => { if (tw[k]) html += row('twitter:' + k, escHtml(tw[k])); });
+
+    if (Array.isArray(data.structured) && data.structured.length) {
+      html += row('Structured data', `${data.structured.length} JSON-LD block(s) found`);
+    }
     html += '</div>';
+
+    if (Array.isArray(data.warnings) && data.warnings.length) {
+      html += '<div class="pt-meta-warnings"><div class="pt-meta-key" style="margin:12px 0 6px">Warnings</div><ul>' +
+        data.warnings.map(w => `<li>${escHtml(w)}</li>`).join('') + '</ul></div>';
+    }
+    if (Array.isArray(data.recommendations) && data.recommendations.length) {
+      html += '<div class="pt-meta-recs"><div class="pt-meta-key" style="margin:12px 0 6px">Recommendations</div><ul>' +
+        data.recommendations.map(r => `<li>${escHtml(r)}</li>`).join('') + '</ul></div>';
+    }
+
+    if (html === '<div class="pt-meta-rows"></div>') {
+      html = '<p style="color:#888">No metadata found on this page.</p>';
+    }
     return html;
   }
 
