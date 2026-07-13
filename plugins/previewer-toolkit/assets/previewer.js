@@ -613,77 +613,219 @@ const PT = (() => {
   }
 
   async function inspect() {
-    const urlEl = document.getElementById('ptInspUrl');
-    const out   = document.getElementById('ptInspMeta');
+    const urlEl  = document.getElementById('ptInspUrl');
+    const out    = document.getElementById('ptInspMeta');
+    const previews = document.getElementById('ptInspPreviews');
+    const btn    = document.querySelector('.pt-insp-btn');
     if (!urlEl || !out) return;
     const url = urlEl.value.trim();
     if (!url) { out.innerHTML = '<p style="color:#e04">Enter a URL first.</p>'; return; }
-    out.innerHTML = '<div class="pt-meta-loading">Fetching…</div>';
+    out.innerHTML = '<div class="pt-insp-loading"><span class="pt-spin"></span> Fetching &amp; analyzing…</div>';
+    if (previews) previews.style.display = 'none';
+    if (btn) btn.disabled = true;
     try {
       const base = (typeof PT_META_BASE !== 'undefined' && PT_META_BASE) ? PT_META_BASE : 'meta.php';
       const resp = await fetch(`${base}?url=${encodeURIComponent(url)}`);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const data = await resp.json();
+      if (data.error) { out.innerHTML = `<p style="color:#e04">Error: ${escHtml(data.error)}</p>`; return; }
       out.innerHTML = renderMeta(data);
+      renderPreviews(data);
+      if (previews) previews.style.display = 'flex';
     } catch (e) {
       out.innerHTML = `<p style="color:#e04">Error: ${escHtml(e.message)}</p>`;
+    } finally {
+      if (btn) btn.disabled = false;
     }
   }
 
-  function renderMeta(data) {
-    if (data.error) return `<p style="color:#e04">Error: ${escHtml(data.error)}</p>`;
+  function scoreColor(score) {
+    if (score >= 80) return '#16a34a';
+    if (score >= 50) return '#d97706';
+    return '#dc2626';
+  }
 
-    const og = data.og || {};
-    const tw = data.twitter || {};
-    const ogImage = og.image || '';
+  function renderMeta(data) {
+    const og   = data.og || {};
+    const tw   = data.twitter || {};
+    const tech = data.technical || {};
+    const content = data.content || {};
+    const headings = data.headings || { h1: [] };
+    const score = typeof data.score === 'number' ? data.score : null;
     let html = '';
 
-    if (ogImage) {
-      html += `<div class="pt-og-preview">
-        <img src="${escHtml(ogImage)}" class="pt-og-img" onerror="this.style.display='none'">
-        <div class="pt-og-info">
-          <div class="pt-og-title">${escHtml(og.title || data.title || 'No title')}</div>
-          <div class="pt-og-desc">${escHtml((og.description || data.description || '').slice(0,150))}</div>
+    // ── Score header ──
+    if (score !== null) {
+      html += `<div class="pt-score-card">
+        <div class="pt-score-ring" style="--score-color:${scoreColor(score)}">
+          <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="var(--color-border)" stroke-width="3"/>
+          <circle cx="18" cy="18" r="16" fill="none" stroke="${scoreColor(score)}" stroke-width="3" stroke-dasharray="${score},100" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+          <span>${score}</span>
+        </div>
+        <div class="pt-score-info">
+          <div class="pt-score-title">SEO Health Score</div>
+          <div class="pt-score-sub">${(data.passed || []).length} checks passed &middot; ${(data.warnings || []).length} issue(s) found</div>
         </div>
       </div>`;
     }
 
-    html += '<div class="pt-meta-rows">';
-    if (data.title)       html += row('Title', escHtml(data.title));
-    if (data.description) html += row('Description', escHtml(data.description));
-    if (data.author)      html += row('Author', escHtml(data.author));
-    if (data.robots)      html += row('Robots', escHtml(data.robots));
-    if (data.canonical)   html += row('Canonical', escHtml(data.canonical));
-    if (data.favicon)     html += row('Favicon', escHtml(data.favicon));
+    // ── Overview ──
+    html += section('Overview', [
+      data.title       && rowStatus('Title', escHtml(data.title), true, `${data.title.length} chars`),
+      data.description && rowStatus('Description', escHtml(data.description), true, `${data.description.length} chars`),
+      !data.title       && rowStatus('Title', '<em>Missing</em>', false),
+      !data.description && rowStatus('Description', '<em>Missing</em>', false),
+      data.canonical    && rowStatus('Canonical', linkVal(data.canonical), true),
+      !data.canonical   && rowStatus('Canonical', '<em>Not set</em>', false),
+      data.lang         && rowStatus('Language', escHtml(data.lang), true),
+      data.robots       && row('Robots', escHtml(data.robots)),
+      data.keywords     && row('Keywords', escHtml(data.keywords)),
+      data.author       && row('Author', escHtml(data.author)),
+    ]);
 
+    // ── Technical ──
+    html += section('Technical', [
+      rowStatus('HTTPS', tech.https ? 'Yes' : 'No', !!tech.https),
+      tech.status && rowStatus('Status code', String(tech.status), tech.status < 400),
+      tech.redirected && row('Redirected to', linkVal(data.finalUrl)),
+      rowStatus('Viewport tag', data.viewport ? escHtml(data.viewport) : '<em>Missing</em>', !!data.viewport),
+      data.charset && row('Charset', escHtml(data.charset)),
+      data.themeColor && row('Theme color', colorSwatch(data.themeColor)),
+      tech.responseTime != null && row('Response time', `${tech.responseTime} ms`),
+      tech.sizeBytes != null && row('Page size', formatBytes(tech.sizeBytes)),
+      tech.contentType && row('Content type', escHtml(tech.contentType)),
+      data.favicon && row('Favicon', linkVal(data.favicon)),
+    ]);
+
+    // ── Headings & Content ──
+    html += section('Headings &amp; Content', [
+      rowStatus('H1 tags', String(headings.h1.length) + (headings.h1.length ? ': ' + escHtml(headings.h1.join(', ')) : ''), headings.h1.length === 1),
+      row('H2–H6 count', `H2: ${headings.h2||0} · H3: ${headings.h3||0} · H4: ${headings.h4||0} · H5: ${headings.h5||0} · H6: ${headings.h6||0}`),
+      rowStatus('Word count', String(content.wordCount || 0), (content.wordCount || 0) >= 300),
+      rowStatus('Images', `${content.imagesTotal || 0} total, ${content.imagesMissingAlt || 0} missing alt`, (content.imagesMissingAlt || 0) === 0),
+      row('Links', `${content.linksInternal || 0} internal · ${content.linksExternal || 0} external · ${content.linksNofollow || 0} nofollow`),
+    ]);
+
+    // ── Open Graph ──
     const ogKeys = ['title','description','image','url','type','site_name'];
-    ogKeys.forEach(k => { if (og[k]) html += row('og:' + k, escHtml(og[k])); });
+    const ogRows = ogKeys.map(k => og[k] ? row('og:' + k, k === 'image' ? linkVal(og[k]) : escHtml(og[k])) : null).filter(Boolean);
+    html += section('Open Graph', ogRows.length ? ogRows : [row('', '<em>No Open Graph tags found</em>')]);
 
-    const twKeys = ['card','title','description','image'];
-    twKeys.forEach(k => { if (tw[k]) html += row('twitter:' + k, escHtml(tw[k])); });
+    // ── Twitter Card ──
+    const twKeys = ['card','title','description','image','site'];
+    const twRows = twKeys.map(k => tw[k] ? row('twitter:' + k, k === 'image' ? linkVal(tw[k]) : escHtml(tw[k])) : null).filter(Boolean);
+    html += section('Twitter Card', twRows.length ? twRows : [row('', '<em>No Twitter Card tags found</em>')]);
 
-    if (Array.isArray(data.structured) && data.structured.length) {
-      html += row('Structured data', `${data.structured.length} JSON-LD block(s) found`);
+    // ── Structured data & hreflang ──
+    const structRows = [];
+    if (Array.isArray(data.structuredTypes) && data.structuredTypes.length) {
+      structRows.push(row('JSON-LD types', escHtml(data.structuredTypes.join(', '))));
+    } else {
+      structRows.push(row('JSON-LD', '<em>None found</em>'));
     }
-    html += '</div>';
+    if (Array.isArray(data.hreflang) && data.hreflang.length) {
+      structRows.push(row('hreflang', data.hreflang.map(h => escHtml(h.lang)).join(', ')));
+    }
+    html += section('Structured Data &amp; i18n', structRows);
 
+    // ── Warnings ──
     if (Array.isArray(data.warnings) && data.warnings.length) {
-      html += '<div class="pt-meta-warnings"><div class="pt-meta-key" style="margin:12px 0 6px">Warnings</div><ul>' +
-        data.warnings.map(w => `<li>${escHtml(w)}</li>`).join('') + '</ul></div>';
+      html += `<div class="pt-issue-block">
+        <div class="pt-issue-title pt-issue-title--warn">Issues (${data.warnings.length})</div>
+        <ul class="pt-issue-list">${data.warnings.map(w => `<li class="pt-issue pt-issue--warn"><i class="fa-solid fa-triangle-exclamation"></i>${escHtml(w)}</li>`).join('')}</ul>
+      </div>`;
+    }
+    if (Array.isArray(data.passed) && data.passed.length) {
+      html += `<div class="pt-issue-block">
+        <div class="pt-issue-title pt-issue-title--ok">Passed (${data.passed.length})</div>
+        <ul class="pt-issue-list">${data.passed.map(w => `<li class="pt-issue pt-issue--ok"><i class="fa-solid fa-circle-check"></i>${escHtml(w)}</li>`).join('')}</ul>
+      </div>`;
     }
     if (Array.isArray(data.recommendations) && data.recommendations.length) {
-      html += '<div class="pt-meta-recs"><div class="pt-meta-key" style="margin:12px 0 6px">Recommendations</div><ul>' +
-        data.recommendations.map(r => `<li>${escHtml(r)}</li>`).join('') + '</ul></div>';
+      html += `<div class="pt-issue-block">
+        <div class="pt-issue-title pt-issue-title--info">Recommendations</div>
+        <ul class="pt-issue-list">${data.recommendations.map(w => `<li class="pt-issue pt-issue--info"><i class="fa-solid fa-lightbulb"></i>${escHtml(w)}</li>`).join('')}</ul>
+      </div>`;
     }
 
-    if (html === '<div class="pt-meta-rows"></div>') {
-      html = '<p style="color:#888">No metadata found on this page.</p>';
-    }
     return html;
   }
 
+  function renderPreviews(data) {
+    const og = data.og || {};
+    const tw = data.twitter || {};
+    const title = data.title || '';
+    const desc  = data.description || '';
+    let host = '';
+    try { host = new URL(data.finalUrl || data.url).hostname; } catch (e) { host = data.url || ''; }
+
+    const gEl = document.getElementById('ptGooglePreviewInner');
+    if (gEl) {
+      gEl.innerHTML = `
+        <div class="pt-google-url"><span class="pt-g-favicon" style="background-image:url('${escHtml(data.favicon||'')}')"></span>${escHtml(host)}</div>
+        <div class="pt-google-title">${escHtml((title || 'Untitled page').slice(0,70))}</div>
+        <div class="pt-google-desc">${escHtml((desc || 'No description available.').slice(0,160))}</div>`;
+    }
+
+    const twImg = tw.image || og.image || '';
+    const twEl = document.getElementById('ptTwitterPreviewInner');
+    if (twEl) {
+      twEl.innerHTML = `
+        <div class="pt-tw-card">
+          <div class="pt-tw-img">${twImg ? `<img src="${escHtml(twImg)}" onerror="this.parentElement.textContent='Image failed to load'">` : 'No image'}</div>
+          <div class="pt-tw-meta">
+            <div class="pt-tw-domain">${escHtml(host)}</div>
+            <div class="pt-tw-title">${escHtml((tw.title || og.title || title || 'Untitled').slice(0,70))}</div>
+            <div class="pt-tw-desc">${escHtml((tw.description || og.description || desc || '').slice(0,125))}</div>
+          </div>
+        </div>`;
+    }
+
+    const ogImg = og.image || '';
+    const ogEl = document.getElementById('ptOgPreviewInner');
+    if (ogEl) {
+      ogEl.innerHTML = `
+        <div class="pt-og-card">
+          <div class="pt-og-img">${ogImg ? `<img src="${escHtml(ogImg)}" onerror="this.parentElement.textContent='Image failed to load'">` : 'No og:image'}</div>
+          <div class="pt-og-meta">
+            <div class="pt-og-site">${escHtml(og.site_name || host)}</div>
+            <div class="pt-og-title">${escHtml((og.title || title || 'Untitled').slice(0,90))}</div>
+            <div class="pt-og-desc">${escHtml((og.description || desc || '').slice(0,150))}</div>
+          </div>
+        </div>`;
+    }
+  }
+
+  function section(title, rows) {
+    const filtered = (rows || []).filter(Boolean);
+    if (!filtered.length) return '';
+    return `<div class="pt-meta-block"><div class="pt-meta-block-title">${title}</div>${filtered.join('')}</div>`;
+  }
+
   function row(key, valHtml) {
-    return `<div class="pt-meta-row"><div class="pt-meta-key">${key}</div><div class="pt-meta-val">${valHtml}</div></div>`;
+    return `<div class="pt-meta-row">${key ? `<div class="pt-meta-key">${key}</div>` : ''}<div class="pt-meta-val">${valHtml}</div></div>`;
+  }
+
+  function rowStatus(key, valHtml, ok, extra) {
+    const icon = ok ? '<i class="fa-solid fa-circle-check pt-status-ok"></i>' : '<i class="fa-solid fa-circle-xmark pt-status-bad"></i>';
+    const extraHtml = extra ? ` <span class="pt-meta-extra">${escHtml(extra)}</span>` : '';
+    return `<div class="pt-meta-row"><div class="pt-meta-key">${key}</div><div class="pt-meta-val">${icon} ${valHtml}${extraHtml}</div></div>`;
+  }
+
+  function linkVal(url) {
+    const safe = escHtml(url);
+    return `<a href="${safe}" target="_blank" rel="noopener noreferrer">${safe}</a>`;
+  }
+
+  function colorSwatch(hex) {
+    const safe = escHtml(hex);
+    return `<span class="pt-color-swatch" style="background:${safe}"></span>${safe}`;
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1024/1024).toFixed(2) + ' MB';
   }
 
   function escHtml(s) {
