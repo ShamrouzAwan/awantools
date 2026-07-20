@@ -2,35 +2,33 @@ Text Toolkit
 
 URL: /text-toolkit
 
-STATUS (updated 2026-07-13)
+STATUS (updated 2026-07-20)
 ================================================================================
-BUILT — plugins/text-toolkit/ (live at /plugins/text-toolkit/, active in DB)
+COMPLETE — plugins/text-toolkit/ (live at /plugins/text-toolkit/, active in DB)
 --------------------------------------------------------------------------------
-109 purely algorithmic, 100% client-side tools, shipped as a single "Workbench"
-UI: one shared textarea on the left that every tool reads/writes live, plus a
-6-tab panel on the right. Covers sections 1-7, 10 and 18 below (all tagged
-[BUILT] inline). Tab breakdown:
-  - Analysis (27 tools)      = section 1 (Counters + Reading Metrics) + section 10 (Readability)
-  - Format & Case (29 tools) = section 2 (Text Formatting) + section 3 (Case Conversion)
-  - Cleanup & Utilities (22) = section 4 (Text Cleanup) + section 18 (Text Utilities)
-  - Extraction (11 tools)    = section 5
-  - Comparison (8 tools)     = section 6
-  - Encoding (12 tools)      = section 7
-Files: plugins/text-toolkit/plugin.json, index.php, assets/text-toolkit.css,
-assets/text-toolkit.js.
+220 tools total across 11 workbench tabs.
 
-NOT YET BUILT
---------------------------------------------------------------------------------
-- Sections 8, 9, 11, 12, 13, 14, 15, 16 [PENDING - AI/LLM] — deferred by explicit
-  decision: these ~148 tools need a server-side LLM call (grammar checking,
-  rewriting/paraphrasing, AI detection/humanizing, academic writing, translation,
-  SEO/social/business copy generation). Not started — needs an LLM provider
-  decision (Replit AI integration or external API key) before any of these can
-  be built.
-- Section 17, "Generator Toolkit" (9 tools) [PENDING - not yet built] — these are
-  algorithmic (random word/sentence/paragraph/quote/name/username/nickname/pen
-  name/fake company generators), not AI-dependent, but were not part of the
-  109-tool build. Could be added to the existing plugin without an LLM.
+PHASE 1 (109 algorithmic, 100% client-side tools):
+  - Analysis (27)           — Counters, Reading Metrics + Readability
+  - Format & Case (29)      — Text Formatting + Case Conversion
+  - Cleanup & Utilities (22)— Text Cleanup + Text Utilities
+  - Extraction (11)         — Text Extraction
+  - Comparison (8)          — Text Comparison
+  - Encoding (12)           — Encoding/Decoding
+  Files: index.php, assets/text-toolkit.css, assets/text-toolkit.js
+
+PHASE 2 (111 AI-powered tools via Gemini 2.0 Flash, + 9 algorithmic generators):
+  - Writing (26)            — Business & marketing copy tools
+  - AI & Grammar (31)       — Grammar checker, AI humanizer/detector, paraphraser…
+  - Academic & Language (26)— Citations, translation, essay tools, vocab helpers…
+  - SEO & Social (19)       — Meta descriptions, headlines, hashtags, ad copy…
+  - Generators (9)          — Random word/sentence/paragraph/name/company/username…
+  Files: assets/text-toolkit-ai.js, api.php (backend → Gemini 2.0 Flash)
+  Requires: GEMINI_API_KEY in Replit Secrets (already set)
+
+KNOWN LIMITATION:
+  Free-tier Gemini API keys have zero remaining quota after initial use. The user
+  must upgrade their Google AI Studio plan to a paid tier for AI tools to function.
 ================================================================================
 
 1. Text Analysis Toolkit [BUILT]

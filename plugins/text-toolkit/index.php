@@ -32,6 +32,11 @@ $ic = [
     'copy'      => '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     'shield'    => '<path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z"/>',
     'bolt'      => '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    'writing'   => '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+    'ai'        => '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M9.5 9.5l5 5"/>',
+    'academic'  => '<path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>',
+    'seo'       => '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+    'gen'       => '<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>',
 ];
 
 ob_start();
@@ -43,8 +48,7 @@ ob_start();
     <section class="xt-hero">
         <span class="xt-hero-badge"><?= xt_icon($ic['shield']) ?> 100% client-side · nothing leaves your browser</span>
         <h1 class="xt-hero-title">Text Toolkit</h1>
-        <p class="xt-hero-sub">One Workbench. 109 text tools. Type or paste once on the left, and analysis, formatting,
-            extraction, comparison and encoding tools on the right all work off the same text — live.</p>
+        <p class="xt-hero-sub">One Workbench. 220 text tools. 109 instant client-side tools plus 111 AI-powered generators, rewriters, grammar checkers, translators and more — all in one place.</p>
 
         <div class="xt-hero-search-wrap">
             <span class="xt-hero-search-icon"><?= xt_icon($ic['search']) ?></span>
@@ -54,9 +58,9 @@ ob_start();
         </div>
 
         <div class="xt-hero-stats">
-            <span class="xt-hero-stat"><strong>109</strong> tools</span>
+            <span class="xt-hero-stat"><strong>220</strong> tools</span>
             <span class="xt-hero-stat-sep">·</span>
-            <span class="xt-hero-stat"><strong>6</strong> workspaces</span>
+            <span class="xt-hero-stat"><strong>11</strong> workspaces</span>
             <span class="xt-hero-stat-sep">·</span>
             <span class="xt-hero-stat"><strong>0</strong> uploads to a server</span>
         </div>
@@ -101,7 +105,13 @@ ob_start();
                 <button class="xt-tab" data-tab="cleanup" style="--xt-tab-c:var(--color-warning)"><?= xt_icon($ic['cleanup']) ?><span>Cleanup &amp; Utilities</span><small id="cnt-cleanup">0</small></button>
                 <button class="xt-tab" data-tab="extract" style="--xt-tab-c:var(--color-success)"><?= xt_icon($ic['extract']) ?><span>Extraction</span><small id="cnt-extract">0</small></button>
                 <button class="xt-tab" data-tab="compare" style="--xt-tab-c:var(--color-danger)"><?= xt_icon($ic['compare']) ?><span>Comparison</span><small id="cnt-compare">0</small></button>
-                <button class="xt-tab" data-tab="encode" style="--xt-tab-c:var(--color-text-secondary)"><?= xt_icon($ic['encode']) ?><span>Encoding</span><small id="cnt-encode">0</small></button>
+                <button class="xt-tab" data-tab="encode"      style="--xt-tab-c:var(--color-text-secondary)"><?= xt_icon($ic['encode'])   ?><span>Encoding</span><small id="cnt-encode">0</small></button>
+                <div class="xt-tabs-divider"></div>
+                <button class="xt-tab" data-tab="writing"    style="--xt-tab-c:#8b5cf6"><?= xt_icon($ic['writing'])  ?><span>Writing</span><small id="cnt-writing">0</small></button>
+                <button class="xt-tab" data-tab="aitools"    style="--xt-tab-c:#ec4899"><?= xt_icon($ic['ai'])       ?><span>AI &amp; Grammar</span><small id="cnt-aitools">0</small></button>
+                <button class="xt-tab" data-tab="academic"   style="--xt-tab-c:#f59e0b"><?= xt_icon($ic['academic']) ?><span>Academic &amp; Language</span><small id="cnt-academic">0</small></button>
+                <button class="xt-tab" data-tab="seosocial"  style="--xt-tab-c:#06b6d4"><?= xt_icon($ic['seo'])      ?><span>SEO &amp; Social</span><small id="cnt-seosocial">0</small></button>
+                <button class="xt-tab" data-tab="generators" style="--xt-tab-c:#6366f1"><?= xt_icon($ic['gen'])      ?><span>Generators</span><small id="cnt-generators">0</small></button>
             </nav>
 
             <!-- Analysis -->
@@ -196,6 +206,41 @@ ob_start();
                 <div class="xt-encode-err" id="xt-enc-err"></div>
             </div>
 
+            <!-- Writing & Business -->
+            <div class="xt-pane" id="pane-writing"
+                 data-empty-icon="writing"
+                 data-empty-text="Enter a topic in any tool's field, or paste content in the Workbench, then click Generate.">
+                <div class="xt-ai-pane-inner" id="xt-ai-writing"></div>
+            </div>
+
+            <!-- AI & Grammar -->
+            <div class="xt-pane" id="pane-aitools"
+                 data-empty-icon="ai"
+                 data-empty-text="Paste text in the Workbench, then run any AI or grammar tool.">
+                <div class="xt-ai-pane-inner" id="xt-ai-aitools"></div>
+            </div>
+
+            <!-- Academic & Language -->
+            <div class="xt-pane" id="pane-academic"
+                 data-empty-icon="academic"
+                 data-empty-text="Enter a source, word, or topic in the tool's field — or paste text in the Workbench — then click Generate.">
+                <div class="xt-ai-pane-inner" id="xt-ai-academic"></div>
+            </div>
+
+            <!-- SEO & Social Media -->
+            <div class="xt-pane" id="pane-seosocial"
+                 data-empty-icon="seo"
+                 data-empty-text="Enter a keyword or topic, or paste content in the Workbench, then click Generate.">
+                <div class="xt-ai-pane-inner" id="xt-ai-seosocial"></div>
+            </div>
+
+            <!-- Generators -->
+            <div class="xt-pane" id="pane-generators"
+                 data-empty-icon="gen"
+                 data-empty-text="Enter optional parameters and click Generate on any tool.">
+                <div class="xt-ai-pane-inner" id="xt-ai-generators"></div>
+            </div>
+
         </section>
     </div>
 </div>
@@ -203,10 +248,11 @@ ob_start();
 <div class="xt-toast" id="xt-toast"></div>
 
 <script><?php echo file_get_contents(__DIR__ . '/assets/text-toolkit.js'); ?></script>
+<script><?php echo file_get_contents(__DIR__ . '/assets/text-toolkit-ai.js'); ?></script>
 
 <?php
 $content = ob_get_clean();
-plugin_render('Text Toolkit &mdash; 109 Free Online Text Analysis &amp; Formatting Tools', $content, [
+plugin_render('Text Toolkit &mdash; 220 Free Online Text Tools', $content, [
     'slug'        => $slug,
     'description' => $_meta['description'] ?? 'Word counters, readability scores, case converters, cleanup, extraction, comparison and encoding — 109 free browser-based text tools in one live Workbench.',
     'og_title'    => $_meta['title']       ?? 'Text Toolkit',
