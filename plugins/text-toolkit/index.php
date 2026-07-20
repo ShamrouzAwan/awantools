@@ -46,7 +46,7 @@ ob_start();
 
     <!-- ── Hero ─────────────────────────────────────────────────────── -->
     <section class="xt-hero">
-        <span class="xt-hero-badge"><?= xt_icon($ic['shield']) ?> 100% client-side · nothing leaves your browser</span>
+        <span class="xt-hero-badge"><?= xt_icon($ic['shield']) ?> 109 tools run 100% client-side · AI tools use your own Gemini key</span>
         <h1 class="xt-hero-title">Text Toolkit</h1>
         <p class="xt-hero-sub">One Workbench. 220 text tools. 109 instant client-side tools plus 111 AI-powered generators, rewriters, grammar checkers, translators and more — all in one place.</p>
 

@@ -19,9 +19,14 @@ $tool   = trim((string)($body['tool']   ?? ''));
 $text   = trim((string)($body['text']   ?? ''));
 $params = (array)($body['params']       ?? []);
 
-$apiKey = getenv('GEMINI_API_KEY') ?: '';
+$apiKey = trim((string)($body['gemini_key'] ?? ''));
 if (!$apiKey) {
-    echo json_encode(['error' => 'Gemini API key not configured. Add GEMINI_API_KEY to Replit Secrets.']);
+    echo json_encode(['error' => 'no_key']);
+    exit;
+}
+// Basic sanity check — Gemini keys start with "AIza"
+if (!preg_match('/^AIza[A-Za-z0-9_\-]{30,}$/', $apiKey)) {
+    echo json_encode(['error' => 'The API key looks invalid. Gemini keys start with "AIza".']);
     exit;
 }
 

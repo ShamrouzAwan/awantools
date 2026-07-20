@@ -224,7 +224,7 @@
     if (!container) return 0;
     var paneTools = AI_TOOLS.filter(function(t){ return t.tab === tabId; });
     var g = groupBySection(paneTools);
-    var html = '';
+    var html = keyBannerHtml();
     g.order.forEach(function(section) {
       html += '<div class="xt-ai-section">'
             + '<div class="xt-ai-section-label">' + section + '</div>'
@@ -283,6 +283,82 @@
     });
   }
 
+  /* ── Gemini API key management (localStorage) ───────────────────────── */
+  var KEY_STORE = 'xt_gemini_key';
+
+  function getGeminiKey() {
+    try { return localStorage.getItem(KEY_STORE) || ''; } catch(e) { return ''; }
+  }
+  function setGeminiKey(k) {
+    try { if (k) localStorage.setItem(KEY_STORE, k); else localStorage.removeItem(KEY_STORE); } catch(e) {}
+  }
+
+  // Called from inline onclick on the key banner Save button
+  function saveGeminiKey(btn) {
+    var banner = btn.closest('.xt-key-banner');
+    var input  = banner.querySelector('.xt-key-input');
+    var status = banner.querySelector('.xt-key-status');
+    var val    = (input.value || '').trim();
+    if (!val) {
+      setGeminiKey('');
+      updateAllKeyBanners();
+      return;
+    }
+    setGeminiKey(val);
+    updateAllKeyBanners();
+    // Brief visual confirmation
+    status.textContent = '✓ Key saved';
+    status.className   = 'xt-key-status xt-key-ok';
+    setTimeout(function() { updateAllKeyBanners(); }, 2000);
+  }
+
+  // Called from inline onclick on the Change / Remove link
+  function clearGeminiKey() {
+    setGeminiKey('');
+    updateAllKeyBanners();
+  }
+
+  function updateAllKeyBanners() {
+    var key = getGeminiKey();
+    document.querySelectorAll('.xt-key-banner').forEach(function(banner) {
+      var input  = banner.querySelector('.xt-key-input');
+      var status = banner.querySelector('.xt-key-status');
+      var saveBtn = banner.querySelector('.xt-key-save');
+      if (key) {
+        // Show masked key, status = saved
+        input.value  = key;
+        input.type   = 'password';
+        status.innerHTML = '<span class="xt-key-ok">✓ Key saved</span>'
+          + ' &nbsp;<button class="xt-key-link" onclick="XT.clearGeminiKey()" type="button">Remove</button>';
+        saveBtn.textContent = 'Update';
+      } else {
+        input.value  = '';
+        input.type   = 'text';
+        status.innerHTML = 'No key saved. '
+          + '<a class="xt-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get a free key →</a>';
+        saveBtn.textContent = 'Save Key';
+      }
+    });
+  }
+
+  /* ── Build the key banner HTML ─────────────────────────────────────── */
+  function keyBannerHtml() {
+    var key = getGeminiKey();
+    return '<div class="xt-key-banner">'
+      + '<div class="xt-key-banner-row">'
+      + '<svg class="xt-key-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>'
+      + '<span class="xt-key-label">Gemini API Key</span>'
+      + '<input class="xt-key-input" type="' + (key ? 'password' : 'text') + '" placeholder="AIza…" value="' + (key ? key.replace(/"/g,'') : '') + '" spellcheck="false" autocomplete="off">'
+      + '<button class="xt-key-save" onclick="XT.saveGeminiKey(this)" type="button">' + (key ? 'Update' : 'Save Key') + '</button>'
+      + '</div>'
+      + '<div class="xt-key-status">'
+      + (key
+          ? '<span class="xt-key-ok">✓ Key saved</span> &nbsp;<button class="xt-key-link" onclick="XT.clearGeminiKey()" type="button">Remove</button>'
+          : 'No key saved. <a class="xt-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get a free key →</a>')
+      + '</div>'
+      + '</div>';
+  }
+
   /* ── Run an AI tool ─────────────────────────────────────────────────── */
   function runAI(btn, toolId) {
     var card     = btn.closest('.xt-ai-card');
@@ -290,6 +366,19 @@
     var errorEl  = card.querySelector('.xt-ai-error');
     var labelEl  = card.querySelector('.xt-ai-run-label');
     var spinEl   = card.querySelector('.xt-ai-run-spin');
+
+    // Check key first
+    var geminiKey = getGeminiKey();
+    if (!geminiKey) {
+      errorEl.innerHTML  = 'Enter your Gemini API key in the banner above, then try again. '
+        + '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Get a free key →</a>';
+      errorEl.style.display = 'block';
+      resultEl.style.display = 'none';
+      // Scroll to banner
+      var banner = card.closest('.xt-ai-pane-inner');
+      if (banner) banner.querySelector('.xt-key-banner').scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
 
     // Gather params
     var params = {};
@@ -311,7 +400,7 @@
     fetch('/plugins/text-toolkit/api', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ tool: toolId, text: text, params: params })
+      body:    JSON.stringify({ tool: toolId, text: text, params: params, gemini_key: geminiKey })
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -319,6 +408,12 @@
       labelEl.style.display = 'inline';
       spinEl.style.display  = 'none';
 
+      if (data.error === 'no_key') {
+        // Key was cleared mid-session — shouldn't happen but handle it
+        errorEl.innerHTML  = 'No API key received. Please re-enter your Gemini key above.';
+        errorEl.style.display  = 'block';
+        return;
+      }
       if (data.error) {
         errorEl.textContent    = data.error;
         errorEl.style.display  = 'block';
@@ -411,9 +506,11 @@
 
   /* ── Expose for inline onclick handlers ─────────────────────────────── */
   if (window.XT) {
-    window.XT.runAI        = runAI;
-    window.XT.copyAIResult = copyAIResult;
-    window.XT.sendAIToWB   = sendAIToWB;
+    window.XT.runAI          = runAI;
+    window.XT.copyAIResult   = copyAIResult;
+    window.XT.sendAIToWB     = sendAIToWB;
+    window.XT.saveGeminiKey  = saveGeminiKey;
+    window.XT.clearGeminiKey = clearGeminiKey;
   }
 
 })();
