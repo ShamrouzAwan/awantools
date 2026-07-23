@@ -4,3 +4,4 @@
 - [Templates.php dead variable bug](templates-php-pd-y-warning.md) — every template function had 4 undefined-$pd_y lines; E_WARNING before ob_start corrupts image responses on shared hosting with display_errors=On
 - [Previewer Toolkit meta.php SSRF hardening](previewer-toolkit-meta-ssrf.md) — follow_location=true bypasses IP blocklist on redirects; always follow manually and validate each hop
 - [AWAN plugin CSS link](awan-plugin-css-link.md) — plugin_render() has no 'stylesheet' opts key; new plugins must emit their own <link> tag in index.php content or ship unstyled
+- [Plugin migration indexes](plugin-migration-indexes.md) — isolated plugin migrations must tolerate repeat activation across SQLite and MySQL
