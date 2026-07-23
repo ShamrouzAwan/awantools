@@ -1,0 +1,666 @@
+# Project: Awan Whiteboard Plugin
+
+## Overview
+
+Build a production-ready plugin called **Awan Whiteboard** for the AwanTools platform.
+
+This is NOT a standalone application.
+
+It must be built as a modular plugin that integrates into an existing PHP-based platform called **AwanTools**.
+
+The plugin should combine the best features of:
+
+* Microsoft Whiteboard
+* Nebo
+* Excalidraw
+* Jamboard
+* Obsidian Canvas
+
+while remaining lightweight and deployable on shared hosting or low-cost VPS infrastructure.
+
+The plugin must be designed for:
+
+* Students
+* Teachers
+* Tutors
+* Study groups
+* Educational institutions
+* Team collaboration
+
+The system must prioritize free and open-source technologies.
+
+No paid APIs should be required.
+
+---
+
+# Existing Platform Constraints
+
+## Platform Name
+
+AwanTools
+
+## Existing Stack
+
+Backend:
+
+* PHP 8.3+
+* SQLite
+
+Frontend:
+
+* HTML5
+* CSS3
+* Vanilla JavaScript
+
+Optional:
+
+* Alpine.js
+* HTMX
+
+Database:
+
+* SQLite
+
+Authentication:
+
+* Existing AwanTools login system
+
+Deployment:
+
+* Shared hosting compatible
+* VPS compatible
+
+Do NOT require:
+
+* Node.js backend
+* Firebase
+* Supabase
+* Paid SaaS services
+* Paid OCR services
+* Paid AI APIs
+
+---
+
+# Plugin Architecture
+
+Build as:
+
+plugins/
+whiteboard/
+controllers/
+models/
+views/
+assets/
+js/
+css/
+fonts/
+api/
+migrations/
+templates/
+
+The plugin must be installable and removable independently.
+
+No code duplication.
+
+All plugin data must remain isolated.
+
+---
+
+# User Roles
+
+## Student
+
+Permissions:
+
+* Create boards
+* Edit own boards
+* Share boards
+* Use handwriting tools
+* Create notes
+* Create flashcards
+* Export content
+
+---
+
+## Teacher
+
+Permissions:
+
+* Everything students have
+* Create classrooms
+* Invite students
+* Create collaborative boards
+* Presentation mode
+* Broadcast mode
+* Manage classroom boards
+
+---
+
+## Admin
+
+Permissions:
+
+* Plugin settings
+* Usage statistics
+* User moderation
+* Storage controls
+
+---
+
+# Core Feature 1: Infinite Whiteboard
+
+Build an infinite canvas system.
+
+Requirements:
+
+* Infinite panning
+* Infinite zooming
+* Mouse support
+* Touch support
+* Stylus support
+* Trackpad support
+
+Canvas Features:
+
+* Pan tool
+* Zoom tool
+* Fit to screen
+* Minimap
+* Grid mode
+* Snap to grid
+* Smart alignment guides
+
+---
+
+# Core Feature 2: Drawing Tools
+
+Implement:
+
+* Pencil
+* Pen
+* Marker
+* Brush
+* Highlighter
+* Eraser
+
+Settings:
+
+* Stroke width
+* Opacity
+* Color picker
+* Pressure sensitivity (when available)
+
+Store all strokes as vector data.
+
+Never flatten drawings into images unless exporting.
+
+---
+
+# Core Feature 3: Shapes
+
+Support:
+
+* Rectangle
+* Rounded Rectangle
+* Circle
+* Ellipse
+* Triangle
+* Diamond
+* Arrow
+* Line
+* Curved Line
+* Polygon
+
+Features:
+
+* Resize
+* Rotate
+* Duplicate
+* Lock
+* Group
+* Ungroup
+
+---
+
+# Core Feature 4: Text Tool
+
+Text blocks must support:
+
+* Rich text
+* Headings
+* Lists
+* Alignment
+* Colors
+* Hyperlinks
+
+Font support:
+
+* Inter
+* Roboto
+* Poppins
+* Montserrat
+* Open Sans
+* Nunito
+
+Teacher Fonts:
+
+* Caveat
+* Kalam
+* Patrick Hand
+* Schoolbell
+
+---
+
+# Core Feature 5: Handwriting Recognition
+
+This is the signature feature.
+
+Users write using:
+
+* Mouse
+* Stylus
+* Touch
+
+System captures stroke vectors.
+
+Recognition Pipeline:
+
+Step 1:
+Store stroke data.
+
+Step 2:
+Render selection to temporary image.
+
+Step 3:
+Run OCR.
+
+Preferred OCR options:
+
+1. Tesseract.js
+2. Tesseract OCR
+3. PaddleOCR
+
+Must remain free.
+
+No paid APIs.
+
+---
+
+# Core Feature 6: Handwriting to Font Conversion
+
+Unique Feature.
+
+User writes:
+
+Handwritten content
+
+System recognizes text.
+
+User can convert recognized text into:
+
+* Inter
+* Roboto
+* Poppins
+* Montserrat
+* Caveat
+* Kalam
+* Patrick Hand
+* Schoolbell
+
+Conversion Modes:
+
+* Automatic
+* Manual
+* Selection Based
+
+Workflow:
+
+Write → Recognize → Convert → Editable Text
+
+Editable text must remain editable after conversion.
+
+---
+
+# Core Feature 7: Smart Shape Recognition
+
+Recognize rough drawings.
+
+Examples:
+
+Messy Circle → Perfect Circle
+
+Messy Rectangle → Perfect Rectangle
+
+Messy Arrow → Perfect Arrow
+
+Use:
+
+* Geometry analysis
+* Open-source shape detection
+* No paid AI
+
+Feature toggle:
+
+Auto Beautify Shapes
+
+---
+
+# Core Feature 8: Math Recognition
+
+User writes equations.
+
+Examples:
+
+x² + y² = z²
+
+Convert to:
+
+LaTeX
+
+Render using:
+
+* MathJax
+* KaTeX
+
+Features:
+
+* Equation editor
+* Equation blocks
+* Math formatting
+
+No paid APIs.
+
+---
+
+# Core Feature 9: Sticky Notes
+
+Support:
+
+* Colors
+* Categories
+* Tags
+* Mentions
+
+Features:
+
+* Drag and drop
+* Resize
+* Group
+
+---
+
+# Core Feature 10: Mind Maps
+
+Build native mind mapping.
+
+Node Features:
+
+* Parent nodes
+* Child nodes
+* Relationships
+* Auto layout
+
+Export support.
+
+---
+
+# Core Feature 11: Flowcharts
+
+Components:
+
+* Process
+* Decision
+* Start
+* End
+* Connector
+
+Auto alignment.
+
+---
+
+# Core Feature 12: Collaboration
+
+Phase 1:
+
+Board sharing.
+
+Roles:
+
+* Owner
+* Editor
+* Viewer
+
+Invite system.
+
+Share links.
+
+---
+
+# Core Feature 13: Board Management
+
+Users can:
+
+* Create boards
+* Duplicate boards
+* Archive boards
+* Restore boards
+* Delete boards
+
+Folders:
+
+* Personal
+* Classroom
+* Shared
+
+Search:
+
+* Board search
+* Tag search
+
+---
+
+# Core Feature 14: Classroom System
+
+Teachers can:
+
+* Create classroom
+* Generate invite links
+* Assign boards
+
+Students can:
+
+* Join classrooms
+* Submit work
+
+---
+
+# Core Feature 15: Notes System
+
+Create:
+
+* Typed notes
+* Handwritten notes
+* Mixed notes
+
+Features:
+
+* Search
+* Categories
+* Tags
+
+---
+
+# Core Feature 16: Flashcards
+
+Generate from:
+
+* Selected text
+* Notes
+* Board content
+
+Support:
+
+* Front
+* Back
+* Categories
+
+---
+
+# Core Feature 17: Import System
+
+Support:
+
+* PNG
+* JPG
+* SVG
+* PDF
+
+Future support:
+
+* PPTX
+* DOCX
+
+---
+
+# Core Feature 18: Export System
+
+Export:
+
+* PNG
+* JPG
+* SVG
+* PDF
+
+Options:
+
+* Entire board
+* Selection only
+* Current viewport
+
+---
+
+# Core Feature 19: Version History
+
+Store snapshots.
+
+Allow:
+
+* Restore
+* Compare
+* Duplicate
+
+SQLite optimized.
+
+---
+
+# Core Feature 20: Offline Support
+
+Use:
+
+* Service Workers
+* IndexedDB
+
+Capabilities:
+
+* Offline drawing
+* Offline editing
+
+Sync when online.
+
+---
+
+# Database Design
+
+Create normalized SQLite schema.
+
+Minimum tables:
+
+users
+boards
+board_members
+board_objects
+board_strokes
+board_versions
+classrooms
+classroom_members
+notes
+flashcards
+comments
+activity_logs
+
+Use indexes where appropriate.
+
+---
+
+# Security Requirements
+
+Implement:
+
+* CSRF protection
+* XSS protection
+* SQL injection protection
+* Rate limiting
+* Permission checks
+
+All actions must verify ownership and access rights.
+
+---
+
+# Performance Requirements
+
+Target:
+
+* 10,000+ objects on a board
+* Smooth zoom and pan
+* Fast save/load
+
+Use:
+
+* Lazy loading
+* Object chunking
+* Efficient stroke storage
+
+Avoid loading entire boards when unnecessary.
+
+---
+
+# UI Requirements
+
+Modern interface.
+
+Style inspiration:
+
+* Figma
+* Notion
+* Microsoft Whiteboard
+
+Support:
+
+* Light mode
+* Dark mode
+
+Responsive:
+
+* Desktop
+* Tablet
+* Mobile
+
+---
+
+# Deliverables
+
+Provide:
+
+1. Complete folder structure
+2. SQLite schema
+3. Backend architecture
+4. Frontend architecture
+5. API endpoints
+6. Plugin installation process
+7. Security implementation
+8. Performance optimization strategy
+9. Offline synchronization design
+10. MVP roadmap
+11. Future roadmap
+
+Before generating code, first create the complete technical architecture and implementation plan, then generate the project in modular phases.
